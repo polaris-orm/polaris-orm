@@ -1,0 +1,147 @@
+plugins {
+  id "java-library"
+  id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
+  id 'de.undercouch.download' version '5.4.0'
+  id "io.github.gradle-nexus.publish-plugin" version "1.3.0"
+}
+
+description = "Polaris ORM framework"
+group = "cn.taketoday"
+
+apply plugin: 'jacoco'
+apply plugin: "java-test-fixtures"
+apply plugin: 'cn.taketoday.application'
+apply plugin: 'cn.taketoday.build.conventions'
+apply plugin: 'cn.taketoday.build.optional-dependencies'
+
+ext.javadocLinks = [
+    "https://docs.oracle.com/en/java/javase/17/docs/api/",
+    "https://jakarta.ee/specifications/platform/9/apidocs/",
+
+] as String[]
+
+ext {
+  isSnapshot = version.endsWith('SNAPSHOT')
+  isReleaseVersion = !isSnapshot
+}
+
+apply from: "$rootDir/gradle/infra-module.gradle"
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+
+  if (version.endsWith('-SNAPSHOT')) {
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+  }
+}
+
+dependencies {
+  api("cn.taketoday:today-beans")
+  api("cn.taketoday:today-core")
+  api("cn.taketoday:today-tx")
+  api("cn.taketoday:today-jdbc") // todo remove
+  optional("cn.taketoday:today-aop")
+  optional("cn.taketoday:today-context")
+  optional("cn.taketoday:today-framework")
+  optional("cn.taketoday:today-starter")
+
+
+  optional("org.hsqldb:hsqldb")
+  optional("com.h2database:h2")
+  optional("org.apache.derby:derby")
+  optional("org.apache.derby:derbyclient")
+  optional("org.apache.derby:derbytools")
+  optional 'com.zaxxer:HikariCP'
+
+  testImplementation 'jakarta.transaction:jakarta.transaction-api:2.0.0'
+  testImplementation 'com.google.guava:guava:33.1.0-jre'
+  testImplementation 'org.zapodot:embedded-db-junit:1.0.0'
+  testImplementation 'org.projectlombok:lombok'
+  testImplementation 'commons-dbutils:commons-dbutils:1.7'
+  testImplementation 'org.hibernate:hibernate-core-jakarta:5.6.10.Final'
+  testImplementation 'org.jooq:jooq:3.3.0'
+  testImplementation 'org.jdbi:jdbi:2.78'
+  testImplementation 'org.sql2o:sql2o:1.6.0'
+  testImplementation 'org.teasoft:bee:1.9.5'
+  testImplementation 'org.teasoft:honey:1.9.5'
+  testImplementation 'org.mybatis:mybatis:3.5.9'
+  testImplementation 'ch.qos.logback:logback-classic'
+  testImplementation 'com.mysql:mysql-connector-j'
+
+  compileOnly 'com.oracle.database.jdbc:ucp:21.7.0.0'
+  compileOnly 'org.postgresql:postgresql'
+  compileOnly 'com.mchange:c3p0:0.9.5.5'
+  compileOnly 'com.h2database:h2'
+  compileOnly 'org.apache.commons:commons-dbcp2'
+  compileOnly 'com.zaxxer:HikariCP:5.0.0'
+  compileOnly 'com.oracle.database.jdbc:ojdbc8:21.7.0.0'
+  compileOnly 'org.apache.derby:derby:10.14.2.0'
+
+  testImplementation("org.junit.jupiter:junit-jupiter-api")
+  testImplementation("org.junit.jupiter:junit-jupiter-params")
+  testImplementation("org.junit.platform:junit-platform-suite-api")
+  testImplementation("org.mockito:mockito-core")
+  testImplementation("org.mockito:mockito-junit-jupiter")
+  testImplementation("junit:junit")
+  testImplementation("org.assertj:assertj-core")
+  testImplementation 'org.projectlombok:lombok'
+  testAnnotationProcessor("org.projectlombok:lombok")
+
+  // Pull in the latest JUnit 5 Launcher API to ensure proper support in IDEs.
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+  testRuntimeOnly("org.junit.platform:junit-platform-suite-engine")
+  // JSR-305 only used for non-required meta-annotations
+  compileOnly("com.google.code.findbugs:jsr305")
+  compileOnly("com.google.code.findbugs:findbugs")
+  compileOnly('org.jboss.logging:jboss-logging:3.5.3.Final')
+
+  testImplementation("cn.taketoday:today-test")
+  testImplementation("cn.taketoday:today-test-support")
+
+  // Pull in the latest JUnit 5 Launcher API to ensure proper support in IDEs.
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+  testRuntimeOnly("org.junit.platform:junit-platform-suite-engine")
+
+  testFixturesImplementation("cn.taketoday:today-aop")
+  testFixturesImplementation("cn.taketoday:today-context")
+  testFixturesImplementation("cn.taketoday:today-web")
+  testFixturesImplementation("io.netty:netty-codec-http")
+  testFixturesImplementation("com.google.code.findbugs:jsr305")
+  testFixturesImplementation("org.junit.platform:junit-platform-launcher")
+  testFixturesImplementation("org.junit.jupiter:junit-jupiter-api")
+  testFixturesImplementation("org.junit.jupiter:junit-jupiter-params")
+  testFixturesImplementation("org.assertj:assertj-core")
+  testFixturesImplementation("org.xmlunit:xmlunit-assertj")
+  testFixturesImplementation("io.projectreactor:reactor-test")
+
+}
+
+jacocoTestReport {
+  reports {
+    xml.required = true
+    csv.required = false
+    html.required = false
+  }
+}
+
+infraJar {
+  enabled = false
+}
+
+check {
+  dependsOn jacocoTestReport
+}
+
+if (isReleaseVersion) {
+  nexusPublishing {
+    repositories {
+      sonatype {
+        username = repoUsername
+        password = repoPassword
+      }
+    }
+  }
+}

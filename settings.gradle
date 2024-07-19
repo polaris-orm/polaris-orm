@@ -1,0 +1,39 @@
+pluginManagement {
+  repositories {
+    mavenLocal()
+    mavenCentral()
+    gradlePluginPortal()
+  }
+}
+
+buildscript {
+  repositories {
+    mavenLocal()
+    maven {
+      url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
+    mavenCentral()
+  }
+
+  dependencies {
+    classpath "cn.taketoday:infra-gradle-plugin:$infraVersion"
+  }
+
+}
+
+
+plugins {
+  id("com.gradle.enterprise") version("3.14.1")
+}
+
+gradleEnterprise {
+  if (System.getenv("CI") != null || Boolean.getBoolean("CI")) {
+    buildScan {
+      publishAlways()
+      termsOfServiceUrl = "https://gradle.com/terms-of-service"
+      termsOfServiceAgree = "yes"
+    }
+  }
+}
+
+rootProject.name = 'polaris'

@@ -1,0 +1,90 @@
+//file:noinspection ConfigurationAvoidance
+import java.time.LocalDateTime
+
+apply plugin: "signing"
+apply plugin: 'java-library'
+
+// Currently commented out due to ZipException: archive is not a ZIP archive
+// apply plugin: 'com.github.johnrengelman.shadow'
+apply from: "$rootDir/gradle/publications.gradle"
+
+jar {
+  manifest.attributes["Implementation-Title"] = project.name
+  manifest.attributes["Implementation-Version"] = project.version
+  manifest.attributes["Implementation-Build"] = LocalDateTime.now()
+  manifest.attributes["Implementation-Vendor"] = 'TODAY Tech'
+  manifest.attributes["Implementation-Vendor-Id"] = 'cn.taketoday'
+  manifest.attributes["Automatic-Module-Name"] = project.name.replace('-', '.')  // for Jigsaw
+  manifest.attributes["Created-By"] =
+      "${System.getProperty("java.version")} (${System.getProperty("java.specification.vendor")})"
+
+  from("${rootDir}/infra-docs/src/docs/dist") {
+    include "license.txt"
+    include "notice.txt"
+    into "META-INF"
+    expand(copyright: new Date().format("yyyy"), version: project.version)
+  }
+}
+
+normalization {
+  runtimeClasspath {
+    ignore "META-INF/MANIFEST.MF"
+  }
+}
+
+javadoc {
+  description = "Generates project-level javadoc for use in -javadoc jar"
+
+  options.encoding = "UTF-8"
+  options.memberLevel = JavadocMemberLevel.PRIVATE
+  options.author = true
+  options.header = project.name
+  options.use = true
+  options.links(project.ext.javadocLinks)
+  // Check for syntax during linting. 'none' doesn't seem to work in suppressing
+  // all linting warnings all the time (see/link references most notably).
+  options.addStringOption("Xdoclint:syntax", "-quiet")
+
+  failOnError = false
+  // Suppress warnings due to cross-module @see and @link references.
+  // Note that global 'api' task does display all warnings, and
+  // checks for 'reference' on top of 'syntax'.
+  logging.captureStandardError LogLevel.INFO
+  logging.captureStandardOutput LogLevel.INFO  // suppress "## warnings" message
+}
+
+tasks.register('sourcesJar', Jar) {
+  dependsOn classes
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+  archiveClassifier.set("sources")
+  from sourceSets.main.allSource
+}
+
+tasks.register('javadocJar', Jar) {
+  archiveClassifier.set("javadoc")
+  from javadoc
+}
+
+publishing {
+  publications {
+    maven(MavenPublication) {
+      from components.java
+      artifact sourcesJar
+      artifact javadocJar
+    }
+  }
+}
+
+if (isReleaseVersion) {
+  signing {
+    for (Publication publication in publishing.publications) {
+      sign(publication)
+    }
+  }
+}
+
+// Disable publication of test fixture artifacts.
+if (configurations.findByName("testFixturesApiElements") != null) {
+  components.java.withVariantsFromConfiguration(configurations.testFixturesApiElements) { skip() }
+  components.java.withVariantsFromConfiguration(configurations.testFixturesRuntimeElements) { skip() }
+}
