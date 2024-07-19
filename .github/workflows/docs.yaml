@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   deploy-docs:
-    if: github.repository_owner == 'TAKETODAY'
+    if: github.repository_owner == 'polaris-orm'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
@@ -44,7 +44,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           name: github-pages
-          path: "${{ github.workspace }}/infra-docs/build/site"
+          path: "${{ github.workspace }}/docs/build/site"
 
       - name: Deploy to GitHub Pages 🚀
         id: deployment

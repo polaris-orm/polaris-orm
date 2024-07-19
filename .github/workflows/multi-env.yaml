@@ -15,7 +15,7 @@ on:
 
 jobs:
   check:
-    if: github.repository_owner == 'TAKETODAY'
+    if: github.repository_owner == 'polaris-orm'
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:

@@ -16,7 +16,7 @@ on:
 
 jobs:
   code-coverage:
-    if: github.repository_owner == 'TAKETODAY'
+    if: github.repository_owner == 'polaris-orm'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout project sources
