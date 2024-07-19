@@ -1,0 +1,632 @@
+/*
+ * Copyright 2024 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package cn.taketoday.polaris;
+
+import org.junit.jupiter.api.TestInstance;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import cn.taketoday.dao.IncorrectResultSizeDataAccessException;
+import cn.taketoday.dao.InvalidDataAccessApiUsageException;
+import cn.taketoday.polaris.jdbc.NamedQuery;
+import cn.taketoday.polaris.jdbc.RepositoryManager;
+import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.model.Gender;
+import cn.taketoday.polaris.model.NoIdModel;
+import cn.taketoday.polaris.model.UserModel;
+import cn.taketoday.test.util.ReflectionTestUtils;
+import cn.taketoday.util.CollectionUtils;
+
+import static cn.taketoday.polaris.PropertyUpdateStrategy.always;
+import static cn.taketoday.polaris.PropertyUpdateStrategy.noneNull;
+import static cn.taketoday.polaris.QueryCondition.between;
+import static cn.taketoday.polaris.QueryCondition.isEqualsTo;
+import static cn.taketoday.polaris.QueryCondition.isNotNull;
+import static cn.taketoday.polaris.QueryCondition.nested;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 4.0 2022/8/16 22:48
+ */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class EntityManagerTests extends AbstractRepositoryManagerTests {
+
+  @Override
+  protected void prepareTestsData(DbType dbType, RepositoryManager repositoryManager) {
+    try (NamedQuery query = repositoryManager.createNamedQuery("""
+            drop table if exists t_user;
+            create table t_user
+            (
+                `id`               int auto_increment primary key,
+                `age`              int           default 0    comment 'Age',
+                `name`             varchar(255)  default null comment '用户名',
+                `avatar`           mediumtext    default null comment '头像',
+                `password`         varchar(255)  default null comment '密码',
+                `introduce`        varchar(1000) default null comment '介绍',
+                `email`            varchar(255)  default null comment 'email',
+                `gender`           int           default -1   comment '性别',
+                `mobile_phone`     varchar(36)   default null comment '手机号'
+            );
+            """)) {
+
+      query.executeUpdate();
+    }
+
+  }
+
+  @ParameterizedRepositoryManagerTest
+  void exception(RepositoryManager repositoryManager) {
+    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+
+    assertThatThrownBy(() ->
+            entityManager.persist(new Object()))
+            .isInstanceOf(cn.taketoday.polaris.IllegalEntityException.class)
+            .hasMessageStartingWith("Cannot determine properties");
+
+  }
+
+  @ParameterizedRepositoryManagerTest
+  void persist(RepositoryManager repositoryManager) {
+    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+
+    UserModel userModel = new UserModel();
+    userModel.name = "TODAY";
+    userModel.gender = Gender.MALE;
+    userModel.age = 10;
+
+    entityManager.persist(userModel, true);
+
+    assertThat(userModel.id).isNotNull();
+
+    try (NamedQuery query = repositoryManager.createNamedQuery("SELECT * from t_user where id=:id")) {
+      query.addParameter("id", userModel.id);
+      query.setAutoDerivingColumns(true);
+
+      List<UserModel> userModels = query.fetch(UserModel.class);
+      assertThat(userModels).hasSize(1);
+      UserModel userModelInDB = CollectionUtils.firstElement(userModels);
+      assertThat(userModelInDB).isNotNull();
+      assertThat(userModelInDB.age).isEqualTo(userModel.age);
+      assertThat(userModelInDB.name).isEqualTo(userModel.name);
+      assertThat(userModelInDB.gender).isEqualTo(userModel.gender);
+    }
+  }
+
+  @ParameterizedRepositoryManagerTest
+  void batchPersist(RepositoryManager repositoryManager) {
+    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    entityManager.setMaxBatchRecords(10);
+
+    UserModel userModel = UserModel.male("TODAY", 9);
+
+    List<Object> entities = new ArrayList<>();
+    entities.add(userModel);
+
+    for (int i = 0; i < 10; i++) {
+      entities.add(UserModel.male("TODAY", 10 + i));
+    }
+
+    entityManager.persist(entities);
+
+    try (NamedQuery query = repositoryManager.createNamedQuery("SELECT * from t_user")) {
+      query.setAutoDerivingColumns(true);
+
+      List<UserModel> userModels = query.fetch(UserModel.class);
+      assertThat(userModels).hasSize(11).isEqualTo(entities);
+
+      UserModel userModelInDB = CollectionUtils.firstElement(userModels);
+      assertThat(userModelInDB).isNotNull();
+      assertThat(userModelInDB.age).isEqualTo(userModel.age);
+      assertThat(userModelInDB.name).isEqualTo(userModel.name);
+      assertThat(userModelInDB.gender).isEqualTo(userModel.gender);
+    }
+
+  }
+
+  // find
+
+  @Retention(RetentionPolicy.RUNTIME)
+  @Target({ ElementType.METHOD, ElementType.FIELD })
+  public @interface HasText {
+
+  }
+
+  static class UserForm {
+
+    @Id
+    @Column("id")
+    Integer userId;
+
+    String name;
+
+    @Nullable
+    Integer age;
+
+    @cn.taketoday.polaris.Where("birthday >= ?")
+    LocalDate birthdayBegin;
+
+    @Where("birthday <= ?")
+    LocalDate birthdayEnd;
+
+  }
+
+  @ParameterizedRepositoryManagerTest
+  void findByExample(RepositoryManager repositoryManager) {
+    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+
+    UserModel userModel = UserModel.male("TODAY", 9);
+
+    List<Object> entities = new ArrayList<>();
+    entities.add(userModel);
+
+    for (int i = 0; i < 10; i++) {
+      entities.add(UserModel.male("TODAY", 10 + i));
+    }
+
+    entityManager.persist(entities);
+
+    UserForm userForm = new UserForm();
+    userForm.name = "TODAY";
+
+    List<UserModel> list = entityManager.find(UserModel.class, userForm);
+
+    assertThat(list).hasSize(entities.size()).isEqualTo(entities);
+
+    // entityManager.iterate(UserModel.class, userForm, System.out::println);
+  }
+
+  @ParameterizedRepositoryManagerTest
+  void iterateListOfQueryConditions(RepositoryManager repositoryManager) {
+    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    createData(entityManager);
+
+//    QueryCondition condition =
+//            QueryCondition.equalsTo("age", 10)
+//                    .and(QueryCondition.of("name", ConditionOperator.LIKE, "T"));
+
+//    QueryCondition condition = QueryCondition.of("name", Operator.SUFFIX_LIKE, "T");
+    // entityManager.iterate(UserModel.class, condition, System.out::println);
+  }
+
+  @ParameterizedRepositoryManagerTest
+  void deleteById(RepositoryManager repositoryManager) {
+    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    createData(entityManager);
+
+    UserModel byId = entityManager.findById(UserModel.class, 1);
+    assertThat(byId).isNotNull().extracting("id").isEqualTo(1);
+
+    entityManager.delete(UserModel.class, 1);
+
+    byId = entityManager.findById(UserModel.class, 1);
+    assertThat(byId).isNull();
+  }
+
+  @ParameterizedRepositoryManagerTest
+  void deleteByEntity(RepositoryManager repositoryManager) {
+    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    createData(entityManager);
+
+    UserModel byId = entityManager.findById(UserModel.class, 1);
+    assertThat(byId).isNotNull().extracting("id").isEqualTo(1);
+
+    UserModel userModel = UserModel.forId(1);
+    entityManager.delete(userModel);
+
+    byId = entityManager.findById(UserModel.class, 1);
+    assertThat(byId).isNull();
+
+    for (int i = 1; i <= 10; i++) {
+      byId = entityManager.findById(UserModel.class, i + 1);
+      UserModel today = UserModel.male("TODAY", 10 + i - 1);
+      today.id = i + 1;
+      assertThat(byId).isEqualTo(today);
+    }
+
+    //
+
+    userModel = new UserModel();
+    userModel.age = 9;
+    userModel.name = "TODAY";
+    userModel.gender = Gender.MALE;
+
+    int deleteRows = entityManager.delete(userModel);
+    assertThat(deleteRows).isZero();
+
+    userModel.age = null;
+    userModel.name = "TODAY";
+    userModel.gender = Gender.MALE;
+
+    deleteRows = entityManager.delete(userModel);
+    assertThat(deleteRows).isEqualTo(10);
+  }
+
+  @ParameterizedRepositoryManagerTest
+  void findUnique(RepositoryManager repositoryManager) {
+    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    createData(entityManager);
+
+    assertThatThrownBy(() ->
+            entityManager.findUnique(UserModel.class,
+                    isNotNull("name")
+                            .or(nested(between("age", 1, 20))))
+    )
+            .isInstanceOf(IncorrectResultSizeDataAccessException.class);
+
+    UserModel unique = entityManager.findUnique(UserModel.class,
+            isNotNull("name")
+                    .and(nested(isEqualsTo("age", 9))));
+
+    assertThat(unique).isNotNull()
+            .extracting("id").isEqualTo(1);
+
+    assertThat(unique).extracting("name").isEqualTo("TODAY");
+    assertThat(unique).extracting("age").isEqualTo(9);
+
+    int deleteRows = entityManager.delete(unique);
+    assertThat(deleteRows).isEqualTo(1);
+
+    // null
+    unique = entityManager.findUnique(UserModel.class,
+            isNotNull("name")
+                    .and(nested(isEqualsTo("age", 9))));
+    assertThat(unique).isNull();
+  }
+
+  @ParameterizedRepositoryManagerTest
+  void updateBy(RepositoryManager repositoryManager) {
+    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    createData(entityManager);
+
+    UserModel userModel = UserModel.forId(1);
+    String name = "TEST-UPDATE";
+    userModel.setName(name);
+    entityManager.updateBy(userModel, "id");
+
+    UserModel model = entityManager.findById(UserModel.class, 1);
+    assertThat(model).isNotNull();
+    assertThat(model.getName()).isEqualTo(name);
+
+    // throw
+
+    assertThatThrownBy(() -> entityManager.updateBy(userModel, "id_"))
+            .isInstanceOf(InvalidDataAccessApiUsageException.class)
+            .hasMessage("Updating an entity, 'where' property 'id_' not found");
+
+    userModel.setId(null);
+    assertThatThrownBy(() -> entityManager.updateBy(userModel, "id"))
+            .isInstanceOf(InvalidDataAccessApiUsageException.class)
+            .hasMessageStartingWith("Updating an entity, 'where' property value 'id' is required");
+  }
+
+  @ParameterizedRepositoryManagerTest
+  void updateById(RepositoryManager repositoryManager) {
+    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    createData(entityManager);
+
+    UserModel userModel = entityManager.findById(UserModel.class, 1);
+    assertThat(userModel).isNotNull();
+
+    String name = "TEST-UPDATE";
+    userModel.setName(name);
+
+    assertThat(entityManager.updateById(userModel, 1)).isEqualTo(1);
+
+    UserModel model = entityManager.findById(UserModel.class, 1);
+    assertThat(model).isNotNull();
+    assertThat(model.getName()).isEqualTo(name);
+    assertThat(userModel.getAge()).isEqualTo(model.getAge());
+    assertThat(userModel.getAvatar()).isEqualTo(model.getAvatar());
+    assertThat(userModel.getGender()).isEqualTo(model.getGender());
+
+    // throw
+
+    userModel.setId(null);
+
+    assertThatThrownBy(() -> entityManager.updateById(userModel, null, null))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Entity id is required");
+
+    assertThatThrownBy(() -> entityManager.updateById(userModel))
+            .isInstanceOf(InvalidDataAccessApiUsageException.class)
+            .hasMessage("Updating an entity, ID value is required");
+
+    assertThatThrownBy(() -> entityManager.updateById(userModel, "errorId"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Entity Id matches failed");
+
+    assertThatThrownBy(() -> entityManager.updateById(new NoIdModel(), "errorId"))
+            .isInstanceOf(IllegalEntityException.class)
+            .hasMessage("ID property is required");
+
+    UserModel update = UserModel.forId(1);
+
+    assertThatThrownBy(() -> entityManager.updateById(update, (entity, property) -> false))
+            .isInstanceOf(InvalidDataAccessApiUsageException.class)
+            .hasMessage("Updating an entity, There is no update properties");
+
+    assertThat(entityManager.updateById(update, (entity, property) -> property.property.getName().equals("age")))
+            .isEqualTo(1);
+
+    UserModel newVal = entityManager.findById(UserModel.class, 1);
+    assertThat(newVal).isNotNull();
+    assertThat(newVal.getAge()).isNull();
+
+  }
+
+  @ParameterizedRepositoryManagerTest
+  void findMap(RepositoryManager repositoryManager) {
+    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    createData(entityManager);
+
+    UserModel example = new UserModel();
+    example.setName("TODAY");
+    assertThat(entityManager.find(UserModel.class, example, "age")).isNotEmpty().hasSize(11);
+
+    assertThat(entityManager.find(UserModel.class, isEqualsTo("name", "TODAY"), "age"))
+            .isEqualTo(entityManager.find(UserModel.class, example, "age"));
+  }
+
+  @ParameterizedRepositoryManagerTest
+  void findMapWithMappingFunction(RepositoryManager repositoryManager) {
+    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    createData(entityManager);
+
+    UserModel example = new UserModel();
+    example.setName("TODAY");
+    assertThat(entityManager.find(UserModel.class, example, UserModel::getAge)).isNotEmpty().hasSize(11);
+
+    assertThat(entityManager.find(UserModel.class, isEqualsTo("name", "TODAY"), UserModel::getAge))
+            .isEqualTo(entityManager.find(example, UserModel::getAge));
+  }
+
+  @ParameterizedRepositoryManagerTest
+  void findList(RepositoryManager repositoryManager) {
+    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    createData(entityManager);
+
+    UserModel example = new UserModel();
+    example.setName("TODAY");
+    assertThat(entityManager.find(UserModel.class, example)).isNotEmpty().hasSize(11);
+
+    assertThat(entityManager.find(UserModel.class, isEqualsTo("name", "TODAY")))
+            .isEqualTo(entityManager.find(UserModel.class, example))
+            .isEqualTo(entityManager.find(example));
+  }
+
+  @ParameterizedRepositoryManagerTest
+  void findByExampleMap(RepositoryManager repositoryManager) {
+    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    createData(entityManager);
+
+    UserModel example = new UserModel();
+    example.setName("TODAY");
+    assertThat(entityManager.find(UserModel.class, example)).isNotEmpty().hasSize(11);
+
+    assertThat(entityManager.find(UserModel.class, Map.of("name", "TODAY")))
+            .isEqualTo(entityManager.find(UserModel.class, example))
+            .isEqualTo(entityManager.find(example));
+  }
+
+  @ParameterizedRepositoryManagerTest
+  void findSortBy(RepositoryManager repositoryManager) {
+    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    createData(entityManager);
+
+    assertThat(entityManager.find(UserModel.class, Map.of("age", cn.taketoday.polaris.Order.DESC)))
+            .isEqualTo(entityManager.find(UserModel.class, Map.of("id", Order.DESC)));
+  }
+
+  @ParameterizedRepositoryManagerTest
+  void batchPersistListener(RepositoryManager repositoryManager) {
+    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    entityManager.setMaxBatchRecords(120);
+    EntityMetadataFactory entityMetadataFactory = ReflectionTestUtils.getField(entityManager, "entityMetadataFactory");
+    assertThat(entityMetadataFactory).isNotNull();
+
+    entityManager.addBatchPersistListeners((execution, implicitExecution, e) -> {
+      assertThat(implicitExecution).isFalse();
+      assertThat(execution.entityMetadata).isEqualTo(entityMetadataFactory.getEntityMetadata(UserModel.class));
+      assertThat(execution.entities).hasSize(11);
+      assertThat(execution.autoGenerateId).isTrue();
+      assertThat(e).isNull();
+    });
+
+    createData(entityManager);
+  }
+
+  @ParameterizedRepositoryManagerTest
+  void count(RepositoryManager repositoryManager) {
+    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+
+    UserModel userModel = UserModel.male("TODAY", 9);
+    List<Object> entities = new ArrayList<>();
+    entities.add(userModel);
+
+    for (int i = 0; i < 100; i++) {
+      entities.add(UserModel.male("TODAY", 10 + i));
+    }
+    entityManager.persist(entities);
+
+    assertThat(entityManager.count(new UserModel())).isEqualTo(101L);
+    assertThat(entityManager.count(UserModel.class)).isEqualTo(101L);
+    assertThat(entityManager.count(UserModel.class, null)).isEqualTo(101L);
+    UserForm userForm = new UserForm();
+    userForm.age = 10;
+    userForm.name = "TODAY";
+    assertThat(entityManager.count(UserModel.class, userForm)).isEqualTo(1L);
+
+  }
+
+  @ParameterizedRepositoryManagerTest
+  void page(RepositoryManager repositoryManager) {
+    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+
+    UserModel userModel = UserModel.male("TODAY", 9);
+
+    List<Object> entities = new ArrayList<>();
+    entities.add(userModel);
+
+    for (int i = 0; i < 100; i++) {
+      entities.add(UserModel.male("TODAY", 10 + i));
+    }
+
+    entityManager.persist(entities);
+
+    UserForm userForm = new UserForm();
+    userForm.age = 10;
+    userForm.name = "TODAY";
+
+    Page<UserModel> page = entityManager.page(UserModel.class, userForm, cn.taketoday.polaris.Pageable.of(1, 10));
+    assertThat(page.getRows()).hasSize(1);
+    assertThat(page.isFirstPage()).isTrue();
+    assertThat(page.isLastPage()).isFalse();
+    assertThat(page.isHasNextPage()).isFalse();
+    assertThat(page.isHasPrevPage()).isFalse();
+    assertThat(page.getPageNumber()).isEqualTo(1);
+    assertThat(page.getLimit()).isEqualTo(10);
+    assertThat(page.getNextPage()).isEqualTo(1);
+    assertThat(page.getPrevPage()).isEqualTo(1);
+    assertThat(page.getTotalPages()).isEqualTo(1);
+    assertThat(page.getTotalRows()).isEqualTo(1L);
+
+    //
+    page = entityManager.page(UserModel.class, Pageable.of(1, 10));
+    assertThat(page.getRows()).hasSize(10);
+    assertThat(page.isFirstPage()).isTrue();
+    assertThat(page.isLastPage()).isFalse();
+    assertThat(page.isHasNextPage()).isTrue();
+    assertThat(page.isHasPrevPage()).isFalse();
+    assertThat(page.getPageNumber()).isEqualTo(1);
+    assertThat(page.getLimit()).isEqualTo(10);
+    assertThat(page.getNextPage()).isEqualTo(2);
+    assertThat(page.getPrevPage()).isEqualTo(1);
+    assertThat(page.getTotalPages()).isEqualTo(11);
+    assertThat(page.getTotalRows()).isEqualTo(101L);
+    assertThat(page.getRows().get(0)).isEqualTo(userModel);
+
+  }
+
+  // update
+
+  @ParameterizedRepositoryManagerTest
+  void update(RepositoryManager repositoryManager) {
+    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    createData(entityManager);
+
+    UserModel userModel = entityManager.findById(UserModel.class, 1);
+    assertThat(userModel).isNotNull();
+
+    String name = "TEST-UPDATE";
+    userModel.setName(name);
+
+    assertThat(entityManager.update(new UserName(1, name))).isEqualTo(1);
+
+    UserModel model = entityManager.findById(UserModel.class, 1);
+    assertThat(model).isNotNull();
+    assertThat(model.getName()).isEqualTo(name);
+    assertThat(userModel.getAge()).isEqualTo(model.getAge());
+    assertThat(userModel.getAvatar()).isEqualTo(model.getAvatar());
+    assertThat(userModel.getGender()).isEqualTo(model.getGender());
+
+    assertThat(entityManager.update(new UserAge(name, 10))).isEqualTo(1);
+
+    model = entityManager.findUnique(UserModel.class, new UserName(null, name));
+
+    assertThat(model).isNotNull();
+    assertThat(model.getName()).isEqualTo(name);
+    assertThat(model.getAge()).isEqualTo(10);
+
+    // throw
+
+    assertThatThrownBy(() -> entityManager.update(new UserFailed()))
+            .isInstanceOf(InvalidDataAccessApiUsageException.class)
+            .hasMessage("Updating an entity, There is no update properties");
+
+    assertThatThrownBy(() -> entityManager.update(new UserFailed(), always()))
+            .isInstanceOf(InvalidDataAccessApiUsageException.class)
+            .hasMessage("Updating an entity, There is no update by properties");
+  }
+
+  public static void createData(DefaultEntityManager entityManager) {
+    UserModel userModel = UserModel.male("TODAY", 9);
+
+    List<Object> entities = new ArrayList<>();
+    entities.add(userModel);
+
+    for (int i = 0; i < 10; i++) {
+      entities.add(UserModel.male("TODAY", 10 + i));
+    }
+
+    entityManager.persist(entities);
+  }
+
+  @cn.taketoday.polaris.EntityRef(UserModel.class)
+  static class UserName implements UpdateStrategySource {
+
+    @Nullable
+    final Integer id;
+
+    final String name;
+
+    UserName(@Nullable Integer id, String name) {
+      this.id = id;
+      this.name = name;
+    }
+
+    @Override
+    public cn.taketoday.polaris.PropertyUpdateStrategy updateStrategy() {
+      return noneNull();
+    }
+
+  }
+
+  @cn.taketoday.polaris.EntityRef(UserModel.class)
+  static class UserAge implements PropertyUpdateStrategy {
+
+    @UpdateBy
+    final String name;
+
+    final int age;
+
+    UserAge(String name, int age) {
+      this.name = name;
+      this.age = age;
+    }
+
+    @Override
+    public boolean shouldUpdate(Object entity, EntityProperty property) {
+      return noneNull().shouldUpdate(entity, property);
+    }
+  }
+
+  @EntityRef(UserModel.class)
+  static class UserFailed {
+    String name;
+  }
+}
+
+
