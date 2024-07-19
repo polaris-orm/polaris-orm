@@ -38,27 +38,27 @@ import cn.taketoday.core.Pair;
 import cn.taketoday.dao.DataAccessException;
 import cn.taketoday.dao.DataRetrievalFailureException;
 import cn.taketoday.dao.InvalidDataAccessApiUsageException;
-import cn.taketoday.polaris.jdbc.DefaultResultSetHandlerFactory;
-import cn.taketoday.polaris.jdbc.GeneratedKeysException;
-import cn.taketoday.polaris.jdbc.JdbcBeanMetadata;
-import cn.taketoday.polaris.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException;
-import cn.taketoday.polaris.jdbc.PersistenceException;
-import cn.taketoday.polaris.jdbc.RepositoryManager;
 import cn.taketoday.jdbc.core.ResultSetExtractor;
 import cn.taketoday.jdbc.datasource.DataSourceUtils;
-import cn.taketoday.polaris.jdbc.format.SqlStatementLogger;
 import cn.taketoday.lang.Assert;
 import cn.taketoday.lang.Descriptive;
 import cn.taketoday.lang.Nullable;
 import cn.taketoday.logging.LogMessage;
 import cn.taketoday.logging.Logger;
 import cn.taketoday.logging.LoggerFactory;
+import cn.taketoday.polaris.dialect.Platform;
+import cn.taketoday.polaris.jdbc.DefaultResultSetHandlerFactory;
+import cn.taketoday.polaris.jdbc.GeneratedKeysException;
+import cn.taketoday.polaris.jdbc.JdbcBeanMetadata;
+import cn.taketoday.polaris.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException;
+import cn.taketoday.polaris.jdbc.PersistenceException;
+import cn.taketoday.polaris.jdbc.RepositoryManager;
+import cn.taketoday.polaris.jdbc.format.SqlStatementLogger;
 import cn.taketoday.polaris.sql.Insert;
 import cn.taketoday.polaris.sql.OrderByClause;
 import cn.taketoday.polaris.sql.Restriction;
 import cn.taketoday.polaris.sql.SimpleSelect;
 import cn.taketoday.polaris.sql.Update;
-import cn.taketoday.polaris.dialect.Platform;
 import cn.taketoday.transaction.TransactionDefinition;
 import cn.taketoday.util.CollectionUtils;
 
@@ -72,7 +72,7 @@ public class DefaultEntityManager implements EntityManager {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultEntityManager.class);
 
-  private cn.taketoday.polaris.EntityMetadataFactory entityMetadataFactory = new DefaultEntityMetadataFactory();
+  private EntityMetadataFactory entityMetadataFactory = new DefaultEntityMetadataFactory();
 
   private final RepositoryManager repositoryManager;
 
@@ -88,9 +88,9 @@ public class DefaultEntityManager implements EntityManager {
 
   private PropertyUpdateStrategy defaultUpdateStrategy = PropertyUpdateStrategy.noneNull();
 
-  private cn.taketoday.polaris.Pageable defaultPageable = cn.taketoday.polaris.Pageable.of(10, 1);
+  private Pageable defaultPageable = Pageable.of(10, 1);
 
-  private cn.taketoday.polaris.dialect.Platform platform = cn.taketoday.polaris.dialect.Platform.forClasspath();
+  private Platform platform = Platform.forClasspath();
 
   private SqlStatementLogger stmtLogger = SqlStatementLogger.sharedInstance;
 
@@ -106,7 +106,7 @@ public class DefaultEntityManager implements EntityManager {
     this.repositoryManager = repositoryManager;
   }
 
-  public void setPlatform(@Nullable cn.taketoday.polaris.dialect.Platform platform) {
+  public void setPlatform(@Nullable Platform platform) {
     this.platform = platform == null ? Platform.forClasspath() : platform;
   }
 
@@ -115,7 +115,7 @@ public class DefaultEntityManager implements EntityManager {
     this.defaultUpdateStrategy = defaultUpdateStrategy;
   }
 
-  public void setDefaultPageable(cn.taketoday.polaris.Pageable defaultPageable) {
+  public void setDefaultPageable(Pageable defaultPageable) {
     Assert.notNull(defaultPageable, "defaultPageable is required");
     this.defaultPageable = defaultPageable;
   }
@@ -337,7 +337,7 @@ public class DefaultEntityManager implements EntityManager {
       strategy = defaultUpdateStrategy(entity);
     }
     EntityMetadata metadata = entityMetadataFactory.getEntityMetadata(entity.getClass());
-    cn.taketoday.polaris.EntityProperty idProperty = metadata.idProperty;
+    EntityProperty idProperty = metadata.idProperty;
     if (idProperty != null) {
       Object id = idProperty.getValue(entity);
       if (id != null) {
@@ -347,9 +347,9 @@ public class DefaultEntityManager implements EntityManager {
 
     Update updateStmt = new Update(metadata.tableName);
 
-    ArrayList<cn.taketoday.polaris.EntityProperty> properties = new ArrayList<>(4);
-    ArrayList<cn.taketoday.polaris.EntityProperty> updateByProperties = new ArrayList<>(2);
-    for (cn.taketoday.polaris.EntityProperty property : metadata.entityPropertiesExcludeId) {
+    ArrayList<EntityProperty> properties = new ArrayList<>(4);
+    ArrayList<EntityProperty> updateByProperties = new ArrayList<>(2);
+    for (EntityProperty property : metadata.entityPropertiesExcludeId) {
       if (property.isPresent(UpdateBy.class)) {
         updateByProperties.add(property);
         updateStmt.addRestriction(property.columnName);
@@ -380,7 +380,7 @@ public class DefaultEntityManager implements EntityManager {
       statement = con.prepareStatement(sql);
       int idx = setParameters(entity, properties, statement);
       // apply where parameters
-      for (cn.taketoday.polaris.EntityProperty updateBy : updateByProperties) {
+      for (EntityProperty updateBy : updateByProperties) {
         updateBy.setTo(statement, idx++, entity);
       }
       return statement.executeUpdate();
@@ -406,7 +406,7 @@ public class DefaultEntityManager implements EntityManager {
   @Override
   public int updateById(Object entity, @Nullable PropertyUpdateStrategy strategy) {
     EntityMetadata metadata = entityMetadataFactory.getEntityMetadata(entity.getClass());
-    cn.taketoday.polaris.EntityProperty idProperty = metadata.idProperty();
+    EntityProperty idProperty = metadata.idProperty();
 
     Object id = idProperty.getValue(entity);
     if (id == null) {
@@ -433,7 +433,7 @@ public class DefaultEntityManager implements EntityManager {
   public int updateById(Object entity, Object id, @Nullable PropertyUpdateStrategy strategy) {
     Assert.notNull(id, "Entity id is required");
     EntityMetadata metadata = entityMetadataFactory.getEntityMetadata(entity.getClass());
-    cn.taketoday.polaris.EntityProperty idProperty = metadata.idProperty();
+    EntityProperty idProperty = metadata.idProperty();
     Assert.isTrue(idProperty.property.isInstance(id), "Entity Id matches failed");
 
     if (strategy == null) {
@@ -443,12 +443,12 @@ public class DefaultEntityManager implements EntityManager {
     return doUpdateById(entity, id, idProperty, metadata, strategy);
   }
 
-  private int doUpdateById(Object entity, Object id, cn.taketoday.polaris.EntityProperty idProperty, EntityMetadata metadata, PropertyUpdateStrategy strategy) {
+  private int doUpdateById(Object entity, Object id, EntityProperty idProperty, EntityMetadata metadata, PropertyUpdateStrategy strategy) {
     Update updateStmt = new Update(metadata.tableName);
     updateStmt.addRestriction(idProperty.columnName);
 
-    ArrayList<cn.taketoday.polaris.EntityProperty> properties = new ArrayList<>();
-    for (cn.taketoday.polaris.EntityProperty property : metadata.entityProperties) {
+    ArrayList<EntityProperty> properties = new ArrayList<>();
+    for (EntityProperty property : metadata.entityProperties) {
       if (strategy.shouldUpdate(entity, property)) {
         updateStmt.addAssignment(property.columnName);
         properties.add(property);
@@ -497,9 +497,9 @@ public class DefaultEntityManager implements EntityManager {
       strategy = defaultUpdateStrategy(entity);
     }
 
-    cn.taketoday.polaris.EntityProperty updateBy = null;
-    ArrayList<cn.taketoday.polaris.EntityProperty> properties = new ArrayList<>();
-    for (cn.taketoday.polaris.EntityProperty property : metadata.entityProperties) {
+    EntityProperty updateBy = null;
+    ArrayList<EntityProperty> properties = new ArrayList<>();
+    for (EntityProperty property : metadata.entityProperties) {
       // columnName or property name
       if (Objects.equals(where, property.columnName)
               || Objects.equals(where, property.property.getName())) {
@@ -588,7 +588,7 @@ public class DefaultEntityManager implements EntityManager {
       id = metadata.idProperty.getValue(entityOrExample);
     }
 
-    cn.taketoday.polaris.ExampleQuery exampleQuery = null;
+    ExampleQuery exampleQuery = null;
 
     StringBuilder sql = new StringBuilder();
     sql.append("DELETE FROM ");
@@ -600,7 +600,7 @@ public class DefaultEntityManager implements EntityManager {
       sql.append("` = ? ");
     }
     else {
-      exampleQuery = new cn.taketoday.polaris.ExampleQuery(entityOrExample, metadata);
+      exampleQuery = new ExampleQuery(entityOrExample, metadata);
       exampleQuery.renderWhereClause(sql);
     }
 
@@ -668,7 +668,7 @@ public class DefaultEntityManager implements EntityManager {
   }
 
   @Override
-  public <T> T findFirst(Class<T> entityClass, @Nullable cn.taketoday.polaris.QueryStatement handler) throws DataAccessException {
+  public <T> T findFirst(Class<T> entityClass, @Nullable QueryStatement handler) throws DataAccessException {
     return iterate(entityClass, handler).first();
   }
 
@@ -686,31 +686,31 @@ public class DefaultEntityManager implements EntityManager {
   }
 
   @Override
-  public <T> T findUnique(Class<T> entityClass, @Nullable cn.taketoday.polaris.QueryStatement handler) throws DataAccessException {
+  public <T> T findUnique(Class<T> entityClass, @Nullable QueryStatement handler) throws DataAccessException {
     return iterate(entityClass, handler).unique();
   }
 
   @Override
   public <T> List<T> find(Class<T> entityClass) throws DataAccessException {
-    return find(entityClass, (cn.taketoday.polaris.QueryStatement) null);
+    return find(entityClass, (QueryStatement) null);
   }
 
   @Override
-  public <T> List<T> find(Class<T> entityClass, Map<String, cn.taketoday.polaris.Order> sortKeys) throws DataAccessException {
+  public <T> List<T> find(Class<T> entityClass, Map<String, Order> sortKeys) throws DataAccessException {
     Assert.notEmpty(sortKeys, "sortKeys is required");
-    return find(entityClass, new cn.taketoday.polaris.NoConditionsOrderByQuery(OrderByClause.forMap(sortKeys)));
+    return find(entityClass, new NoConditionsOrderByQuery(OrderByClause.forMap(sortKeys)));
   }
 
   @Override
-  public <T> List<T> find(Class<T> entityClass, Pair<String, cn.taketoday.polaris.Order> sortKey) throws DataAccessException {
+  public <T> List<T> find(Class<T> entityClass, Pair<String, Order> sortKey) throws DataAccessException {
     Assert.notNull(sortKey, "sortKey is required");
-    return find(entityClass, new cn.taketoday.polaris.NoConditionsOrderByQuery(OrderByClause.mutable().orderBy(sortKey)));
+    return find(entityClass, new NoConditionsOrderByQuery(OrderByClause.mutable().orderBy(sortKey)));
   }
 
   @SafeVarargs
   @Override
   public final <T> List<T> find(Class<T> entityClass, Pair<String, Order>... sortKeys) throws DataAccessException {
-    return find(entityClass, new cn.taketoday.polaris.NoConditionsOrderByQuery(OrderByClause.valueOf(sortKeys)));
+    return find(entityClass, new NoConditionsOrderByQuery(OrderByClause.valueOf(sortKeys)));
   }
 
   @Override
@@ -725,7 +725,7 @@ public class DefaultEntityManager implements EntityManager {
   }
 
   @Override
-  public <T> List<T> find(Class<T> entityClass, @Nullable cn.taketoday.polaris.QueryStatement handler) throws DataAccessException {
+  public <T> List<T> find(Class<T> entityClass, @Nullable QueryStatement handler) throws DataAccessException {
     return iterate(entityClass, handler).list();
   }
 
@@ -741,7 +741,7 @@ public class DefaultEntityManager implements EntityManager {
   }
 
   @Override
-  public <K, T> Map<K, T> find(Class<T> entityClass, @Nullable cn.taketoday.polaris.QueryStatement handler, String mapKey) throws DataAccessException {
+  public <K, T> Map<K, T> find(Class<T> entityClass, @Nullable QueryStatement handler, String mapKey) throws DataAccessException {
     return iterate(entityClass, handler).toMap(mapKey);
   }
 
@@ -757,7 +757,7 @@ public class DefaultEntityManager implements EntityManager {
   }
 
   @Override
-  public <K, T> Map<K, T> find(Class<T> entityClass, @Nullable cn.taketoday.polaris.QueryStatement handler, Function<T, K> keyMapper) throws DataAccessException {
+  public <K, T> Map<K, T> find(Class<T> entityClass, @Nullable QueryStatement handler, Function<T, K> keyMapper) throws DataAccessException {
     return iterate(entityClass, handler).toMap(keyMapper);
   }
 
@@ -778,34 +778,34 @@ public class DefaultEntityManager implements EntityManager {
   }
 
   @Override
-  public <T> cn.taketoday.polaris.Page<T> page(T example) throws DataAccessException {
-    return page(example, cn.taketoday.polaris.Pageable.unwrap(example));
+  public <T> Page<T> page(T example) throws DataAccessException {
+    return page(example, Pageable.unwrap(example));
   }
 
   @Override
-  public <T> cn.taketoday.polaris.Page<T> page(Class<T> entityClass, @Nullable cn.taketoday.polaris.Pageable pageable) throws DataAccessException {
+  public <T> Page<T> page(Class<T> entityClass, @Nullable Pageable pageable) throws DataAccessException {
     return page(entityClass, null, pageable);
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public <T> cn.taketoday.polaris.Page<T> page(T example, @Nullable cn.taketoday.polaris.Pageable pageable) throws DataAccessException {
+  public <T> Page<T> page(T example, @Nullable Pageable pageable) throws DataAccessException {
     return page((Class<T>) example.getClass(), example, pageable);
   }
 
   @Override
-  public <T> cn.taketoday.polaris.Page<T> page(Class<T> entityClass, Object example) throws DataAccessException {
-    return page(entityClass, example, cn.taketoday.polaris.Pageable.unwrap(example));
+  public <T> Page<T> page(Class<T> entityClass, Object example) throws DataAccessException {
+    return page(entityClass, example, Pageable.unwrap(example));
   }
 
   @Override
-  public <T> cn.taketoday.polaris.Page<T> page(Class<T> entityClass, Object example, @Nullable cn.taketoday.polaris.Pageable pageable) throws DataAccessException {
+  public <T> Page<T> page(Class<T> entityClass, Object example, @Nullable Pageable pageable) throws DataAccessException {
     return page(entityClass, handlerFactories.createCondition(example), pageable);
   }
 
   @Override
-  public <T> cn.taketoday.polaris.Page<T> page(Class<T> entityClass, @Nullable ConditionStatement handler) throws DataAccessException {
-    return page(entityClass, handler, cn.taketoday.polaris.Pageable.unwrap(handler));
+  public <T> Page<T> page(Class<T> entityClass, @Nullable ConditionStatement handler) throws DataAccessException {
+    return page(entityClass, handler, Pageable.unwrap(handler));
   }
 
   @Override
@@ -820,7 +820,7 @@ public class DefaultEntityManager implements EntityManager {
   }
 
   @Override
-  public <T> void iterate(Class<T> entityClass, @Nullable cn.taketoday.polaris.QueryStatement handler, Consumer<T> entityConsumer) throws DataAccessException {
+  public <T> void iterate(Class<T> entityClass, @Nullable QueryStatement handler, Consumer<T> entityConsumer) throws DataAccessException {
     iterate(entityClass, handler).consume(entityConsumer);
   }
 
@@ -881,7 +881,7 @@ public class DefaultEntityManager implements EntityManager {
   }
 
   @Override
-  public <T> cn.taketoday.polaris.Page<T> page(Class<T> entityClass, @Nullable ConditionStatement handler, @Nullable cn.taketoday.polaris.Pageable pageable) throws DataAccessException {
+  public <T> Page<T> page(Class<T> entityClass, @Nullable ConditionStatement handler, @Nullable Pageable pageable) throws DataAccessException {
     if (handler == null) {
       handler = NoConditionsQuery.instance;
     }
@@ -902,7 +902,7 @@ public class DefaultEntityManager implements EntityManager {
       if (count.intValue() < 1) {
         // no record
         DataSourceUtils.releaseConnection(con, dataSource);
-        return new cn.taketoday.polaris.Page<>(pageable, 0, Collections.emptyList());
+        return new Page<>(pageable, 0, Collections.emptyList());
       }
 
       statement = new SimpleSelect(Arrays.asList(metadata.columnNames), restrictions)
@@ -997,10 +997,10 @@ public class DefaultEntityManager implements EntityManager {
     return repositoryManager.translateException(task, sql, ex);
   }
 
-  private Pair<String, ArrayList<cn.taketoday.polaris.EntityProperty>> insertStatement(PropertyUpdateStrategy strategy, Object entity, EntityMetadata entityMetadata) {
+  private Pair<String, ArrayList<EntityProperty>> insertStatement(PropertyUpdateStrategy strategy, Object entity, EntityMetadata entityMetadata) {
     Insert insert = new Insert(entityMetadata.tableName);
-    var properties = new ArrayList<cn.taketoday.polaris.EntityProperty>(entityMetadata.entityProperties.length);
-    for (cn.taketoday.polaris.EntityProperty property : entityMetadata.entityProperties) {
+    var properties = new ArrayList<EntityProperty>(entityMetadata.entityProperties.length);
+    for (EntityProperty property : entityMetadata.entityProperties) {
       if (strategy.shouldUpdate(entity, property)) {
         insert.addColumn(property.columnName);
         properties.add(property);
@@ -1078,9 +1078,9 @@ public class DefaultEntityManager implements EntityManager {
 
   //
 
-  private static int setParameters(Object entity, ArrayList<cn.taketoday.polaris.EntityProperty> properties, PreparedStatement statement) throws SQLException {
+  private static int setParameters(Object entity, ArrayList<EntityProperty> properties, PreparedStatement statement) throws SQLException {
     int idx = 1;
-    for (cn.taketoday.polaris.EntityProperty property : properties) {
+    for (EntityProperty property : properties) {
       property.setTo(statement, idx++, entity);
     }
     return idx;
@@ -1135,12 +1135,12 @@ public class DefaultEntityManager implements EntityManager {
 
     public final PreparedStatement statement;
 
-    public final ArrayList<cn.taketoday.polaris.EntityProperty> properties;
+    public final ArrayList<EntityProperty> properties;
 
     public int currentBatchRecords = 0;
 
     PreparedBatch(Connection connection, String sql, PropertyUpdateStrategy strategy,
-            EntityMetadata entityMetadata, ArrayList<cn.taketoday.polaris.EntityProperty> properties, boolean autoGenerateId) throws SQLException {
+            EntityMetadata entityMetadata, ArrayList<EntityProperty> properties, boolean autoGenerateId) throws SQLException {
       super(sql, strategy, entityMetadata, autoGenerateId);
       this.properties = properties;
       this.statement = prepareStatement(connection, sql, autoGenerateId);

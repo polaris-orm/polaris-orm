@@ -66,11 +66,11 @@ final class ArrayParameters {
    * Update both the query and the parameter indexes to include the array
    * parameters.
    *
-   * @throws cn.taketoday.polaris.jdbc.ArrayParameterBindFailedException array parameter bind failed
+   * @throws ArrayParameterBindFailedException array parameter bind failed
    */
   static String updateQueryAndParametersIndexes(
           String parsedQuery,
-          HashMap<String, cn.taketoday.polaris.jdbc.parsing.QueryParameter> queryParameters,
+          HashMap<String, QueryParameter> queryParameters,
           boolean allowArrayParameters
   ) {
     ArrayList<ArrayParameter> arrayParameters
@@ -86,12 +86,12 @@ final class ArrayParameters {
   /**
    * Update the indexes of each query parameter
    */
-  static Map<String, cn.taketoday.polaris.jdbc.parsing.QueryParameter> updateMap(
-          HashMap<String, cn.taketoday.polaris.jdbc.parsing.QueryParameter> queryParameters,
+  static Map<String, QueryParameter> updateMap(
+          HashMap<String, QueryParameter> queryParameters,
           ArrayList<ArrayParameter> arrayParametersSortedAsc
   ) {
 
-    for (cn.taketoday.polaris.jdbc.parsing.QueryParameter parameter : queryParameters.values()) {
+    for (QueryParameter parameter : queryParameters.values()) {
       ArrayList<Integer> newParameterIndex = new ArrayList<>();
 
       for (int parameterIndex : parameter.getHolder()) {
@@ -100,7 +100,7 @@ final class ArrayParameters {
       }
 
       if (newParameterIndex.size() > 1) {
-        parameter.setHolder(cn.taketoday.polaris.jdbc.parsing.ParameterIndexHolder.valueOf(newParameterIndex));
+        parameter.setHolder(ParameterIndexHolder.valueOf(newParameterIndex));
       }
       else {
         parameter.setHolder(ParameterIndexHolder.valueOf(newParameterIndex.get(0)));
@@ -132,10 +132,10 @@ final class ArrayParameters {
    * array parameter below 1 parameter will not change the text query nor the
    * parameter indexes.
    *
-   * @throws cn.taketoday.polaris.jdbc.ArrayParameterBindFailedException array parameter bind failed
+   * @throws ArrayParameterBindFailedException array parameter bind failed
    */
   private static ArrayList<ArrayParameter> sortedArrayParameters(
-          HashMap<String, cn.taketoday.polaris.jdbc.parsing.QueryParameter> queryParameters,
+          HashMap<String, QueryParameter> queryParameters,
           boolean allowArrayParameters
   ) {
     ArrayList<ArrayParameter> arrayParameters = new ArrayList<>();

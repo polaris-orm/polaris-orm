@@ -67,7 +67,7 @@ public interface PropertyFilter {
   }
 
   /**
-   * use {@link cn.taketoday.polaris.Transient}
+   * use {@link Transient}
    */
   static PropertyFilter forTransientAnnotation() {
     return forAnnotation(Transient.class);

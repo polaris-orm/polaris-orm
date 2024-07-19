@@ -29,9 +29,9 @@ import java.util.Map;
 
 import cn.taketoday.dao.IncorrectResultSizeDataAccessException;
 import cn.taketoday.dao.InvalidDataAccessApiUsageException;
+import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.jdbc.NamedQuery;
 import cn.taketoday.polaris.jdbc.RepositoryManager;
-import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.model.Gender;
 import cn.taketoday.polaris.model.NoIdModel;
 import cn.taketoday.polaris.model.UserModel;
@@ -79,18 +79,18 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
 
   @ParameterizedRepositoryManagerTest
   void exception(RepositoryManager repositoryManager) {
-    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
 
     assertThatThrownBy(() ->
             entityManager.persist(new Object()))
-            .isInstanceOf(cn.taketoday.polaris.IllegalEntityException.class)
+            .isInstanceOf(IllegalEntityException.class)
             .hasMessageStartingWith("Cannot determine properties");
 
   }
 
   @ParameterizedRepositoryManagerTest
   void persist(RepositoryManager repositoryManager) {
-    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
 
     UserModel userModel = new UserModel();
     userModel.name = "TODAY";
@@ -117,7 +117,7 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
 
   @ParameterizedRepositoryManagerTest
   void batchPersist(RepositoryManager repositoryManager) {
-    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
     entityManager.setMaxBatchRecords(10);
 
     UserModel userModel = UserModel.male("TODAY", 9);
@@ -165,7 +165,7 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
     @Nullable
     Integer age;
 
-    @cn.taketoday.polaris.Where("birthday >= ?")
+    @Where("birthday >= ?")
     LocalDate birthdayBegin;
 
     @Where("birthday <= ?")
@@ -175,7 +175,7 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
 
   @ParameterizedRepositoryManagerTest
   void findByExample(RepositoryManager repositoryManager) {
-    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
 
     UserModel userModel = UserModel.male("TODAY", 9);
 
@@ -200,7 +200,7 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
 
   @ParameterizedRepositoryManagerTest
   void iterateListOfQueryConditions(RepositoryManager repositoryManager) {
-    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
     createData(entityManager);
 
 //    QueryCondition condition =
@@ -213,7 +213,7 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
 
   @ParameterizedRepositoryManagerTest
   void deleteById(RepositoryManager repositoryManager) {
-    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
     createData(entityManager);
 
     UserModel byId = entityManager.findById(UserModel.class, 1);
@@ -227,7 +227,7 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
 
   @ParameterizedRepositoryManagerTest
   void deleteByEntity(RepositoryManager repositoryManager) {
-    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
     createData(entityManager);
 
     UserModel byId = entityManager.findById(UserModel.class, 1);
@@ -266,7 +266,7 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
 
   @ParameterizedRepositoryManagerTest
   void findUnique(RepositoryManager repositoryManager) {
-    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
     createData(entityManager);
 
     assertThatThrownBy(() ->
@@ -298,7 +298,7 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
 
   @ParameterizedRepositoryManagerTest
   void updateBy(RepositoryManager repositoryManager) {
-    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
     createData(entityManager);
 
     UserModel userModel = UserModel.forId(1);
@@ -324,7 +324,7 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
 
   @ParameterizedRepositoryManagerTest
   void updateById(RepositoryManager repositoryManager) {
-    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
     createData(entityManager);
 
     UserModel userModel = entityManager.findById(UserModel.class, 1);
@@ -379,7 +379,7 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
 
   @ParameterizedRepositoryManagerTest
   void findMap(RepositoryManager repositoryManager) {
-    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
     createData(entityManager);
 
     UserModel example = new UserModel();
@@ -392,7 +392,7 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
 
   @ParameterizedRepositoryManagerTest
   void findMapWithMappingFunction(RepositoryManager repositoryManager) {
-    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
     createData(entityManager);
 
     UserModel example = new UserModel();
@@ -405,7 +405,7 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
 
   @ParameterizedRepositoryManagerTest
   void findList(RepositoryManager repositoryManager) {
-    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
     createData(entityManager);
 
     UserModel example = new UserModel();
@@ -419,7 +419,7 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
 
   @ParameterizedRepositoryManagerTest
   void findByExampleMap(RepositoryManager repositoryManager) {
-    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
     createData(entityManager);
 
     UserModel example = new UserModel();
@@ -433,16 +433,16 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
 
   @ParameterizedRepositoryManagerTest
   void findSortBy(RepositoryManager repositoryManager) {
-    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
     createData(entityManager);
 
-    assertThat(entityManager.find(UserModel.class, Map.of("age", cn.taketoday.polaris.Order.DESC)))
+    assertThat(entityManager.find(UserModel.class, Map.of("age", Order.DESC)))
             .isEqualTo(entityManager.find(UserModel.class, Map.of("id", Order.DESC)));
   }
 
   @ParameterizedRepositoryManagerTest
   void batchPersistListener(RepositoryManager repositoryManager) {
-    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
     entityManager.setMaxBatchRecords(120);
     EntityMetadataFactory entityMetadataFactory = ReflectionTestUtils.getField(entityManager, "entityMetadataFactory");
     assertThat(entityMetadataFactory).isNotNull();
@@ -460,7 +460,7 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
 
   @ParameterizedRepositoryManagerTest
   void count(RepositoryManager repositoryManager) {
-    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
 
     UserModel userModel = UserModel.male("TODAY", 9);
     List<Object> entities = new ArrayList<>();
@@ -483,7 +483,7 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
 
   @ParameterizedRepositoryManagerTest
   void page(RepositoryManager repositoryManager) {
-    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
 
     UserModel userModel = UserModel.male("TODAY", 9);
 
@@ -500,7 +500,7 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
     userForm.age = 10;
     userForm.name = "TODAY";
 
-    Page<UserModel> page = entityManager.page(UserModel.class, userForm, cn.taketoday.polaris.Pageable.of(1, 10));
+    Page<UserModel> page = entityManager.page(UserModel.class, userForm, Pageable.of(1, 10));
     assertThat(page.getRows()).hasSize(1);
     assertThat(page.isFirstPage()).isTrue();
     assertThat(page.isLastPage()).isFalse();
@@ -534,7 +534,7 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
 
   @ParameterizedRepositoryManagerTest
   void update(RepositoryManager repositoryManager) {
-    cn.taketoday.polaris.DefaultEntityManager entityManager = new cn.taketoday.polaris.DefaultEntityManager(repositoryManager);
+    DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
     createData(entityManager);
 
     UserModel userModel = entityManager.findById(UserModel.class, 1);
@@ -584,7 +584,7 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
     entityManager.persist(entities);
   }
 
-  @cn.taketoday.polaris.EntityRef(UserModel.class)
+  @EntityRef(UserModel.class)
   static class UserName implements UpdateStrategySource {
 
     @Nullable
@@ -598,13 +598,13 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
     }
 
     @Override
-    public cn.taketoday.polaris.PropertyUpdateStrategy updateStrategy() {
+    public PropertyUpdateStrategy updateStrategy() {
       return noneNull();
     }
 
   }
 
-  @cn.taketoday.polaris.EntityRef(UserModel.class)
+  @EntityRef(UserModel.class)
   static class UserAge implements PropertyUpdateStrategy {
 
     @UpdateBy

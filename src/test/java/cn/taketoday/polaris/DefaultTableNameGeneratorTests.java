@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 4.0 2022/8/16 23:10
  */
 class DefaultTableNameGeneratorTests {
-  cn.taketoday.polaris.DefaultTableNameGenerator generator = new DefaultTableNameGenerator();
+  DefaultTableNameGenerator generator = new DefaultTableNameGenerator();
 
   @Test
   void generateTableName() {

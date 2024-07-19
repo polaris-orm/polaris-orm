@@ -105,7 +105,7 @@ public class Update implements StatementSequence {
   }
 
   @Override
-  public String toStatementString(cn.taketoday.polaris.dialect.Platform platform) {
+  public String toStatementString(Platform platform) {
     final var buf = new StringBuilder((assignments.size() * 15) + tableName.length() + 10);
 
     if (comment != null) {

@@ -53,7 +53,7 @@ public abstract class BaseMemDbTest {
   }
 
   protected final DbType dbType;
-  protected final cn.taketoday.polaris.jdbc.RepositoryManager repositoryManager;
+  protected final RepositoryManager repositoryManager;
 
   public BaseMemDbTest(DbType dbType, String testName) {
     this.dbType = dbType;

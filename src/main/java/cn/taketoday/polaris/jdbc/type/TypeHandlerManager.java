@@ -20,6 +20,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -46,7 +48,7 @@ import cn.taketoday.lang.Enumerable;
 import cn.taketoday.lang.Nullable;
 
 /**
- * {@link cn.taketoday.polaris.jdbc.type.TypeHandler} Manager
+ * {@link TypeHandler} Manager
  *
  * @author Clinton Begin
  * @author Kazuki Shimizu
@@ -58,11 +60,11 @@ public class TypeHandlerManager implements TypeHandlerResolver {
 
   public static final TypeHandlerManager sharedInstance = new TypeHandlerManager();
 
-  private final cn.taketoday.polaris.jdbc.type.TypeHandler<Object> unknownTypeHandler;
+  private final TypeHandler<Object> unknownTypeHandler;
 
-  private final HashMap<Class<?>, cn.taketoday.polaris.jdbc.type.TypeHandler<?>> typeHandlers = new HashMap<>();
+  private final HashMap<Class<?>, TypeHandler<?>> typeHandlers = new HashMap<>();
 
-  private Class<? extends cn.taketoday.polaris.jdbc.type.TypeHandler> defaultEnumTypeHandler = EnumerationValueTypeHandler.class;
+  private Class<? extends TypeHandler> defaultEnumTypeHandler = EnumerationValueTypeHandler.class;
 
   private TypeHandlerResolver typeHandlerResolver = TypeHandlerResolver.forMappedTypeHandlerAnnotation();
 
@@ -72,12 +74,12 @@ public class TypeHandlerManager implements TypeHandlerResolver {
   }
 
   /**
-   * Set a default {@link cn.taketoday.polaris.jdbc.type.TypeHandler} class for {@link Enum}.
-   * A default {@link cn.taketoday.polaris.jdbc.type.TypeHandler} is {@link EnumTypeHandler}.
+   * Set a default {@link TypeHandler} class for {@link Enum}.
+   * A default {@link TypeHandler} is {@link EnumTypeHandler}.
    *
    * @param typeHandler a type handler class for {@link Enum}
    */
-  public void setDefaultEnumTypeHandler(Class<? extends cn.taketoday.polaris.jdbc.type.TypeHandler> typeHandler) {
+  public void setDefaultEnumTypeHandler(Class<? extends TypeHandler> typeHandler) {
     this.defaultEnumTypeHandler = typeHandler;
   }
 
@@ -93,8 +95,8 @@ public class TypeHandlerManager implements TypeHandlerResolver {
   //
 
   @SuppressWarnings("unchecked")
-  public <T> cn.taketoday.polaris.jdbc.type.TypeHandler<T> getTypeHandler(Class<T> type) {
-    cn.taketoday.polaris.jdbc.type.TypeHandler<?> typeHandler = typeHandlers.get(type);
+  public <T> TypeHandler<T> getTypeHandler(Class<T> type) {
+    TypeHandler<?> typeHandler = typeHandlers.get(type);
     if (typeHandler == null) {
       if (Enumerable.class.isAssignableFrom(type)) {
         typeHandler = new EnumerableEnumTypeHandler(type, this);
@@ -108,12 +110,12 @@ public class TypeHandlerManager implements TypeHandlerResolver {
         typeHandler = typeHandlerNotFound(type);
       }
     }
-    return (cn.taketoday.polaris.jdbc.type.TypeHandler<T>) typeHandler;
+    return (TypeHandler<T>) typeHandler;
   }
 
   @Nullable
   @Override
-  public cn.taketoday.polaris.jdbc.type.TypeHandler<?> resolve(BeanProperty beanProperty) {
+  public TypeHandler<?> resolve(BeanProperty beanProperty) {
     return getTypeHandler(beanProperty);
   }
 
@@ -121,8 +123,8 @@ public class TypeHandlerManager implements TypeHandlerResolver {
    * @since 4.0
    */
   @SuppressWarnings("unchecked")
-  public <T> cn.taketoday.polaris.jdbc.type.TypeHandler<T> getTypeHandler(BeanProperty property) {
-    cn.taketoday.polaris.jdbc.type.TypeHandler<?> typeHandler = typeHandlerResolver.resolve(property);
+  public <T> TypeHandler<T> getTypeHandler(BeanProperty property) {
+    TypeHandler<?> typeHandler = typeHandlerResolver.resolve(property);
     if (typeHandler == null) {
       // fallback to default
       Class<?> type = property.getType();
@@ -159,19 +161,19 @@ public class TypeHandlerManager implements TypeHandlerResolver {
       }
     }
 
-    return (cn.taketoday.polaris.jdbc.type.TypeHandler<T>) typeHandler;
+    return (TypeHandler<T>) typeHandler;
   }
 
-  protected cn.taketoday.polaris.jdbc.type.TypeHandler<?> typeHandlerNotFound(Type type) {
+  protected TypeHandler<?> typeHandlerNotFound(Type type) {
     return unknownTypeHandler;
   }
 
-  public cn.taketoday.polaris.jdbc.type.TypeHandler<Object> getUnknownTypeHandler() {
+  public TypeHandler<Object> getUnknownTypeHandler() {
     return unknownTypeHandler;
   }
 
   @SuppressWarnings("unchecked")
-  public <T> void register(cn.taketoday.polaris.jdbc.type.TypeHandler<T> typeHandler) {
+  public <T> void register(TypeHandler<T> typeHandler) {
     boolean mappedTypeFound = false;
     var mappedTypes = MergedAnnotations.from(typeHandler.getClass()).get(MappedTypes.class);
     if (mappedTypes.isPresent()) {
@@ -195,11 +197,11 @@ public class TypeHandlerManager implements TypeHandlerResolver {
     }
   }
 
-  public <T> void register(Class<T> javaType, cn.taketoday.polaris.jdbc.type.TypeHandler<?> typeHandler) {
+  public <T> void register(Class<T> javaType, TypeHandler<?> typeHandler) {
     typeHandlers.put(javaType, typeHandler);
   }
 
-  public <T> void register(ParameterizedTypeReference<T> reference, cn.taketoday.polaris.jdbc.type.TypeHandler<T> handler) {
+  public <T> void register(ParameterizedTypeReference<T> reference, TypeHandler<T> handler) {
     ResolvableType resolvableType = reference.getResolvableType();
     Class<?> aClass = resolvableType.toClass();
     register(aClass, handler);
@@ -232,7 +234,7 @@ public class TypeHandlerManager implements TypeHandlerResolver {
   // Construct a handler (used also from Builders)
 
   @SuppressWarnings("unchecked")
-  public <T> cn.taketoday.polaris.jdbc.type.TypeHandler<T> getInstance(@Nullable Class<?> javaTypeClass, Class<?> typeHandlerClass) {
+  public <T> TypeHandler<T> getInstance(@Nullable Class<?> javaTypeClass, Class<?> typeHandlerClass) {
     if (javaTypeClass != null) {
       Constructor<?> constructor = BeanUtils.getConstructor(typeHandlerClass);
       if (constructor == null) {
@@ -247,10 +249,10 @@ public class TypeHandlerManager implements TypeHandlerResolver {
           for (Class<?> parameterType : parameterTypes) {
             args[i++] = resolveArg(javaTypeClass, parameterType);
           }
-          return (cn.taketoday.polaris.jdbc.type.TypeHandler<T>) BeanUtils.newInstance(constructor, args);
+          return (TypeHandler<T>) BeanUtils.newInstance(constructor, args);
         }
         else {
-          return (cn.taketoday.polaris.jdbc.type.TypeHandler<T>) BeanUtils.newInstance(constructor);
+          return (TypeHandler<T>) BeanUtils.newInstance(constructor);
         }
       }
       catch (Exception e) {
@@ -291,7 +293,7 @@ public class TypeHandlerManager implements TypeHandlerResolver {
     registry.register(Byte.class, new ByteTypeHandler());
     registry.register(byte.class, new ByteTypeHandler());
 
-    registry.register(Short.class, new cn.taketoday.polaris.jdbc.type.ShortTypeHandler());
+    registry.register(Short.class, new ShortTypeHandler());
     registry.register(short.class, new ShortTypeHandler());
 
     registry.register(int.class, new IntegerTypeHandler());
@@ -318,8 +320,8 @@ public class TypeHandlerManager implements TypeHandlerResolver {
     registry.register(Date.class, new DateTypeHandler());
 
     registry.register(java.sql.Date.class, new SqlDateTypeHandler());
-    registry.register(java.sql.Time.class, new SqlTimeTypeHandler());
-    registry.register(java.sql.Timestamp.class, new SqlTimestampTypeHandler());
+    registry.register(Time.class, new SqlTimeTypeHandler());
+    registry.register(Timestamp.class, new SqlTimestampTypeHandler());
 
     registry.register(Instant.class, new InstantTypeHandler());
     registry.register(Year.class, new YearTypeHandler());

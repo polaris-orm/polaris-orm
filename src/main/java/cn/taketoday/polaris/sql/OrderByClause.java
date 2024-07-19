@@ -38,8 +38,8 @@ public interface OrderByClause {
 
   // Static Factory Methods
 
-  static cn.taketoday.polaris.sql.MutableOrderByClause forMap(Map<String, Order> sortKeys) {
-    cn.taketoday.polaris.sql.MutableOrderByClause clause = new cn.taketoday.polaris.sql.MutableOrderByClause(sortKeys.size());
+  static MutableOrderByClause forMap(Map<String, Order> sortKeys) {
+    MutableOrderByClause clause = new MutableOrderByClause(sortKeys.size());
     for (Map.Entry<String, Order> entry : sortKeys.entrySet()) {
       clause.orderBy(entry.getKey(), entry.getValue());
     }
@@ -47,16 +47,16 @@ public interface OrderByClause {
   }
 
   @SafeVarargs
-  static cn.taketoday.polaris.sql.MutableOrderByClause valueOf(Pair<String, Order>... sortKeys) {
+  static MutableOrderByClause valueOf(Pair<String, Order>... sortKeys) {
     Assert.notNull(sortKeys, "sortKeys is required");
-    return new cn.taketoday.polaris.sql.MutableOrderByClause(List.of(sortKeys));
+    return new MutableOrderByClause(List.of(sortKeys));
   }
 
   static OrderByClause plain(CharSequence sequence) {
     return new Plain(sequence);
   }
 
-  static cn.taketoday.polaris.sql.MutableOrderByClause mutable() {
+  static MutableOrderByClause mutable() {
     return new MutableOrderByClause();
   }
 

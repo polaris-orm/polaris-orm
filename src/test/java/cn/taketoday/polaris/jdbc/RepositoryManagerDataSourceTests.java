@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 public class RepositoryManagerDataSourceTests {
 
-  private cn.taketoday.polaris.jdbc.RepositoryManager manager;
+  private RepositoryManager manager;
 
   private String url = "jdbc:h2:mem:test2;DB_CLOSE_DELAY=-1;MODE=MySQL";
   private String user = "sa";

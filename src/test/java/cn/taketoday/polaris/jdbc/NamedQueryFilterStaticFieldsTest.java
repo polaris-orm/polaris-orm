@@ -50,7 +50,7 @@ public class NamedQueryFilterStaticFieldsTest {
 
   @Test
   public void dontTouchTheStaticFieldTest() throws Exception {
-    final cn.taketoday.polaris.jdbc.RepositoryManager dataBase = new RepositoryManager(databaseRule.getDataSource());
+    final RepositoryManager dataBase = new RepositoryManager(databaseRule.getDataSource());
     try (final JdbcConnection connection = dataBase.open();
             final NamedQuery query = connection.createNamedQuery("SELECT * FROM TEST WHERE ver=1")) {
       final Entity entity = query.fetchFirst(Entity.class);

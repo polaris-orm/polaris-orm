@@ -49,7 +49,7 @@ class PropertyFilterTests {
 
   @Test
   void filteredNames() {
-    cn.taketoday.polaris.PropertyFilter propertyFilter = cn.taketoday.polaris.PropertyFilter.filteredNames(Set.of("class"));
+    PropertyFilter propertyFilter = PropertyFilter.filteredNames(Set.of("class"));
 
     BeanMetadata metadata = BeanMetadata.from(UserModel.class);
     assertThat(propertyFilter.isFiltered(metadata.getBeanProperty("id"))).isFalse();
@@ -59,7 +59,7 @@ class PropertyFilterTests {
 
   @Test
   void forTransientAnnotation() {
-    cn.taketoday.polaris.PropertyFilter propertyFilter = cn.taketoday.polaris.PropertyFilter.forTransientAnnotation();
+    PropertyFilter propertyFilter = PropertyFilter.forTransientAnnotation();
     BeanMetadata metadata = BeanMetadata.from(NestedUserModel.class);
     assertThat(propertyFilter.isFiltered(metadata.getBeanProperty("class"))).isFalse();
     assertThat(propertyFilter.isFiltered(metadata.getBeanProperty("id"))).isFalse();
@@ -70,7 +70,7 @@ class PropertyFilterTests {
 
   @Test
   void forAnnotation() {
-    cn.taketoday.polaris.PropertyFilter propertyFilter = cn.taketoday.polaris.PropertyFilter.forAnnotation(MyTransient.class);
+    PropertyFilter propertyFilter = PropertyFilter.forAnnotation(MyTransient.class);
     BeanMetadata metadata = BeanMetadata.from(NestedUserModel.class);
     assertThat(propertyFilter.isFiltered(metadata.getBeanProperty("class"))).isFalse();
     assertThat(propertyFilter.isFiltered(metadata.getBeanProperty("id"))).isFalse();
@@ -81,8 +81,8 @@ class PropertyFilterTests {
 
   @Test
   void and() {
-    cn.taketoday.polaris.PropertyFilter propertyFilter = cn.taketoday.polaris.PropertyFilter.forAnnotation(MyTransient.class)
-            .and(cn.taketoday.polaris.PropertyFilter.filteredNames(Set.of("class")))
+    PropertyFilter propertyFilter = PropertyFilter.forAnnotation(MyTransient.class)
+            .and(PropertyFilter.filteredNames(Set.of("class")))
             .and(PropertyFilter.forTransientAnnotation());
 
     BeanMetadata metadata = BeanMetadata.from(NestedUserModel.class);

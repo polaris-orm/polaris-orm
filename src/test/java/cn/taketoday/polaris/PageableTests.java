@@ -28,39 +28,39 @@ class PageableTests {
 
   @Test
   void pageNumber() {
-    assertThat(cn.taketoday.polaris.Pageable.of(1, 10).pageNumber()).isEqualTo(1);
-    assertThat(cn.taketoday.polaris.Pageable.of(3, 10).pageNumber()).isEqualTo(3);
-    assertThat(cn.taketoday.polaris.Pageable.of(4, 10).pageNumber()).isEqualTo(4);
-    assertThat(cn.taketoday.polaris.Pageable.of(4, 1).pageNumber()).isEqualTo(4);
+    assertThat(Pageable.of(1, 10).pageNumber()).isEqualTo(1);
+    assertThat(Pageable.of(3, 10).pageNumber()).isEqualTo(3);
+    assertThat(Pageable.of(4, 10).pageNumber()).isEqualTo(4);
+    assertThat(Pageable.of(4, 1).pageNumber()).isEqualTo(4);
   }
 
   @Test
   void pageSize() {
-    assertThat(cn.taketoday.polaris.Pageable.of(1, 10).pageSize()).isEqualTo(10);
-    assertThat(cn.taketoday.polaris.Pageable.of(1, 10).pageSize(5)).isEqualTo(5);
-    assertThat(cn.taketoday.polaris.Pageable.of(2, 10).pageSize(5)).isEqualTo(5);
+    assertThat(Pageable.of(1, 10).pageSize()).isEqualTo(10);
+    assertThat(Pageable.of(1, 10).pageSize(5)).isEqualTo(5);
+    assertThat(Pageable.of(2, 10).pageSize(5)).isEqualTo(5);
   }
 
   @Test
   void offset() {
-    assertThat(cn.taketoday.polaris.Pageable.of(1, 10).offset()).isEqualTo(0);
-    assertThat(cn.taketoday.polaris.Pageable.of(2, 10).offset()).isEqualTo(10);
-    assertThat(cn.taketoday.polaris.Pageable.of(1, 10).offset(5)).isEqualTo(0);
+    assertThat(Pageable.of(1, 10).offset()).isEqualTo(0);
+    assertThat(Pageable.of(2, 10).offset()).isEqualTo(10);
+    assertThat(Pageable.of(1, 10).offset(5)).isEqualTo(0);
 
-    assertThat(cn.taketoday.polaris.Pageable.of(2, 10).offset(5)).isEqualTo(5);
-    assertThat(cn.taketoday.polaris.Pageable.of(3, 10).offset(5)).isEqualTo(10);
+    assertThat(Pageable.of(2, 10).offset(5)).isEqualTo(5);
+    assertThat(Pageable.of(3, 10).offset(5)).isEqualTo(10);
   }
 
   @Test
   void of() {
-    assertThat(cn.taketoday.polaris.Pageable.of(1, 10)).isEqualTo(new cn.taketoday.polaris.SimplePageable(1, 10));
+    assertThat(Pageable.of(1, 10)).isEqualTo(new SimplePageable(1, 10));
   }
 
   @Test
   void unwrap() {
-    assertThat(cn.taketoday.polaris.Pageable.unwrap(1)).isNull();
-    assertThat(cn.taketoday.polaris.Pageable.unwrap(null)).isNull();
-    assertThat(cn.taketoday.polaris.Pageable.unwrap(cn.taketoday.polaris.Pageable.of(1, 10))).isNotNull();
+    assertThat(Pageable.unwrap(1)).isNull();
+    assertThat(Pageable.unwrap(null)).isNull();
+    assertThat(Pageable.unwrap(Pageable.of(1, 10))).isNotNull();
   }
 
   @Test

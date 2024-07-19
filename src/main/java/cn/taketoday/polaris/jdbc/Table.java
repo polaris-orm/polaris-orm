@@ -25,10 +25,10 @@ import java.util.Map;
  */
 public final class Table {
   private final String name;
-  private final List<cn.taketoday.polaris.jdbc.Row> rows;
-  private final List<cn.taketoday.polaris.jdbc.Column> columns;
+  private final List<Row> rows;
+  private final List<Column> columns;
 
-  public Table(String name, List<cn.taketoday.polaris.jdbc.Row> rows, List<cn.taketoday.polaris.jdbc.Column> columns) {
+  public Table(String name, List<Row> rows, List<Column> columns) {
     this.name = name;
     this.rows = rows;
     this.columns = columns;

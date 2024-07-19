@@ -51,9 +51,9 @@ public class QuerySelect implements StatementSequence {
 
   private boolean distinct;
 
-  private final cn.taketoday.polaris.sql.JoinFragment joins;
+  private final JoinFragment joins;
 
-  public QuerySelect(cn.taketoday.polaris.dialect.Platform platform) {
+  public QuerySelect(Platform platform) {
     joins = new QueryJoinFragment(platform, false);
   }
 
@@ -119,7 +119,7 @@ public class QuerySelect implements StatementSequence {
   }
 
   @Override
-  public String toStatementString(cn.taketoday.polaris.dialect.Platform platform) {
+  public String toStatementString(Platform platform) {
     StringBuilder buf = new StringBuilder(50);
     if (comment != null) {
       buf.append("/* ").append(Platform.escapeComment(comment)).append(" */ ");

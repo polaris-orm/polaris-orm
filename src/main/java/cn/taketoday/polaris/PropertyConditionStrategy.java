@@ -31,11 +31,11 @@ public interface PropertyConditionStrategy {
   @Nullable
   Condition resolve(EntityProperty entityProperty, Object propertyValue);
 
-  class Condition implements cn.taketoday.polaris.sql.Restriction {
+  class Condition implements Restriction {
 
     public final Object propertyValue;
 
-    public final cn.taketoday.polaris.sql.Restriction restriction;
+    public final Restriction restriction;
 
     public final EntityProperty entityProperty;
 

@@ -52,11 +52,11 @@ public final class NamedQuery extends AbstractQuery {
 
   private boolean hasArrayParameter = false;
 
-  public NamedQuery(cn.taketoday.polaris.jdbc.JdbcConnection connection, String queryText, boolean generatedKeys) {
+  public NamedQuery(JdbcConnection connection, String queryText, boolean generatedKeys) {
     this(connection, queryText, generatedKeys, null);
   }
 
-  public NamedQuery(cn.taketoday.polaris.jdbc.JdbcConnection connection, String queryText, String[] columnNames) {
+  public NamedQuery(JdbcConnection connection, String queryText, String[] columnNames) {
     this(connection, queryText, false, columnNames);
   }
 
@@ -93,7 +93,7 @@ public final class NamedQuery extends AbstractQuery {
   // Add Parameters
   //---------------------------------------------------------------------
 
-  public void addParameter(String name, cn.taketoday.polaris.jdbc.ParameterBinder parameterBinder) {
+  public void addParameter(String name, ParameterBinder parameterBinder) {
     QueryParameter queryParameter = queryParameters.get(name);
     if (queryParameter == null) {
       throw new PersistenceException(
@@ -114,7 +114,7 @@ public final class NamedQuery extends AbstractQuery {
       return addParameter(name, (Collection<?>) value);
     }
     TypeHandler<T> typeHandler = getTypeHandlerManager().getTypeHandler(parameterClass);
-    final class TypeHandlerParameterBinder extends cn.taketoday.polaris.jdbc.ParameterBinder {
+    final class TypeHandlerParameterBinder extends ParameterBinder {
       @Override
       public void bind(PreparedStatement statement, int paramIdx) throws SQLException {
         typeHandler.setParameter(statement, paramIdx, value);
@@ -140,47 +140,47 @@ public final class NamedQuery extends AbstractQuery {
   }
 
   public NamedQuery addNullParameter(String name) {
-    addParameter(name, cn.taketoday.polaris.jdbc.ParameterBinder.null_binder);
+    addParameter(name, ParameterBinder.null_binder);
     return this;
   }
 
   public NamedQuery addParameter(String name, InputStream value) {
-    addParameter(name, cn.taketoday.polaris.jdbc.ParameterBinder.forBinaryStream(value));
+    addParameter(name, ParameterBinder.forBinaryStream(value));
     return this;
   }
 
   public NamedQuery addParameter(String name, int value) {
-    addParameter(name, cn.taketoday.polaris.jdbc.ParameterBinder.forInt(value));
+    addParameter(name, ParameterBinder.forInt(value));
     return this;
   }
 
   public NamedQuery addParameter(String name, long value) {
-    addParameter(name, cn.taketoday.polaris.jdbc.ParameterBinder.forLong(value));
+    addParameter(name, ParameterBinder.forLong(value));
     return this;
   }
 
   public NamedQuery addParameter(String name, String value) {
-    addParameter(name, cn.taketoday.polaris.jdbc.ParameterBinder.forString(value));
+    addParameter(name, ParameterBinder.forString(value));
     return this;
   }
 
   public NamedQuery addParameter(String name, boolean value) {
-    addParameter(name, cn.taketoday.polaris.jdbc.ParameterBinder.forBoolean(value));
+    addParameter(name, ParameterBinder.forBoolean(value));
     return this;
   }
 
   public NamedQuery addParameter(String name, LocalDateTime value) {
-    addParameter(name, cn.taketoday.polaris.jdbc.ParameterBinder.forTimestamp(Timestamp.valueOf(value)));
+    addParameter(name, ParameterBinder.forTimestamp(Timestamp.valueOf(value)));
     return this;
   }
 
   public NamedQuery addParameter(String name, LocalDate value) {
-    addParameter(name, cn.taketoday.polaris.jdbc.ParameterBinder.forDate(Date.valueOf(value)));
+    addParameter(name, ParameterBinder.forDate(Date.valueOf(value)));
     return this;
   }
 
   public NamedQuery addParameter(String name, LocalTime value) {
-    addParameter(name, cn.taketoday.polaris.jdbc.ParameterBinder.forTime(Time.valueOf(value)));
+    addParameter(name, ParameterBinder.forTime(Time.valueOf(value)));
     return this;
   }
 
@@ -257,7 +257,7 @@ public final class NamedQuery extends AbstractQuery {
   protected String getQuerySQL(boolean allowArrayParameters) {
     if (hasArrayParameter) {
       // array parameter handling
-      this.parsedQuery = cn.taketoday.polaris.jdbc.ArrayParameters.updateQueryAndParametersIndexes(
+      this.parsedQuery = ArrayParameters.updateQueryAndParametersIndexes(
               parsedQuery,
               queryParameters,
               allowArrayParameters

@@ -30,12 +30,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 4.0 2024/2/16 22:47
  */
 class NoConditionsOrderByQueryTests {
-  cn.taketoday.polaris.DefaultEntityMetadataFactory factory = new DefaultEntityMetadataFactory();
+  DefaultEntityMetadataFactory factory = new DefaultEntityMetadataFactory();
 
   @Test
   void render() {
     EntityMetadata entityMetadata = factory.createEntityMetadata(UserModel.class);
-    var handler = new cn.taketoday.polaris.NoConditionsOrderByQuery(OrderByClause.forMap(Map.of("name", cn.taketoday.polaris.Order.ASC, "age", Order.DESC)));
+    var handler = new NoConditionsOrderByQuery(OrderByClause.forMap(Map.of("name", Order.ASC, "age", Order.DESC)));
 
     StatementSequence select = handler.render(entityMetadata);
     assertThat(select).extracting("orderByClause").isNotNull().asString().contains("`name` ASC").contains("`age` DESC");

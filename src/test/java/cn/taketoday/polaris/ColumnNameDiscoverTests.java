@@ -58,7 +58,7 @@ class ColumnNameDiscoverTests {
       int test;
     }
 
-    cn.taketoday.polaris.ColumnNameDiscover nameDiscover = cn.taketoday.polaris.ColumnNameDiscover.forColumnAnnotation();
+    ColumnNameDiscover nameDiscover = ColumnNameDiscover.forColumnAnnotation();
     assertThat(nameDiscover.getColumnName(valueOf(UserModel.class, "age")))
             .isEqualTo(null);
 
@@ -77,11 +77,11 @@ class ColumnNameDiscoverTests {
       int test1;
     }
 
-    var nameDiscover = cn.taketoday.polaris.ColumnNameDiscover.forAnnotation(MyColumn.class);
+    var nameDiscover = ColumnNameDiscover.forAnnotation(MyColumn.class);
     assertThat(nameDiscover.getColumnName(valueOf(UserModel.class, "age"))).isEqualTo(null);
     assertThat(nameDiscover.getColumnName(valueOf(Model.class, "test"))).isEqualTo("test-name");
 
-    var myValueDiscover = cn.taketoday.polaris.ColumnNameDiscover.forAnnotation(MyColumn.class, "myValue");
+    var myValueDiscover = ColumnNameDiscover.forAnnotation(MyColumn.class, "myValue");
     assertThat(myValueDiscover.getColumnName(valueOf(UserModel.class, "age"))).isEqualTo(null);
     assertThat(myValueDiscover.getColumnName(valueOf(Model.class, "test"))).isEqualTo(null);
     assertThat(myValueDiscover.getColumnName(valueOf(Model.class, "test1"))).isEqualTo("test-name");
@@ -95,7 +95,7 @@ class ColumnNameDiscoverTests {
       int testName;
     }
 
-    var nameDiscover = cn.taketoday.polaris.ColumnNameDiscover.camelCaseToUnderscore();
+    var nameDiscover = ColumnNameDiscover.camelCaseToUnderscore();
     assertThat(nameDiscover.getColumnName(valueOf(UserModel.class, "mobilePhone"))).isEqualTo("mobile_phone");
     assertThat(nameDiscover.getColumnName(valueOf(Model.class, "testName"))).isEqualTo("test_name");
 
@@ -108,7 +108,7 @@ class ColumnNameDiscoverTests {
       int testName;
     }
 
-    var nameDiscover = cn.taketoday.polaris.ColumnNameDiscover.forPropertyName();
+    var nameDiscover = ColumnNameDiscover.forPropertyName();
     assertThat(nameDiscover.getColumnName(valueOf(UserModel.class, "mobilePhone"))).isEqualTo("mobilePhone");
     assertThat(nameDiscover.getColumnName(valueOf(Model.class, "testName"))).isEqualTo("testName");
 
@@ -123,9 +123,9 @@ class ColumnNameDiscoverTests {
       int test1;
     }
 
-    var nameDiscover = cn.taketoday.polaris.ColumnNameDiscover.forColumnAnnotation()
-            .and(cn.taketoday.polaris.ColumnNameDiscover.forAnnotation(MyColumn.class, "myValue"))
-            .and(cn.taketoday.polaris.ColumnNameDiscover.forPropertyName());
+    var nameDiscover = ColumnNameDiscover.forColumnAnnotation()
+            .and(ColumnNameDiscover.forAnnotation(MyColumn.class, "myValue"))
+            .and(ColumnNameDiscover.forPropertyName());
 
     assertThat(nameDiscover.getColumnName(valueOf(UserModel.class, "mobilePhone"))).isEqualTo("mobilePhone");
     assertThat(nameDiscover.getColumnName(valueOf(Model.class, "testName"))).isEqualTo("testName");
@@ -144,10 +144,10 @@ class ColumnNameDiscoverTests {
       int test1;
     }
 
-    var nameDiscover = cn.taketoday.polaris.ColumnNameDiscover.composite(
-            cn.taketoday.polaris.ColumnNameDiscover.forColumnAnnotation(),
-            cn.taketoday.polaris.ColumnNameDiscover.forAnnotation(MyColumn.class, "myValue"),
-            cn.taketoday.polaris.ColumnNameDiscover.forPropertyName()
+    var nameDiscover = ColumnNameDiscover.composite(
+            ColumnNameDiscover.forColumnAnnotation(),
+            ColumnNameDiscover.forAnnotation(MyColumn.class, "myValue"),
+            ColumnNameDiscover.forPropertyName()
     );
 
     assertThat(nameDiscover.getColumnName(valueOf(UserModel.class, "mobilePhone"))).isEqualTo("mobilePhone");
@@ -158,8 +158,8 @@ class ColumnNameDiscoverTests {
 
     // composite null
 
-    nameDiscover = cn.taketoday.polaris.ColumnNameDiscover.composite(
-            List.of(cn.taketoday.polaris.ColumnNameDiscover.forColumnAnnotation(),
+    nameDiscover = ColumnNameDiscover.composite(
+            List.of(ColumnNameDiscover.forColumnAnnotation(),
                     ColumnNameDiscover.forAnnotation(MyColumn.class, "myValue"))
     );
     assertThat(nameDiscover.getColumnName(valueOf(UserModel.class, "age"))).isEqualTo(null);

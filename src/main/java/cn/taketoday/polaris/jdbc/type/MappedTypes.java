@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The annotation that specify java types to map {@link cn.taketoday.polaris.jdbc.type.TypeHandler}.
+ * The annotation that specify java types to map {@link TypeHandler}.
  *
  * <p>
  * <b>How to use:</b>

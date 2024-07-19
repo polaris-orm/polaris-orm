@@ -35,7 +35,7 @@ import cn.taketoday.util.ReflectionUtils;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 4.0 2022/8/1 22:15
  */
-public class EnumerableEnumTypeHandler<V> implements cn.taketoday.polaris.jdbc.type.TypeHandler<Enumerable<V>> {
+public class EnumerableEnumTypeHandler<V> implements TypeHandler<Enumerable<V>> {
 
   private final Class<? extends Enumerable<V>> type;
 

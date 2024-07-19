@@ -24,7 +24,7 @@ import java.sql.SQLException;
 import cn.taketoday.lang.Nullable;
 
 /**
- * The base {@link cn.taketoday.polaris.jdbc.type.TypeHandler} for references a generic type.
+ * The base {@link TypeHandler} for references a generic type.
  * <p>
  * Important: This class never call the {@link ResultSet#wasNull()} and
  * {@link CallableStatement#wasNull()} method for handling the SQL {@code NULL} value.

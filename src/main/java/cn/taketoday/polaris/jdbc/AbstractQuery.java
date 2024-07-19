@@ -51,7 +51,7 @@ import cn.taketoday.util.ObjectUtils;
  */
 public sealed abstract class AbstractQuery implements AutoCloseable permits NamedQuery, Query {
   private static final Logger log = LoggerFactory.getLogger(AbstractQuery.class);
-  static final cn.taketoday.polaris.jdbc.format.SqlStatementLogger stmtLogger = SqlStatementLogger.sharedInstance;
+  static final SqlStatementLogger stmtLogger = SqlStatementLogger.sharedInstance;
 
   private final JdbcConnection connection;
 
@@ -83,10 +83,10 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
   private Map<String, String> caseSensitiveColumnMappings;
 
   @Nullable
-  private cn.taketoday.polaris.jdbc.QueryStatementCallback statementCallback;
+  private QueryStatementCallback statementCallback;
 
   @Nullable
-  private cn.taketoday.polaris.jdbc.BatchResult batchResult;
+  private BatchResult batchResult;
 
   public AbstractQuery(JdbcConnection connection, String querySQL, boolean generatedKeys) {
     this(connection, querySQL, generatedKeys, null);
@@ -273,7 +273,7 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
    *
    * @return iterable results
    */
-  public <T> List<T> fetch(cn.taketoday.polaris.jdbc.ResultSetHandlerFactory<T> factory) {
+  public <T> List<T> fetch(ResultSetHandlerFactory<T> factory) {
     return iterate(factory).list();
   }
 
@@ -288,7 +288,7 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
   }
 
   @Nullable
-  public <T> T fetchFirst(cn.taketoday.polaris.jdbc.ResultSetHandlerFactory<T> factory) {
+  public <T> T fetchFirst(ResultSetHandlerFactory<T> factory) {
     return iterate(factory).first();
   }
 
@@ -327,11 +327,11 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
    * @param factory factory to provide ResultSetHandler
    * @return iterable results
    */
-  public <T> ResultSetIterator<T> iterate(cn.taketoday.polaris.jdbc.ResultSetHandlerFactory<T> factory) {
+  public <T> ResultSetIterator<T> iterate(ResultSetHandlerFactory<T> factory) {
     return new ResultSetHandlerIterator<>(factory);
   }
 
-  public <T> cn.taketoday.polaris.jdbc.ResultSetHandlerFactory<T> createHandlerFactory(Class<T> returnType) {
+  public <T> ResultSetHandlerFactory<T> createHandlerFactory(Class<T> returnType) {
     return new DefaultResultSetHandlerFactory<>(
             new JdbcBeanMetadata(returnType, caseSensitive, autoDerivingColumns, throwOnMappingFailure),
             connection.getManager(), getColumnMappings());
@@ -365,7 +365,7 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
   /**
    * @see PreparedStatement#executeUpdate()
    */
-  public <T> cn.taketoday.polaris.jdbc.UpdateResult<T> executeUpdate() {
+  public <T> UpdateResult<T> executeUpdate() {
     return executeUpdate(returnGeneratedKeys);
   }
 
@@ -373,15 +373,15 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
    * @see PreparedStatement#executeUpdate()
    */
   @SuppressWarnings("unchecked")
-  public <T> cn.taketoday.polaris.jdbc.UpdateResult<T> executeUpdate(boolean generatedKeys) {
-    return (cn.taketoday.polaris.jdbc.UpdateResult<T>) executeUpdate(generatedKeys ? cn.taketoday.polaris.jdbc.type.ObjectTypeHandler.sharedInstance : null);
+  public <T> UpdateResult<T> executeUpdate(boolean generatedKeys) {
+    return (UpdateResult<T>) executeUpdate(generatedKeys ? ObjectTypeHandler.sharedInstance : null);
   }
 
   /**
    * @param generatedKeyHandler {@link PreparedStatement#getGeneratedKeys()} value getter
    * @see PreparedStatement#executeUpdate()
    */
-  public <T> cn.taketoday.polaris.jdbc.UpdateResult<T> executeUpdate(@Nullable TypeHandler<T> generatedKeyHandler) {
+  public <T> UpdateResult<T> executeUpdate(@Nullable TypeHandler<T> generatedKeyHandler) {
     logStatement();
     long start = System.currentTimeMillis();
     try {
@@ -550,7 +550,7 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
    */
   public <A> List<A> addToBatchGetKeys(Class<A> klass) {
     addToBatch();
-    cn.taketoday.polaris.jdbc.BatchResult batchResult = this.batchResult;
+    BatchResult batchResult = this.batchResult;
     if (batchResult != null) {
       return batchResult.getKeys(klass);
     }
@@ -562,22 +562,22 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
   /**
    * @see PreparedStatement#executeBatch()
    */
-  public cn.taketoday.polaris.jdbc.BatchResult executeBatch() {
+  public BatchResult executeBatch() {
     return executeBatch(returnGeneratedKeys);
   }
 
   /**
    * @see PreparedStatement#executeBatch()
    */
-  public cn.taketoday.polaris.jdbc.BatchResult executeBatch(boolean generatedKeys) {
+  public BatchResult executeBatch(boolean generatedKeys) {
     logStatement();
     long start = System.currentTimeMillis();
     try {
       PreparedStatement statement = buildStatement();
 
-      cn.taketoday.polaris.jdbc.BatchResult batchResult = this.batchResult;
+      BatchResult batchResult = this.batchResult;
       if (batchResult == null) {
-        batchResult = new cn.taketoday.polaris.jdbc.BatchResult(connection);
+        batchResult = new BatchResult(connection);
         this.batchResult = batchResult;
       }
       batchResult.setBatchResult(statement.executeBatch());
@@ -610,13 +610,13 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
     }
   }
 
-  public <T> cn.taketoday.polaris.jdbc.BatchResult executeBatch(@Nullable TypeHandler<T> handler) {
+  public <T> BatchResult executeBatch(@Nullable TypeHandler<T> handler) {
     logStatement();
     long start = System.currentTimeMillis();
     try {
       PreparedStatement statement = buildStatement();
 
-      cn.taketoday.polaris.jdbc.BatchResult batchResult = this.batchResult;
+      BatchResult batchResult = this.batchResult;
       if (batchResult == null) {
         batchResult = new BatchResult(connection);
         this.batchResult = batchResult;
@@ -832,7 +832,7 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
    * @since 4.0
    */
   final class TableResultSetIterator extends CloseResultSetIterator<Row> {
-    private final List<cn.taketoday.polaris.jdbc.Column> columns;
+    private final List<Column> columns;
 
     private final boolean isCaseSensitive;
 
@@ -846,7 +846,7 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
       this.conversionService = conversionService == null ? DefaultConversionService.getSharedInstance() : conversionService;
       try {
         ResultSetMetaData meta = rs.getMetaData();
-        ArrayList<cn.taketoday.polaris.jdbc.Column> columns = new ArrayList<>();
+        ArrayList<Column> columns = new ArrayList<>();
         HashMap<String, Integer> columnNameToIdxMap = new HashMap<>();
 
         lt.setName(meta.getTableName(1));
@@ -856,7 +856,7 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
         for (int colIdx = 1; colIdx <= columnCount; colIdx++) {
           String colName = JdbcUtils.lookupColumnName(meta, colIdx);
           String colType = meta.getColumnTypeName(colIdx);
-          columns.add(new cn.taketoday.polaris.jdbc.Column(colName, colIdx - 1, colType));
+          columns.add(new Column(colName, colIdx - 1, colType));
 
           String colMapName = isCaseSensitive ? colName : colName.toLowerCase();
           columnNameToIdxMap.put(colMapName, colIdx - 1);

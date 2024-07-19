@@ -44,7 +44,7 @@ import cn.taketoday.transaction.UnexpectedRollbackException;
 public final class JdbcConnection implements Closeable, QueryProducer {
   private static final Logger log = LoggerFactory.getLogger(JdbcConnection.class);
 
-  private final cn.taketoday.polaris.jdbc.RepositoryManager manager;
+  private final RepositoryManager manager;
   private final DataSource dataSource;
 
   @Nullable
@@ -60,14 +60,14 @@ public final class JdbcConnection implements Closeable, QueryProducer {
   @Nullable
   private TransactionStatus transaction;
 
-  public JdbcConnection(cn.taketoday.polaris.jdbc.RepositoryManager manager, DataSource dataSource, boolean autoClose) {
+  public JdbcConnection(RepositoryManager manager, DataSource dataSource, boolean autoClose) {
     this.manager = manager;
     this.autoClose = autoClose;
     this.dataSource = dataSource;
     createConnection();
   }
 
-  public JdbcConnection(cn.taketoday.polaris.jdbc.RepositoryManager manager, DataSource dataSource) {
+  public JdbcConnection(RepositoryManager manager, DataSource dataSource) {
     this.manager = manager;
     this.autoClose = false;
     this.dataSource = dataSource;
@@ -244,7 +244,7 @@ public final class JdbcConnection implements Closeable, QueryProducer {
    * @throws IllegalTransactionStateException if the given transaction
    * is already completed (that is, committed or rolled back)
    */
-  public cn.taketoday.polaris.jdbc.RepositoryManager rollback() {
+  public RepositoryManager rollback() {
     rollback(true);
     return manager;
   }

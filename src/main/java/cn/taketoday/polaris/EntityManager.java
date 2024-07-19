@@ -308,7 +308,7 @@ public interface EntityManager {
    * @throws IllegalEntityException entityClass is legal entity
    */
   @Nullable
-  <T> T findFirst(Class<T> entityClass, @Nullable cn.taketoday.polaris.QueryStatement handler)
+  <T> T findFirst(Class<T> entityClass, @Nullable QueryStatement handler)
           throws DataAccessException;
 
   /**
@@ -327,7 +327,7 @@ public interface EntityManager {
    * @throws IllegalEntityException entityClass is legal entity
    */
   @Nullable
-  <T> T findUnique(Class<T> entityClass, @Nullable cn.taketoday.polaris.QueryStatement handler)
+  <T> T findUnique(Class<T> entityClass, @Nullable QueryStatement handler)
           throws DataAccessException;
 
   /**
@@ -337,9 +337,9 @@ public interface EntityManager {
    */
   <T> List<T> find(Class<T> entityClass) throws DataAccessException;
 
-  <T> List<T> find(Class<T> entityClass, Map<String, cn.taketoday.polaris.Order> sortKeys) throws DataAccessException;
+  <T> List<T> find(Class<T> entityClass, Map<String, Order> sortKeys) throws DataAccessException;
 
-  <T> List<T> find(Class<T> entityClass, Pair<String, cn.taketoday.polaris.Order> sortKey) throws DataAccessException;
+  <T> List<T> find(Class<T> entityClass, Pair<String, Order> sortKey) throws DataAccessException;
 
   <T> List<T> find(Class<T> entityClass, Pair<String, Order>... sortKeys) throws DataAccessException;
 
@@ -354,11 +354,11 @@ public interface EntityManager {
   <T> List<T> find(Class<T> entityClass, Object example) throws DataAccessException;
 
   /**
-   * @param handler build {@link cn.taketoday.polaris.sql.Select}
+   * @param handler build {@link Select}
    * @throws IllegalEntityException entityClass is legal entity
-   * @see #iterate(Class, cn.taketoday.polaris.QueryStatement)
+   * @see #iterate(Class, QueryStatement)
    */
-  <T> List<T> find(Class<T> entityClass, @Nullable cn.taketoday.polaris.QueryStatement handler)
+  <T> List<T> find(Class<T> entityClass, @Nullable QueryStatement handler)
           throws DataAccessException;
 
   /**
@@ -405,7 +405,7 @@ public interface EntityManager {
    * @return Map containing key pair data.
    * @throws IllegalEntityException entityClass is legal entity
    */
-  <K, T> Map<K, T> find(Class<T> entityClass, @Nullable cn.taketoday.polaris.QueryStatement handler, String mapKey)
+  <K, T> Map<K, T> find(Class<T> entityClass, @Nullable QueryStatement handler, String mapKey)
           throws DataAccessException;
 
   /**
@@ -451,7 +451,7 @@ public interface EntityManager {
    * @return Map containing key pair data.
    * @throws IllegalEntityException entityClass is legal entity
    */
-  <K, T> Map<K, T> find(Class<T> entityClass, @Nullable cn.taketoday.polaris.QueryStatement handler, Function<T, K> keyMapper)
+  <K, T> Map<K, T> find(Class<T> entityClass, @Nullable QueryStatement handler, Function<T, K> keyMapper)
           throws DataAccessException;
 
   /**
@@ -470,52 +470,52 @@ public interface EntityManager {
   <T> Number count(Class<T> entityClass, Object example) throws DataAccessException;
 
   /**
-   * @param handler build {@link cn.taketoday.polaris.sql.Select}
+   * @param handler build {@link Select}
    * @throws IllegalEntityException entityClass is legal entity
-   * @see #iterate(Class, cn.taketoday.polaris.QueryStatement)
+   * @see #iterate(Class, QueryStatement)
    */
   <T> Number count(Class<T> entityClass, @Nullable ConditionStatement handler)
           throws DataAccessException;
 
   /**
    * @throws IllegalEntityException entityClass is legal entity
-   * @see #iterate(Class, cn.taketoday.polaris.QueryStatement)
+   * @see #iterate(Class, QueryStatement)
    */
-  <T> cn.taketoday.polaris.Page<T> page(Class<T> entityClass, @Nullable cn.taketoday.polaris.Pageable pageable)
+  <T> Page<T> page(Class<T> entityClass, @Nullable Pageable pageable)
           throws DataAccessException;
 
   /**
    * @throws IllegalEntityException entityClass is legal entity
    */
-  <T> cn.taketoday.polaris.Page<T> page(T example) throws DataAccessException;
+  <T> Page<T> page(T example) throws DataAccessException;
 
   /**
    * @throws IllegalEntityException entityClass is legal entity
    */
-  <T> cn.taketoday.polaris.Page<T> page(T example, @Nullable cn.taketoday.polaris.Pageable pageable) throws DataAccessException;
+  <T> Page<T> page(T example, @Nullable Pageable pageable) throws DataAccessException;
 
   /**
    * @throws IllegalEntityException entityClass is legal entity
    */
-  <T> cn.taketoday.polaris.Page<T> page(Class<T> entityClass, Object example) throws DataAccessException;
+  <T> Page<T> page(Class<T> entityClass, Object example) throws DataAccessException;
 
   /**
    * @throws IllegalEntityException entityClass is legal entity
    */
-  <T> cn.taketoday.polaris.Page<T> page(Class<T> entityClass, Object example, @Nullable cn.taketoday.polaris.Pageable pageable) throws DataAccessException;
+  <T> Page<T> page(Class<T> entityClass, Object example, @Nullable Pageable pageable) throws DataAccessException;
 
   /**
-   * @param handler build {@link cn.taketoday.polaris.sql.Select}
+   * @param handler build {@link Select}
    * @throws IllegalEntityException entityClass is legal entity
-   * @see #iterate(Class, cn.taketoday.polaris.QueryStatement)
+   * @see #iterate(Class, QueryStatement)
    */
-  <T> cn.taketoday.polaris.Page<T> page(Class<T> entityClass, @Nullable ConditionStatement handler)
+  <T> Page<T> page(Class<T> entityClass, @Nullable ConditionStatement handler)
           throws DataAccessException;
 
   /**
-   * @param handler build {@link cn.taketoday.polaris.sql.Select}
+   * @param handler build {@link Select}
    * @throws IllegalEntityException entityClass is legal entity
-   * @see #iterate(Class, cn.taketoday.polaris.QueryStatement)
+   * @see #iterate(Class, QueryStatement)
    */
   <T> Page<T> page(Class<T> entityClass, @Nullable ConditionStatement handler, @Nullable Pageable pageable)
           throws DataAccessException;
@@ -534,7 +534,7 @@ public interface EntityManager {
   /**
    * @throws IllegalEntityException entityClass is legal entity
    */
-  <T> void iterate(Class<T> entityClass, @Nullable cn.taketoday.polaris.QueryStatement handler, Consumer<T> entityConsumer)
+  <T> void iterate(Class<T> entityClass, @Nullable QueryStatement handler, Consumer<T> entityConsumer)
           throws DataAccessException;
 
   /**
@@ -553,7 +553,7 @@ public interface EntityManager {
           throws DataAccessException;
 
   /**
-   * Iterate entities with given {@link cn.taketoday.polaris.QueryStatement}
+   * Iterate entities with given {@link QueryStatement}
    *
    * @param handler build {@link Select}
    * @throws IllegalEntityException entityClass is legal entity

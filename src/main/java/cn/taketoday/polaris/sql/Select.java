@@ -58,7 +58,7 @@ public class Select implements StatementSequence {
    * Construct an SQL <tt>SELECT</tt> statement from the given clauses
    */
   @Override
-  public String toStatementString(cn.taketoday.polaris.dialect.Platform platform) {
+  public String toStatementString(Platform platform) {
     StringBuilder buf = new StringBuilder(guesstimatedBufferSize);
 
     if (comment != null) {

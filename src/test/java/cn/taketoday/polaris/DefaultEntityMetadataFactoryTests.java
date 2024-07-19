@@ -37,15 +37,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @since 4.0 2022/8/18 16:55
  */
 class DefaultEntityMetadataFactoryTests {
-  cn.taketoday.polaris.DefaultEntityMetadataFactory factory = new DefaultEntityMetadataFactory();
+  DefaultEntityMetadataFactory factory = new DefaultEntityMetadataFactory();
 
   @Test
   void defaultState() {
-    cn.taketoday.polaris.EntityMetadata entityMetadata = factory.createEntityMetadata(UserModel.class);
+    EntityMetadata entityMetadata = factory.createEntityMetadata(UserModel.class);
     assertThat(entityMetadata).isNotNull();
     assertThatThrownBy(() ->
             factory.createEntityMetadata(Object.class))
-            .isInstanceOf(cn.taketoday.polaris.IllegalEntityException.class)
+            .isInstanceOf(IllegalEntityException.class)
             .hasMessageStartingWith("Cannot determine properties for entity: " + Object.class);
   }
 
@@ -56,14 +56,14 @@ class DefaultEntityMetadataFactoryTests {
     assertIllegalArgumentException(factory::setIdPropertyDiscover);
     assertIllegalArgumentException(factory::setTableNameGenerator);
 
-    factory.setTableNameGenerator(cn.taketoday.polaris.TableNameGenerator.forTableAnnotation());
+    factory.setTableNameGenerator(TableNameGenerator.forTableAnnotation());
     assertThatThrownBy(() ->
             factory.createEntityMetadata(Object.class))
-            .isInstanceOf(cn.taketoday.polaris.IllegalEntityException.class)
+            .isInstanceOf(IllegalEntityException.class)
             .hasMessage("Cannot determine table name for entity: " + Object.class);
 
     factory.setTableNameGenerator(
-            cn.taketoday.polaris.TableNameGenerator.forTableAnnotation()
+            TableNameGenerator.forTableAnnotation()
                     .and(TableNameGenerator.defaultStrategy())
     );
 
@@ -71,7 +71,7 @@ class DefaultEntityMetadataFactoryTests {
 
     assertThatThrownBy(() ->
             factory.createEntityMetadata(UserModel.class))
-            .isInstanceOf(cn.taketoday.polaris.IllegalEntityException.class)
+            .isInstanceOf(IllegalEntityException.class)
             .hasMessageStartingWith("Cannot determine column name for property: UserModel#");
 
     factory.setPropertyFilter(PropertyFilter.acceptAny());
@@ -80,12 +80,12 @@ class DefaultEntityMetadataFactoryTests {
   @Test
   void multipleId() {
     class MultipleId extends UserModel {
-      @cn.taketoday.polaris.Id
+      @Id
       private Long id_;
     }
     assertThatThrownBy(() ->
             factory.createEntityMetadata(MultipleId.class))
-            .isInstanceOf(cn.taketoday.polaris.IllegalEntityException.class)
+            .isInstanceOf(IllegalEntityException.class)
             .hasMessage("Only one Id property supported, entity: " + MultipleId.class);
   }
 
@@ -97,7 +97,7 @@ class DefaultEntityMetadataFactoryTests {
 
     }
 
-    cn.taketoday.polaris.EntityMetadata entityMetadata = factory.createEntityMetadata(OverrideId.class);
+    EntityMetadata entityMetadata = factory.createEntityMetadata(OverrideId.class);
     assertThat(entityMetadata.idProperty).isNotNull();
     BeanProperty id = BeanMetadata.from(OverrideId.class).obtainBeanProperty("id");
     assertThat(entityMetadata.idProperty.property)
@@ -114,7 +114,7 @@ class DefaultEntityMetadataFactoryTests {
 
     // default
 
-    cn.taketoday.polaris.EntityMetadata entityMetadata = factory.createEntityMetadata(IdDiscover.class);
+    EntityMetadata entityMetadata = factory.createEntityMetadata(IdDiscover.class);
     assertThat(entityMetadata.idProperty).isNotNull();
     assertThat(entityMetadata.idProperty.property)
             .isEqualTo(BeanProperty.valueOf(IdDiscover.class, "id"));
@@ -130,7 +130,7 @@ class DefaultEntityMetadataFactoryTests {
 
   @Test
   void getEntityHolder() {
-    cn.taketoday.polaris.EntityMetadata entityMetadata = factory.getEntityMetadata(UserModel.class);
+    EntityMetadata entityMetadata = factory.getEntityMetadata(UserModel.class);
     assertThat(factory.entityCache.get(UserModel.class)).isEqualTo(entityMetadata);
   }
 
@@ -139,7 +139,7 @@ class DefaultEntityMetadataFactoryTests {
     class NullId {
       String name;
     }
-    cn.taketoday.polaris.EntityMetadata entityMetadata = factory.getEntityMetadata(NullId.class);
+    EntityMetadata entityMetadata = factory.getEntityMetadata(NullId.class);
     assertThat(factory.entityCache.get(NullId.class)).isSameAs(entityMetadata);
     assertThat(entityMetadata.idProperty).isNull();
     assertThat(entityMetadata.idColumnName).isNull();
@@ -164,7 +164,7 @@ class DefaultEntityMetadataFactoryTests {
 
       Long id_;
 
-      @cn.taketoday.polaris.GeneratedId
+      @GeneratedId
       public Long getId_() {
         return id_;
       }

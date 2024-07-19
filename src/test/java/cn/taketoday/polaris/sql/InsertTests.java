@@ -29,7 +29,7 @@ class InsertTests {
 
   @Test
   void addColumn() {
-    cn.taketoday.polaris.sql.Insert insert = new cn.taketoday.polaris.sql.Insert("t_user");
+    Insert insert = new Insert("t_user");
     insert.setComment("comment");
 
     insert.addColumn("name");
@@ -41,7 +41,7 @@ class InsertTests {
 
   @Test
   void addColumns() {
-    cn.taketoday.polaris.sql.Insert insert = new cn.taketoday.polaris.sql.Insert("t_user");
+    Insert insert = new Insert("t_user");
     insert.setComment("comment");
 
     insert.addColumns(new String[] { "name", "age" });
@@ -52,7 +52,7 @@ class InsertTests {
 
   @Test
   void empty() {
-    cn.taketoday.polaris.sql.Insert insert = new Insert("t_user");
+    Insert insert = new Insert("t_user");
     insert.setComment("comment");
 
     assertThat(insert.toStatementString(Platform.forClasspath()))

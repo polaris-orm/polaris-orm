@@ -21,7 +21,7 @@ import java.sql.SQLWarning;
 import cn.taketoday.dao.UncategorizedDataAccessException;
 
 /**
- * Exception thrown when we're not ignoring {@link java.sql.SQLWarning SQLWarnings}.
+ * Exception thrown when we're not ignoring {@link SQLWarning SQLWarnings}.
  *
  * <p>If an SQLWarning is reported, the operation completed, so we will need
  * to explicitly roll it back if we're not happy when looking at the warning.

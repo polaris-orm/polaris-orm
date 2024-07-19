@@ -22,8 +22,8 @@ import java.util.Map;
  */
 public class SqlParameterParser {
 
-  public static cn.taketoday.polaris.jdbc.parsing.CharParser[] getCharParsers(Map<String, QueryParameter> paramMap) {
-    return new cn.taketoday.polaris.jdbc.parsing.CharParser[] {
+  public static CharParser[] getCharParsers(Map<String, QueryParameter> paramMap) {
+    return new CharParser[] {
             new QuoteParser(),
             new DoubleHyphensCommentParser(),
             new ForwardSlashCommentParser(),
@@ -40,7 +40,7 @@ public class SqlParameterParser {
   public String parse(final String statement, final Map<String, QueryParameter> paramMap) {
     final int length = statement.length();
     final StringBuilder parsedQuery = new StringBuilder(length);
-    final cn.taketoday.polaris.jdbc.parsing.CharParser[] charParsers = getCharParsers(paramMap);
+    final CharParser[] charParsers = getCharParsers(paramMap);
 
     for (int idx = 0; idx < length; idx++) {
       for (final CharParser parser : charParsers) {

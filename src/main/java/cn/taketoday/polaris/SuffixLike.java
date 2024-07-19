@@ -28,7 +28,7 @@ import cn.taketoday.lang.Constant;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 4.0 2024/2/24 23:53
  */
-@cn.taketoday.polaris.Like
+@Like
 @Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SuffixLike {
@@ -36,10 +36,10 @@ public @interface SuffixLike {
   /**
    * The where-clause predicate.
    */
-  @AliasFor(annotation = cn.taketoday.polaris.Like.class, attribute = "value")
+  @AliasFor(annotation = Like.class, attribute = "value")
   String value() default Constant.DEFAULT_NONE;
 
-  @AliasFor(annotation = cn.taketoday.polaris.Like.class, attribute = "column")
+  @AliasFor(annotation = Like.class, attribute = "column")
   String column() default Constant.DEFAULT_NONE;
 
   @AliasFor(annotation = Like.class, attribute = "trim")

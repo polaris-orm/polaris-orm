@@ -16,6 +16,7 @@
 
 package cn.taketoday.polaris.jdbc.issues;
 
+import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -48,7 +49,7 @@ class H2Tests {
     url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1";
     user = "sa";
     pass = "";
-    org.h2.jdbcx.JdbcDataSource datasource = new org.h2.jdbcx.JdbcDataSource();
+    JdbcDataSource datasource = new JdbcDataSource();
     datasource.setURL(url);
     datasource.setUser(user);
     datasource.setPassword(pass);

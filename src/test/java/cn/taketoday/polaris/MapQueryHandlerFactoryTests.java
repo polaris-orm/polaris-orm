@@ -33,12 +33,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class MapQueryHandlerFactoryTests {
 
-  final cn.taketoday.polaris.DefaultEntityMetadataFactory metadataFactory = new DefaultEntityMetadataFactory();
+  final DefaultEntityMetadataFactory metadataFactory = new DefaultEntityMetadataFactory();
   final EntityMetadata entityMetadata = metadataFactory.getEntityMetadata(UserModel.class);
 
   @Test
   void createCondition() {
-    cn.taketoday.polaris.MapQueryHandlerFactory factory = new cn.taketoday.polaris.MapQueryHandlerFactory();
+    MapQueryHandlerFactory factory = new MapQueryHandlerFactory();
     ConditionStatement condition = factory.createCondition(Map.of("name", "TODAY"));
     assertThat(condition).isNotNull();
 
@@ -52,7 +52,7 @@ class MapQueryHandlerFactoryTests {
 
   @Test
   void createQuery() {
-    cn.taketoday.polaris.MapQueryHandlerFactory factory = new cn.taketoday.polaris.MapQueryHandlerFactory();
+    MapQueryHandlerFactory factory = new MapQueryHandlerFactory();
     QueryStatement queryStatement = factory.createQuery(Map.of("name", "TODAY"));
     assertThat(queryStatement).isNotNull();
 

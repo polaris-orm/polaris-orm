@@ -33,7 +33,7 @@ import cn.taketoday.lang.Nullable;
 /**
  * <p>
  * better to use :
- * create queries with {@link cn.taketoday.polaris.jdbc.JdbcConnection} class instead,
+ * create queries with {@link JdbcConnection} class instead,
  * using try-with-resource blocks
  * <pre>
  * try (Connection con = repositoryManager.open()) {
@@ -50,11 +50,11 @@ public final class Query extends AbstractQuery {
 
   private final ArrayList<ParameterBinder> queryParameters = new ArrayList<>();
 
-  public Query(cn.taketoday.polaris.jdbc.JdbcConnection connection, String querySQL, boolean generatedKeys) {
+  public Query(JdbcConnection connection, String querySQL, boolean generatedKeys) {
     super(connection, querySQL, generatedKeys);
   }
 
-  public Query(cn.taketoday.polaris.jdbc.JdbcConnection connection, String querySQL, @Nullable String[] columnNames) {
+  public Query(JdbcConnection connection, String querySQL, @Nullable String[] columnNames) {
     super(connection, querySQL, columnNames);
   }
 

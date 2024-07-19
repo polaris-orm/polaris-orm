@@ -30,7 +30,7 @@ public interface BatchPersistListener {
    * @param execution batch execution
    * @param implicitExecution implicit Execution
    */
-  default void beforeProcessing(cn.taketoday.polaris.BatchExecution execution, boolean implicitExecution) { }
+  default void beforeProcessing(BatchExecution execution, boolean implicitExecution) { }
 
   /**
    * after batch processing

@@ -173,7 +173,7 @@ public class SimpleSelect implements StatementSequence {
     return this;
   }
 
-  public cn.taketoday.polaris.sql.MutableOrderByClause orderByClause() {
+  public MutableOrderByClause orderByClause() {
     if (orderByClause instanceof MutableOrderByClause mutable) {
       return mutable;
     }
@@ -188,7 +188,7 @@ public class SimpleSelect implements StatementSequence {
   }
 
   @Override
-  public String toStatementString(cn.taketoday.polaris.dialect.Platform platform) {
+  public String toStatementString(Platform platform) {
     StringBuilder buf = new StringBuilder(columns.size() * 10 + tableName.length() + restrictions.size() * 10 + 10);
     if (comment != null) {
       buf.append("/* ").append(Platform.escapeComment(comment)).append(" */ ");

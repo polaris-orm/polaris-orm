@@ -33,7 +33,7 @@ public class UserInserterFactory {
   private static class BindUserInserter implements UserInserter {
 
     @Override
-    public void insertUser(cn.taketoday.polaris.jdbc.NamedQuery insertQuery, int idx) {
+    public void insertUser(NamedQuery insertQuery, int idx) {
       User user = new User();
       user.name = "a name " + idx;
       user.setEmail(String.format("test%s@email.com", idx));

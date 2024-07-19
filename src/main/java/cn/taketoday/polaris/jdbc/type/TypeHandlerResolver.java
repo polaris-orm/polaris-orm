@@ -28,7 +28,7 @@ import cn.taketoday.lang.Assert;
 import cn.taketoday.lang.Nullable;
 
 /**
- * BeanProperty {@link cn.taketoday.polaris.jdbc.type.TypeHandler} resolver
+ * BeanProperty {@link TypeHandler} resolver
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 4.0 2022/7/30 23:32
@@ -36,12 +36,12 @@ import cn.taketoday.lang.Nullable;
 public interface TypeHandlerResolver {
 
   /**
-   * BeanProperty {@link cn.taketoday.polaris.jdbc.type.TypeHandler} resolver
+   * BeanProperty {@link TypeHandler} resolver
    *
    * @param beanProperty target property
    */
   @Nullable
-  cn.taketoday.polaris.jdbc.type.TypeHandler<?> resolve(BeanProperty beanProperty);
+  TypeHandler<?> resolve(BeanProperty beanProperty);
 
   /**
    * returns a new resolving chain
@@ -51,7 +51,7 @@ public interface TypeHandlerResolver {
    */
   default TypeHandlerResolver and(TypeHandlerResolver next) {
     return beanProperty -> {
-      cn.taketoday.polaris.jdbc.type.TypeHandler<?> resolved = resolve(beanProperty);
+      TypeHandler<?> resolved = resolve(beanProperty);
       if (resolved == null) {
         resolved = next.resolve(beanProperty);
       }
@@ -68,7 +68,7 @@ public interface TypeHandlerResolver {
     Assert.notNull(resolvers, "TypeHandlerResolver is required");
     return beanProperty -> {
       for (TypeHandlerResolver resolver : resolvers) {
-        cn.taketoday.polaris.jdbc.type.TypeHandler<?> resolved = resolver.resolve(beanProperty);
+        TypeHandler<?> resolved = resolver.resolve(beanProperty);
         if (resolved != null) {
           return resolved;
         }
@@ -79,7 +79,7 @@ public interface TypeHandlerResolver {
   }
 
   /**
-   * Use {@link cn.taketoday.polaris.jdbc.type.MappedTypeHandler} to resolve {@link cn.taketoday.polaris.jdbc.type.TypeHandler}
+   * Use {@link MappedTypeHandler} to resolve {@link TypeHandler}
    *
    * @return Annotation based {@link TypeHandlerResolver}
    * @see MergedAnnotation#getClass(String)
@@ -89,7 +89,7 @@ public interface TypeHandlerResolver {
   }
 
   /**
-   * Use input {@code annotationType} to resolve {@link cn.taketoday.polaris.jdbc.type.TypeHandler}
+   * Use input {@code annotationType} to resolve {@link TypeHandler}
    *
    * @param annotationType Annotation type
    * @return Annotation based {@link TypeHandlerResolver}
@@ -100,7 +100,7 @@ public interface TypeHandlerResolver {
   }
 
   /**
-   * Use input {@code annotationType} and {@code attributeName} to resolve {@link cn.taketoday.polaris.jdbc.type.TypeHandler}
+   * Use input {@code annotationType} and {@code attributeName} to resolve {@link TypeHandler}
    *
    * @param annotationType Annotation type
    * @param attributeName the attribute name
@@ -116,7 +116,7 @@ public interface TypeHandlerResolver {
               property, property.getAnnotations()).get(annotationType);
       if (mappedTypeHandler.isPresent()) {
         // user defined TypeHandler
-        Class<? extends cn.taketoday.polaris.jdbc.type.TypeHandler<?>> typeHandlerClass = mappedTypeHandler.getClass(attributeName);
+        Class<? extends TypeHandler<?>> typeHandlerClass = mappedTypeHandler.getClass(attributeName);
         Constructor<? extends TypeHandler<?>> constructor = BeanUtils.getConstructor(typeHandlerClass);
         if (constructor == null) {
           throw new IllegalStateException("No suitable constructor in " + typeHandlerClass);

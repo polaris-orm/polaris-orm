@@ -68,7 +68,7 @@ public class InsertSelect implements StatementSequence {
   }
 
   @Override
-  public String toStatementString(cn.taketoday.polaris.dialect.Platform platform) {
+  public String toStatementString(Platform platform) {
     Assert.state(select != null, "no select defined for insert-select");
     Assert.state(tableName != null, "no table name defined for insert-select");
 

@@ -31,7 +31,7 @@ public class QueryJoinFragment extends JoinFragment {
   private StringBuilder afterFrom = new StringBuilder();
   private StringBuilder afterWhere = new StringBuilder();
 
-  private final cn.taketoday.polaris.dialect.Platform platform;
+  private final Platform platform;
 
   private final boolean useThetaStyleInnerJoins;
 

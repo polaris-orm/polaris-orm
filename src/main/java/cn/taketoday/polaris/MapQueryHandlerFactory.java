@@ -31,7 +31,7 @@ import cn.taketoday.polaris.sql.SimpleSelect;
 final class MapQueryHandlerFactory implements QueryHandlerFactory {
 
   @Override
-  public cn.taketoday.polaris.QueryStatement createQuery(Object example) {
+  public QueryStatement createQuery(Object example) {
     if (example instanceof Map<?, ?> map) {
       return new MapQueryStatement(map);
     }
@@ -39,7 +39,7 @@ final class MapQueryHandlerFactory implements QueryHandlerFactory {
   }
 
   @Override
-  public cn.taketoday.polaris.ConditionStatement createCondition(Object example) {
+  public ConditionStatement createCondition(Object example) {
     if (example instanceof Map<?, ?> map) {
       return new MapQueryStatement(map);
     }

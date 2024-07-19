@@ -24,10 +24,10 @@ import java.util.Map;
  */
 public class ParameterParser extends CharParser {
 
-  private final Map<String, cn.taketoday.polaris.jdbc.parsing.QueryParameter> parameterMap;
+  private final Map<String, QueryParameter> parameterMap;
   int paramIdx = 1;
 
-  public ParameterParser(Map<String, cn.taketoday.polaris.jdbc.parsing.QueryParameter> parameterMap) {
+  public ParameterParser(Map<String, QueryParameter> parameterMap) {
     this.parameterMap = parameterMap;
   }
 
@@ -49,25 +49,25 @@ public class ParameterParser extends CharParser {
     }
 
     String name = sql.substring(startIdx + 1, idx + 1);
-    cn.taketoday.polaris.jdbc.parsing.QueryParameter queryParameter = parameterMap.get(name);
+    QueryParameter queryParameter = parameterMap.get(name);
 
     if (queryParameter == null) {
-      queryParameter = new QueryParameter(name, cn.taketoday.polaris.jdbc.parsing.ParameterIndexHolder.valueOf(paramIdx));
+      queryParameter = new QueryParameter(name, ParameterIndexHolder.valueOf(paramIdx));
       parameterMap.put(name, queryParameter);
     }
     else {
       // set ParameterApplier
-      cn.taketoday.polaris.jdbc.parsing.ParameterIndexHolder indexHolder = queryParameter.getHolder();
+      ParameterIndexHolder indexHolder = queryParameter.getHolder();
       if (indexHolder == null) {
-        indexHolder = cn.taketoday.polaris.jdbc.parsing.ParameterIndexHolder.valueOf(paramIdx);
+        indexHolder = ParameterIndexHolder.valueOf(paramIdx);
         queryParameter.setHolder(indexHolder);
       }
-      else if (indexHolder instanceof cn.taketoday.polaris.jdbc.parsing.ListParameterIndexApplier) {
-        ((cn.taketoday.polaris.jdbc.parsing.ListParameterIndexApplier) indexHolder).addIndex(paramIdx);
+      else if (indexHolder instanceof ListParameterIndexApplier) {
+        ((ListParameterIndexApplier) indexHolder).addIndex(paramIdx);
       }
-      else if (indexHolder instanceof cn.taketoday.polaris.jdbc.parsing.DefaultParameterIndexHolder) {
+      else if (indexHolder instanceof DefaultParameterIndexHolder) {
         ArrayList<Integer> indices = new ArrayList<>();
-        final int index = ((cn.taketoday.polaris.jdbc.parsing.DefaultParameterIndexHolder) indexHolder).getIndex();
+        final int index = ((DefaultParameterIndexHolder) indexHolder).getIndex();
         indices.add(index);
         indices.add(paramIdx);
         queryParameter.setHolder(ParameterIndexHolder.valueOf(indices));

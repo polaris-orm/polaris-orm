@@ -22,7 +22,7 @@ package cn.taketoday.polaris;
  */
 final class DefaultQueryHandlerFactory implements QueryHandlerFactory {
 
-  private final cn.taketoday.polaris.EntityMetadataFactory factory;
+  private final EntityMetadataFactory factory;
 
   public DefaultQueryHandlerFactory(EntityMetadataFactory factory) {
     this.factory = factory;
@@ -30,12 +30,12 @@ final class DefaultQueryHandlerFactory implements QueryHandlerFactory {
 
   @Override
   public QueryStatement createQuery(Object example) {
-    return new cn.taketoday.polaris.ExampleQuery(factory, example);
+    return new ExampleQuery(factory, example);
   }
 
   @Override
   public ConditionStatement createCondition(Object example) {
-    return new cn.taketoday.polaris.ExampleQuery(factory, example);
+    return new ExampleQuery(factory, example);
   }
 
 }

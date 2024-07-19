@@ -37,7 +37,7 @@ import cn.taketoday.lang.TodayStrategies;
  * @since 4.0 2022/8/2 20:42
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class EnumerationValueTypeHandler<T extends Enum<T>> implements cn.taketoday.polaris.jdbc.type.TypeHandler<T> {
+public class EnumerationValueTypeHandler<T extends Enum<T>> implements TypeHandler<T> {
   public static final String fallbackValueBeanPropertyKey = "jdbc.type-handler.enum-value-property-name";
 
   private static final String fallbackValueBeanProperty = TodayStrategies.getProperty(

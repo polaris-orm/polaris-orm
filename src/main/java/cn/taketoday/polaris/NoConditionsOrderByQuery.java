@@ -28,7 +28,7 @@ import cn.taketoday.polaris.sql.Select;
  */
 class NoConditionsOrderByQuery extends ColumnsQueryStatement implements QueryStatement {
 
-  private final cn.taketoday.polaris.sql.OrderByClause clause;
+  private final OrderByClause clause;
 
   NoConditionsOrderByQuery(OrderByClause clause) {
     this.clause = clause;

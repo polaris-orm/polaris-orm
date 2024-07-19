@@ -31,10 +31,10 @@ import cn.taketoday.polaris.jdbc.ParameterBinder;
 public final class QueryParameter {
   private final String name;
 
-  private cn.taketoday.polaris.jdbc.ParameterBinder setter;
-  private cn.taketoday.polaris.jdbc.parsing.ParameterIndexHolder applier;
+  private ParameterBinder setter;
+  private ParameterIndexHolder applier;
 
-  public QueryParameter(String name, cn.taketoday.polaris.jdbc.parsing.ParameterIndexHolder indexHolder) {
+  public QueryParameter(String name, ParameterIndexHolder indexHolder) {
     this.name = name;
     this.applier = indexHolder;
   }
@@ -51,11 +51,11 @@ public final class QueryParameter {
     }
   }
 
-  public void setHolder(cn.taketoday.polaris.jdbc.parsing.ParameterIndexHolder applier) {
+  public void setHolder(ParameterIndexHolder applier) {
     this.applier = applier;
   }
 
-  public void setSetter(cn.taketoday.polaris.jdbc.ParameterBinder setter) {
+  public void setSetter(ParameterBinder setter) {
     this.setter = setter;
   }
 

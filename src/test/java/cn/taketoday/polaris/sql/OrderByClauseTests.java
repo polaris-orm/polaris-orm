@@ -33,42 +33,42 @@ class OrderByClauseTests {
 
   @Test
   void toClause() {
-    cn.taketoday.polaris.sql.OrderByClause clause = cn.taketoday.polaris.sql.OrderByClause.forMap(Map.of("name", Order.ASC));
+    OrderByClause clause = OrderByClause.forMap(Map.of("name", Order.ASC));
     assertThat(clause.toClause().toString()).isEqualTo("`name` ASC");
 
-    assertThat(cn.taketoday.polaris.sql.OrderByClause.valueOf(Pair.of("name", Order.ASC), Pair.of("age", Order.DESC))
+    assertThat(OrderByClause.valueOf(Pair.of("name", Order.ASC), Pair.of("age", Order.DESC))
             .toClause().toString()).isEqualTo("`name` ASC, `age` DESC");
   }
 
   @Test
   void desc() {
-    assertThat(cn.taketoday.polaris.sql.OrderByClause.valueOf()
+    assertThat(OrderByClause.valueOf()
             .desc("name").toClause().toString()).isEqualTo("`name` DESC");
   }
 
   @Test
   void asc() {
-    assertThat(cn.taketoday.polaris.sql.OrderByClause.mutable()
+    assertThat(OrderByClause.mutable()
             .asc("name").toClause().toString()).isEqualTo("`name` ASC");
   }
 
   @Test
   void isEmpty() {
-    assertThat(cn.taketoday.polaris.sql.OrderByClause.mutable().isEmpty()).isTrue();
-    assertThat(cn.taketoday.polaris.sql.OrderByClause.mutable().asc("name").isEmpty()).isFalse();
+    assertThat(OrderByClause.mutable().isEmpty()).isTrue();
+    assertThat(OrderByClause.mutable().asc("name").isEmpty()).isFalse();
   }
 
   @Test
   void merge() {
-    cn.taketoday.polaris.sql.MutableOrderByClause clause = new MutableOrderByClause().asc("name");
-    clause.merge(cn.taketoday.polaris.sql.OrderByClause.mutable().desc("age"));
+    MutableOrderByClause clause = new MutableOrderByClause().asc("name");
+    clause.merge(OrderByClause.mutable().desc("age"));
     assertThat(clause.isEmpty()).isFalse();
     assertThat(clause.toClause().toString()).isEqualTo("`name` ASC, `age` DESC");
   }
 
   @Test
   void plain() {
-    assertThat(cn.taketoday.polaris.sql.OrderByClause.plain("`name` ASC, `age` DESC").isEmpty()).isFalse();
+    assertThat(OrderByClause.plain("`name` ASC, `age` DESC").isEmpty()).isFalse();
     assertThat(OrderByClause.plain("`name` ASC, `age` DESC").toClause()).isEqualTo("`name` ASC, `age` DESC");
   }
 

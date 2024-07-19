@@ -142,46 +142,46 @@ public abstract class QueryCondition extends ColumnsQueryStatement implements Qu
 
   // Static factory methods
 
-  public static cn.taketoday.polaris.DefaultQueryCondition of(String columnName, cn.taketoday.polaris.Operator operator, Object value) {
-    return new cn.taketoday.polaris.DefaultQueryCondition(columnName, operator, value);
+  public static DefaultQueryCondition of(String columnName, Operator operator, Object value) {
+    return new DefaultQueryCondition(columnName, operator, value);
   }
 
-  public static cn.taketoday.polaris.DefaultQueryCondition isEqualsTo(String columnName, Object value) {
-    return new cn.taketoday.polaris.DefaultQueryCondition(columnName, cn.taketoday.polaris.Operator.EQUALS, value);
+  public static DefaultQueryCondition isEqualsTo(String columnName, Object value) {
+    return new DefaultQueryCondition(columnName, Operator.EQUALS, value);
   }
 
-  public static cn.taketoday.polaris.DefaultQueryCondition between(String columnName, Object array) {
+  public static DefaultQueryCondition between(String columnName, Object array) {
     Assert.isTrue(getLength(array) == 2, "BETWEEN expression must have left and right value");
-    return new cn.taketoday.polaris.DefaultQueryCondition(columnName, cn.taketoday.polaris.Operator.BETWEEN, array);
+    return new DefaultQueryCondition(columnName, Operator.BETWEEN, array);
   }
 
-  public static cn.taketoday.polaris.DefaultQueryCondition between(String columnName, Object left, Object right) {
-    return new cn.taketoday.polaris.DefaultQueryCondition(columnName, cn.taketoday.polaris.Operator.BETWEEN, new Object[] { left, right });
+  public static DefaultQueryCondition between(String columnName, Object left, Object right) {
+    return new DefaultQueryCondition(columnName, Operator.BETWEEN, new Object[] { left, right });
   }
 
-  public static cn.taketoday.polaris.DefaultQueryCondition notBetween(String columnName, Object array) {
+  public static DefaultQueryCondition notBetween(String columnName, Object array) {
     Assert.isTrue(getLength(array) == 2, "BETWEEN expression must have left and right value");
-    return new cn.taketoday.polaris.DefaultQueryCondition(columnName, cn.taketoday.polaris.Operator.BETWEEN, array);
+    return new DefaultQueryCondition(columnName, Operator.BETWEEN, array);
   }
 
-  public static cn.taketoday.polaris.DefaultQueryCondition notBetween(String columnName, Object left, Object right) {
-    return new cn.taketoday.polaris.DefaultQueryCondition(columnName, cn.taketoday.polaris.Operator.NOT_BETWEEN, new Object[] { left, right });
+  public static DefaultQueryCondition notBetween(String columnName, Object left, Object right) {
+    return new DefaultQueryCondition(columnName, Operator.NOT_BETWEEN, new Object[] { left, right });
   }
 
-  public static cn.taketoday.polaris.DefaultQueryCondition isNotNull(String columnName) {
-    return new NullQueryCondition(columnName, cn.taketoday.polaris.Operator.IS_NOT_NULL);
+  public static DefaultQueryCondition isNotNull(String columnName) {
+    return new NullQueryCondition(columnName, Operator.IS_NOT_NULL);
   }
 
-  public static cn.taketoday.polaris.DefaultQueryCondition isNull(String columnName) {
-    return new NullQueryCondition(columnName, cn.taketoday.polaris.Operator.IS_NULL);
+  public static DefaultQueryCondition isNull(String columnName) {
+    return new NullQueryCondition(columnName, Operator.IS_NULL);
   }
 
-  public static cn.taketoday.polaris.DefaultQueryCondition nullable(String columnName, Object value) {
-    return new cn.taketoday.polaris.DefaultQueryCondition(columnName, cn.taketoday.polaris.Operator.EQUALS, value, true);
+  public static DefaultQueryCondition nullable(String columnName, Object value) {
+    return new DefaultQueryCondition(columnName, Operator.EQUALS, value, true);
   }
 
-  public static cn.taketoday.polaris.DefaultQueryCondition isNotEmpty(String columnName, Object value) {
-    return new cn.taketoday.polaris.DefaultQueryCondition(columnName, cn.taketoday.polaris.Operator.EQUALS, value) {
+  public static DefaultQueryCondition isNotEmpty(String columnName, Object value) {
+    return new DefaultQueryCondition(columnName, Operator.EQUALS, value) {
       @Override
       public boolean matches() {
         return ObjectUtils.isNotEmpty(parameterValue);
@@ -211,7 +211,7 @@ public abstract class QueryCondition extends ColumnsQueryStatement implements Qu
    * @param condition normal condition
    * @return nested condition
    */
-  public static cn.taketoday.polaris.NestedQueryCondition nested(QueryCondition condition) {
+  public static NestedQueryCondition nested(QueryCondition condition) {
     return new NestedQueryCondition(condition);
   }
 

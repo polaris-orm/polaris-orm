@@ -87,28 +87,28 @@ class EnumerationValueTypeHandlerTests {
 
   @Test
   void getAnnotatedProperty() {
-    BeanProperty annotatedProperty = cn.taketoday.polaris.jdbc.type.EnumerationValueTypeHandler.getAnnotatedProperty(StringCode.class);
+    BeanProperty annotatedProperty = EnumerationValueTypeHandler.getAnnotatedProperty(StringCode.class);
     assertThat(annotatedProperty).isNotNull();
     assertThat(annotatedProperty.getType()).isEqualTo(int.class);
 
     //
-    annotatedProperty = cn.taketoday.polaris.jdbc.type.EnumerationValueTypeHandler.getAnnotatedProperty(StringValue.class);
+    annotatedProperty = EnumerationValueTypeHandler.getAnnotatedProperty(StringValue.class);
     assertThat(annotatedProperty).isNotNull();
     assertThat(annotatedProperty.getType()).isEqualTo(int.class);
 
-    assertThat(cn.taketoday.polaris.jdbc.type.EnumerationValueTypeHandler.getAnnotatedProperty(StringValueNotFound.class)).isNull();
+    assertThat(EnumerationValueTypeHandler.getAnnotatedProperty(StringValueNotFound.class)).isNull();
 
   }
 
   @Test
   void setParameter() throws SQLException {
-    cn.taketoday.polaris.jdbc.type.TypeHandler<Integer> delegate = mock(cn.taketoday.polaris.jdbc.type.TypeHandler.class);
+    TypeHandler<Integer> delegate = mock(TypeHandler.class);
     PreparedStatement statement = mock(PreparedStatement.class);
 
-    cn.taketoday.polaris.jdbc.type.TypeHandlerManager registry = new cn.taketoday.polaris.jdbc.type.TypeHandlerManager();
+    TypeHandlerManager registry = new TypeHandlerManager();
     registry.register(int.class, delegate);
 
-    var handler = new cn.taketoday.polaris.jdbc.type.EnumerationValueTypeHandler<>(StringCode.class, registry);
+    var handler = new EnumerationValueTypeHandler<>(StringCode.class, registry);
 
     handler.setParameter(statement, 1, null);
     handler.setParameter(statement, 1, StringCode.TEST1);
@@ -119,7 +119,7 @@ class EnumerationValueTypeHandlerTests {
 
   @Test
   void getResult() throws SQLException {
-    cn.taketoday.polaris.jdbc.type.TypeHandler<Integer> delegate = mock(TypeHandler.class);
+    TypeHandler<Integer> delegate = mock(TypeHandler.class);
     ResultSet resultSet = mock(ResultSet.class);
     CallableStatement callableStatement = mock(CallableStatement.class);
 
@@ -127,7 +127,7 @@ class EnumerationValueTypeHandlerTests {
     given(delegate.getResult(resultSet, "test")).willReturn(StringCode.TEST2.code);
     given(delegate.getResult(callableStatement, 1)).willReturn(StringCode.TEST2.code);
 
-    cn.taketoday.polaris.jdbc.type.TypeHandlerManager registry = new TypeHandlerManager();
+    TypeHandlerManager registry = new TypeHandlerManager();
     registry.register(int.class, delegate);
 
     var handler = new EnumerationValueTypeHandler<>(StringCode.class, registry);

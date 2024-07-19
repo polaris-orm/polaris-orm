@@ -21,8 +21,8 @@ import java.sql.ResultSet;
 import cn.taketoday.beans.BeanProperty;
 
 /**
- * use this handler when {@link cn.taketoday.polaris.jdbc.ObjectPropertySetter}
- * handle {@link cn.taketoday.polaris.jdbc.ObjectPropertySetter#setTo(Object, ResultSet, int)}
+ * use this handler when {@link ObjectPropertySetter}
+ * handle {@link ObjectPropertySetter#setTo(Object, ResultSet, int)}
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 4.0 2022/7/30 09:24

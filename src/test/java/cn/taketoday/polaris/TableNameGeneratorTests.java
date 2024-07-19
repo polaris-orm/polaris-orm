@@ -30,7 +30,7 @@ class TableNameGeneratorTests {
 
   @Test
   void forAnnotation() {
-    cn.taketoday.polaris.TableNameGenerator generator = TableNameGenerator.forTableAnnotation();
+    TableNameGenerator generator = TableNameGenerator.forTableAnnotation();
     assertThat(generator.generateTableName(UserModel.class)).isEqualTo("t_user");
     assertThat(generator.generateTableName(UpdateUserName.class)).isEqualTo("t_user");
   }

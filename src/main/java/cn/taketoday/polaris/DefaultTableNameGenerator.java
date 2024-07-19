@@ -21,14 +21,14 @@ import cn.taketoday.util.ObjectUtils;
 import cn.taketoday.util.StringUtils;
 
 /**
- * default {@link cn.taketoday.polaris.TableNameGenerator}
+ * default {@link TableNameGenerator}
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 4.0 2022/8/16 23:09
  */
-public class DefaultTableNameGenerator implements cn.taketoday.polaris.TableNameGenerator {
+public class DefaultTableNameGenerator implements TableNameGenerator {
 
-  private final cn.taketoday.polaris.TableNameGenerator annotationGenerator = TableNameGenerator.forTableAnnotation();
+  private final TableNameGenerator annotationGenerator = TableNameGenerator.forTableAnnotation();
 
   @Nullable
   private String prefixToAppend;

@@ -29,7 +29,7 @@ public abstract class SimpleSelectQueryStatement implements QueryStatement {
 
   @Override
   public StatementSequence render(EntityMetadata metadata) {
-    cn.taketoday.polaris.sql.SimpleSelect select = new cn.taketoday.polaris.sql.SimpleSelect(Arrays.asList(metadata.columnNames), new ArrayList<>());
+    SimpleSelect select = new SimpleSelect(Arrays.asList(metadata.columnNames), new ArrayList<>());
     select.setTableName(metadata.tableName);
 
     renderInternal(metadata, select);

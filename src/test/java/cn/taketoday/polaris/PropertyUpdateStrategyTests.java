@@ -31,11 +31,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PropertyUpdateStrategyTests {
 
   final EntityMetadataFactory metadataFactory = new DefaultEntityMetadataFactory();
-  final cn.taketoday.polaris.EntityMetadata entityMetadata = metadataFactory.getEntityMetadata(UserModel.class);
+  final EntityMetadata entityMetadata = metadataFactory.getEntityMetadata(UserModel.class);
 
   @Test
   void updateNoneNull() {
-    cn.taketoday.polaris.PropertyUpdateStrategy propertyUpdateStrategy = cn.taketoday.polaris.PropertyUpdateStrategy.noneNull();
+    PropertyUpdateStrategy propertyUpdateStrategy = PropertyUpdateStrategy.noneNull();
     UserModel userModel = new UserModel();
 
     EntityMetadata entityMetadata = metadataFactory.getEntityMetadata(UserModel.class);
@@ -49,7 +49,7 @@ class PropertyUpdateStrategyTests {
 
   @Test
   void always() {
-    cn.taketoday.polaris.PropertyUpdateStrategy strategy = cn.taketoday.polaris.PropertyUpdateStrategy.always();
+    PropertyUpdateStrategy strategy = PropertyUpdateStrategy.always();
     UserModel userModel = new UserModel();
 
     assertThat(strategy.shouldUpdate(userModel, entityMetadata.idProperty()))
@@ -62,7 +62,7 @@ class PropertyUpdateStrategyTests {
 
   @Test
   void and() {
-    cn.taketoday.polaris.PropertyUpdateStrategy strategy = cn.taketoday.polaris.PropertyUpdateStrategy.noneNull().and((entity, property) -> !property.isIdProperty);
+    PropertyUpdateStrategy strategy = PropertyUpdateStrategy.noneNull().and((entity, property) -> !property.isIdProperty);
 
     UserModel userModel = new UserModel();
     assertThat(strategy.shouldUpdate(userModel, entityMetadata.idProperty()))
@@ -79,7 +79,7 @@ class PropertyUpdateStrategyTests {
 
   @Test
   void or() {
-    cn.taketoday.polaris.PropertyUpdateStrategy strategy = PropertyUpdateStrategy.noneNull().or((entity, property) -> !property.isIdProperty);
+    PropertyUpdateStrategy strategy = PropertyUpdateStrategy.noneNull().or((entity, property) -> !property.isIdProperty);
 
     UserModel userModel = new UserModel();
     assertThat(strategy.shouldUpdate(userModel, entityMetadata.idProperty()))

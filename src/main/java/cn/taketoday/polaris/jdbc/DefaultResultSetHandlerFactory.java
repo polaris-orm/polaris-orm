@@ -24,21 +24,22 @@ import cn.taketoday.beans.BeanProperty;
 import cn.taketoday.beans.BeanUtils;
 import cn.taketoday.jdbc.core.ResultSetExtractor;
 import cn.taketoday.jdbc.support.JdbcUtils;
-import cn.taketoday.polaris.jdbc.type.TypeHandler;
 import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.jdbc.type.TypeHandler;
 import cn.taketoday.util.ConcurrentReferenceHashMap;
 import cn.taketoday.util.MapCache;
 
 @SuppressWarnings("rawtypes")
 public class DefaultResultSetHandlerFactory<T> implements ResultSetHandlerFactory<T> {
 
-  private final cn.taketoday.polaris.jdbc.JdbcBeanMetadata metadata;
-  private final cn.taketoday.polaris.jdbc.RepositoryManager repositoryManager;
+  private final JdbcBeanMetadata metadata;
+
+  private final RepositoryManager repositoryManager;
 
   @Nullable
   private final Map<String, String> columnMappings;
 
-  public DefaultResultSetHandlerFactory(cn.taketoday.polaris.jdbc.JdbcBeanMetadata pojoMetadata,
+  public DefaultResultSetHandlerFactory(JdbcBeanMetadata pojoMetadata,
           RepositoryManager operations, @Nullable Map<String, String> columnMappings) {
     this.metadata = pojoMetadata;
     this.repositoryManager = operations;
@@ -72,7 +73,7 @@ public class DefaultResultSetHandlerFactory<T> implements ResultSetHandlerFactor
       return new TypeHandlerResultSetHandler<>(typeHandler);
     }
 
-    var accessors = new cn.taketoday.polaris.jdbc.ObjectPropertySetter[columnCount];
+    var accessors = new ObjectPropertySetter[columnCount];
     for (int i = 1; i <= columnCount; i++) {
       String colName = JdbcUtils.lookupColumnName(meta, i);
       var accessor = getAccessor(colName, metadata);
@@ -84,11 +85,11 @@ public class DefaultResultSetHandlerFactory<T> implements ResultSetHandlerFactor
       accessors[i - 1] = accessor;
     }
 
-    return new cn.taketoday.polaris.jdbc.ObjectResultHandler<>(metadata, accessors, columnCount);
+    return new ObjectResultHandler<>(metadata, accessors, columnCount);
   }
 
   @Nullable
-  private cn.taketoday.polaris.jdbc.ObjectPropertySetter getAccessor(String colName, JdbcBeanMetadata metadata) {
+  private ObjectPropertySetter getAccessor(String colName, JdbcBeanMetadata metadata) {
     int index = colName.indexOf('.');
     if (index <= 0) {
       // Simple path - column
@@ -96,10 +97,10 @@ public class DefaultResultSetHandlerFactory<T> implements ResultSetHandlerFactor
       if (beanProperty == null) {
         return null;
       }
-      return new cn.taketoday.polaris.jdbc.ObjectPropertySetter(null, beanProperty, repositoryManager);
+      return new ObjectPropertySetter(null, beanProperty, repositoryManager);
     }
 
-    cn.taketoday.polaris.jdbc.PropertyPath propertyPath = new cn.taketoday.polaris.jdbc.PropertyPath(metadata.getObjectType(), colName);
+    PropertyPath propertyPath = new PropertyPath(metadata.getObjectType(), colName);
     // find property-path
     BeanProperty beanProperty = propertyPath.getNestedBeanProperty();
     if (beanProperty == null) {

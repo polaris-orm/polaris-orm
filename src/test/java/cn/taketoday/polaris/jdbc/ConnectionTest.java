@@ -49,10 +49,10 @@ public class ConnectionTest {
     PreparedStatement ps = mock(PreparedStatement.class);
     when(jdbcConnection.prepareStatement(ArgumentMatchers.anyString())).thenReturn(ps);
 
-    cn.taketoday.polaris.jdbc.RepositoryManager operations = new cn.taketoday.polaris.jdbc.RepositoryManager(dataSource);
+    RepositoryManager operations = new RepositoryManager(dataSource);
 
     operations.setGeneratedKeys(false);
-    cn.taketoday.polaris.jdbc.JdbcConnection cn = new cn.taketoday.polaris.jdbc.JdbcConnection(operations, operations.getDataSource(), false);
+    JdbcConnection cn = new JdbcConnection(operations, operations.getDataSource(), false);
     cn.createNamedQueryWithParams("select :p1 name, :p2 age", "Dmitry Alexandrov", 35).buildStatement();
 
     verify(dataSource, times(1)).getConnection();
@@ -78,7 +78,7 @@ public class ConnectionTest {
     doThrow(MyException.class).when(ps).setInt(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt());
     when(jdbcConnection.prepareStatement(ArgumentMatchers.anyString())).thenReturn(ps);
 
-    cn.taketoday.polaris.jdbc.RepositoryManager manager = new RepositoryManager(dataSource);
+    RepositoryManager manager = new RepositoryManager(dataSource);
     manager.setGeneratedKeys(false);
     try (JdbcConnection cn = manager.open()) {
       cn.createNamedQueryWithParams("select :p1 name, :p2 age", "Dmitry Alexandrov", 35).buildStatement();

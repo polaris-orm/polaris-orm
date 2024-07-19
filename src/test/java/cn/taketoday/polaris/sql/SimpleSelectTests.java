@@ -33,7 +33,7 @@ class SimpleSelectTests {
 
   @Test
   void simple() {
-    cn.taketoday.polaris.sql.SimpleSelect select = new cn.taketoday.polaris.sql.SimpleSelect();
+    SimpleSelect select = new SimpleSelect();
     select.addColumn("name")
             .addColumn("age")
             .addColumns(new String[] { "id", "gender" })
@@ -44,7 +44,7 @@ class SimpleSelectTests {
 
   @Test
   void alias() {
-    cn.taketoday.polaris.sql.SimpleSelect select = new cn.taketoday.polaris.sql.SimpleSelect();
+    SimpleSelect select = new SimpleSelect();
     select.addColumn("name")
             .addColumn("age")
             .addColumn("user_id", "id")
@@ -56,7 +56,7 @@ class SimpleSelectTests {
 
   @Test
   void where() {
-    cn.taketoday.polaris.sql.SimpleSelect select = new cn.taketoday.polaris.sql.SimpleSelect();
+    SimpleSelect select = new SimpleSelect();
     select.addColumn("name")
             .addColumn("age")
             .addColumn("user_id", "id")
@@ -72,7 +72,7 @@ class SimpleSelectTests {
 
   @Test
   void orderBy() {
-    cn.taketoday.polaris.sql.SimpleSelect select = new cn.taketoday.polaris.sql.SimpleSelect();
+    SimpleSelect select = new SimpleSelect();
     select.addColumn("name")
             .addColumn("age")
             .addWhereToken("id = 1")
@@ -86,7 +86,7 @@ class SimpleSelectTests {
 
   @Test
   void comment() {
-    cn.taketoday.polaris.sql.SimpleSelect select = new SimpleSelect();
+    SimpleSelect select = new SimpleSelect();
     select.addColumn("name")
             .addColumn("age")
             .addWhereToken("id = 1")

@@ -28,13 +28,13 @@ import cn.taketoday.polaris.jdbc.format.SqlStatementLogger;
  * @since 4.0 2022/9/12 19:38
  */
 class SqlStatementLoggerTests {
-  cn.taketoday.polaris.jdbc.format.SqlStatementLogger logger = new SqlStatementLogger(true, true, true, 20);
+  SqlStatementLogger logger = new SqlStatementLogger(true, true, true, 20);
 
   @Test
   void log() {
 
     logger.logStatement("SELECT * FROM t_user where id = ?");
-    logger.logStatement("SELECT * FROM t_user where id = ?", cn.taketoday.polaris.jdbc.format.DDLSQLFormatter.INSTANCE);
+    logger.logStatement("SELECT * FROM t_user where id = ?", DDLSQLFormatter.INSTANCE);
     logger.logSlowQuery("SELECT * FROM t_user where id = ?", System.nanoTime() - TimeUnit.MINUTES.toNanos(2));
 
     logger.logStatement(

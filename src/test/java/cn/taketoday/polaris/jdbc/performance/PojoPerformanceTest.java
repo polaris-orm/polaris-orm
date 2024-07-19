@@ -22,6 +22,7 @@ import org.apache.commons.dbutils.BasicRowProcessor;
 import org.apache.commons.dbutils.BeanProcessor;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
@@ -506,13 +507,13 @@ public class PojoPerformanceTest {
 
   class ApacheDbUtilsTypicalSelect extends PerformanceTestBase {
     private QueryRunner runner;
-    private org.apache.commons.dbutils.ResultSetHandler<Post> rsHandler;
+    private ResultSetHandler<Post> rsHandler;
     private Connection conn;
 
     /**
      * This class handles mapping "first_name" column to "firstName" property. It
      * looks worse than it is, most is copied from
-     * {@link org.apache.commons.dbutils.BeanProcessor} and many people complain
+     * {@link BeanProcessor} and many people complain
      * online that this isn't built in to Apache DbUtils yet.
      */
     class IgnoreUnderscoreBeanProcessor extends BeanProcessor {

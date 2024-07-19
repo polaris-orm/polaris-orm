@@ -49,5 +49,5 @@ public @interface OrderBy {
   /**
    * Property level
    */
-  cn.taketoday.polaris.Order direction() default Order.ASC;
+  Order direction() default Order.ASC;
 }

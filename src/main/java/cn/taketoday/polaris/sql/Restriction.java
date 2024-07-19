@@ -45,28 +45,28 @@ public interface Restriction {
    * equal
    */
   static Restriction equal(String columnName) {
-    return new cn.taketoday.polaris.sql.ComparisonRestriction(columnName, " = ", "?");
+    return new ComparisonRestriction(columnName, " = ", "?");
   }
 
   /**
    * equal
    */
   static Restriction equal(String lhs, String rhs) {
-    return new cn.taketoday.polaris.sql.ComparisonRestriction(lhs, " = ", rhs);
+    return new ComparisonRestriction(lhs, " = ", rhs);
   }
 
   /**
    * not equal
    */
   static Restriction notEqual(String columnName) {
-    return new cn.taketoday.polaris.sql.ComparisonRestriction(columnName, " <> ", "?");
+    return new ComparisonRestriction(columnName, " <> ", "?");
   }
 
   /**
    * not equal
    */
   static Restriction notEqual(String lhs, String rhs) {
-    return new cn.taketoday.polaris.sql.ComparisonRestriction(lhs, " <> ", rhs);
+    return new ComparisonRestriction(lhs, " <> ", rhs);
   }
 
   static Restriction graterThan(String columnName) {
@@ -74,7 +74,7 @@ public interface Restriction {
   }
 
   static Restriction graterThan(String lhs, String rhs) {
-    return new cn.taketoday.polaris.sql.ComparisonRestriction(lhs, " > ", rhs);
+    return new ComparisonRestriction(lhs, " > ", rhs);
   }
 
   static Restriction graterEqual(String columnName) {
@@ -82,7 +82,7 @@ public interface Restriction {
   }
 
   static Restriction graterEqual(String lhs, String rhs) {
-    return new cn.taketoday.polaris.sql.ComparisonRestriction(lhs, " >= ", rhs);
+    return new ComparisonRestriction(lhs, " >= ", rhs);
   }
 
   static Restriction lessThan(String columnName) {
@@ -90,7 +90,7 @@ public interface Restriction {
   }
 
   static Restriction lessThan(String lhs, String rhs) {
-    return new cn.taketoday.polaris.sql.ComparisonRestriction(lhs, " < ", rhs);
+    return new ComparisonRestriction(lhs, " < ", rhs);
   }
 
   static Restriction lessEqual(String columnName) {
@@ -98,25 +98,25 @@ public interface Restriction {
   }
 
   static Restriction lessEqual(String lhs, String rhs) {
-    return new cn.taketoday.polaris.sql.ComparisonRestriction(lhs, " <= ", rhs);
+    return new ComparisonRestriction(lhs, " <= ", rhs);
   }
 
   static Restriction forOperator(String lhs, String operator, String rhs) {
-    return new cn.taketoday.polaris.sql.ComparisonRestriction(lhs, operator, rhs);
+    return new ComparisonRestriction(lhs, operator, rhs);
   }
 
   /**
    * Null-ness restriction - IS (NOT)? NULL
    */
   static Restriction isNull(String columnName) {
-    return new cn.taketoday.polaris.sql.NullnessRestriction(columnName, true);
+    return new NullnessRestriction(columnName, true);
   }
 
   /**
    * Null-ness restriction - IS (NOT)? NULL
    */
   static Restriction isNotNull(String columnName) {
-    return new cn.taketoday.polaris.sql.NullnessRestriction(columnName, false);
+    return new NullnessRestriction(columnName, false);
   }
 
   /**

@@ -35,7 +35,7 @@ public class FuzzyQueryConditionStrategy implements PropertyConditionStrategy {
   @Nullable
   @Override
   public Condition resolve(EntityProperty entityProperty, Object propertyValue) {
-    MergedAnnotation<cn.taketoday.polaris.Like> annotation = entityProperty.getAnnotation(Like.class);
+    MergedAnnotation<Like> annotation = entityProperty.getAnnotation(Like.class);
     if (annotation.isPresent()) {
       // get column name
       String column = annotation.getStringValue();

@@ -35,9 +35,9 @@ class IdPropertyDiscoverTests {
 
   @Test
   void composite() {
-    cn.taketoday.polaris.IdPropertyDiscover propertyDiscover = cn.taketoday.polaris.IdPropertyDiscover.composite(
-            cn.taketoday.polaris.IdPropertyDiscover.forPropertyName("myId"),
-            cn.taketoday.polaris.IdPropertyDiscover.forPropertyName("myId_"),
+    IdPropertyDiscover propertyDiscover = IdPropertyDiscover.composite(
+            IdPropertyDiscover.forPropertyName("myId"),
+            IdPropertyDiscover.forPropertyName("myId_"),
             IdPropertyDiscover.forAnnotation(MyId.class));
     BeanMetadata metadata = BeanMetadata.from(MyIdEntity.class);
     propertyDiscover.isIdProperty(metadata.obtainBeanProperty("id"));

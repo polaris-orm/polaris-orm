@@ -39,7 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class QueryTests extends AbstractRepositoryManagerTests {
 
   @Override
-  protected void prepareTestsData(DbType dbType, cn.taketoday.polaris.jdbc.RepositoryManager repositoryManager) {
+  protected void prepareTestsData(DbType dbType, RepositoryManager repositoryManager) {
     try (NamedQuery query = repositoryManager.createNamedQuery("""
             drop table if exists t_user;
             create table t_user
@@ -62,13 +62,13 @@ class QueryTests extends AbstractRepositoryManagerTests {
   }
 
   @ParameterizedRepositoryManagerTest
-  void create(cn.taketoday.polaris.jdbc.RepositoryManager repositoryManager) {
+  void create(RepositoryManager repositoryManager) {
     DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
     createData(entityManager);
 
-    try (cn.taketoday.polaris.jdbc.JdbcConnection connection = repositoryManager.open()) {
+    try (JdbcConnection connection = repositoryManager.open()) {
 
-      cn.taketoday.polaris.jdbc.Query query = connection.createQuery("select * from t_user where id=?")
+      Query query = connection.createQuery("select * from t_user where id=?")
               .addParameter(1);
 
       query.setAutoDerivingColumns(true);

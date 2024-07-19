@@ -36,14 +36,14 @@ public class ArrayParametersTest {
   @Test
   public void testUpdateParameterNamesToIndexes() {
     final ImmutableList<Integer> of = ImmutableList.of(3, 5);
-    ArrayList<cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter> arrayParametersSortedAsc =
-            listOf(new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(6, 3));
+    ArrayList<ArrayParameters.ArrayParameter> arrayParametersSortedAsc =
+            listOf(new ArrayParameters.ArrayParameter(6, 3));
 
     QueryParameter parameter = new QueryParameter("paramName", ParameterIndexHolder.valueOf(of));
 
     ImmutableMap<String, QueryParameter> paramName2 = ImmutableMap.of("paramName", parameter);
     Map<String, QueryParameter> paramName =
-            cn.taketoday.polaris.jdbc.ArrayParameters.updateMap(Maps.newHashMap(paramName2), arrayParametersSortedAsc);
+            ArrayParameters.updateMap(Maps.newHashMap(paramName2), arrayParametersSortedAsc);
 
     assertEquals(ImmutableMap.of("paramName", new QueryParameter("paramName", ParameterIndexHolder.valueOf(ImmutableList.of(3, 5)))),
             paramName);
@@ -54,14 +54,14 @@ public class ArrayParametersTest {
 
     assertEquals(
             ImmutableMap.of("paramName", new QueryParameter("paramName", ParameterIndexHolder.valueOf(ImmutableList.of(3, 9)))),
-            cn.taketoday.polaris.jdbc.ArrayParameters.updateMap(
+            ArrayParameters.updateMap(
                     Maps.newHashMap(paramName1),
-                    listOf(new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(6, 3))));
+                    listOf(new ArrayParameters.ArrayParameter(6, 3))));
   }
 
-  static ArrayList<cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter> listOf(
-          cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter... parameter) {
-    ArrayList<cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter> parameters = new ArrayList<>();
+  static ArrayList<ArrayParameters.ArrayParameter> listOf(
+          ArrayParameters.ArrayParameter... parameter) {
+    ArrayList<ArrayParameters.ArrayParameter> parameters = new ArrayList<>();
     Collections.addAll(parameters, parameter);
     return parameters;
   }
@@ -71,105 +71,105 @@ public class ArrayParametersTest {
 
     assertEquals(
             2,
-            cn.taketoday.polaris.jdbc.ArrayParameters.computeNewIndex(
+            ArrayParameters.computeNewIndex(
                     2,
                     listOf(
-                            new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(3, 5))));
+                            new ArrayParameters.ArrayParameter(3, 5))));
 
     assertEquals(
             3,
-            cn.taketoday.polaris.jdbc.ArrayParameters.computeNewIndex(
+            ArrayParameters.computeNewIndex(
                     3,
                     listOf(
-                            new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(3, 5))));
+                            new ArrayParameters.ArrayParameter(3, 5))));
 
     assertEquals(
             8,
-            cn.taketoday.polaris.jdbc.ArrayParameters.computeNewIndex(
+            ArrayParameters.computeNewIndex(
                     4,
                     listOf(
-                            new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(3, 5))));
+                            new ArrayParameters.ArrayParameter(3, 5))));
 
     assertEquals(
             9,
-            cn.taketoday.polaris.jdbc.ArrayParameters.computeNewIndex(
+            ArrayParameters.computeNewIndex(
                     4,
                     listOf(
-                            new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(1, 2),
-                            new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(3, 5))));
+                            new ArrayParameters.ArrayParameter(1, 2),
+                            new ArrayParameters.ArrayParameter(3, 5))));
 
     assertEquals(
             9,
-            cn.taketoday.polaris.jdbc.ArrayParameters.computeNewIndex(
+            ArrayParameters.computeNewIndex(
                     4,
                     listOf(
-                            new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(1, 2),
-                            new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(3, 5),
-                            new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(4, 5))));
+                            new ArrayParameters.ArrayParameter(1, 2),
+                            new ArrayParameters.ArrayParameter(3, 5),
+                            new ArrayParameters.ArrayParameter(4, 5))));
 
     assertEquals(
             9,
-            cn.taketoday.polaris.jdbc.ArrayParameters.computeNewIndex(
+            ArrayParameters.computeNewIndex(
                     4,
                     listOf(
-                            new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(1, 2),
-                            new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(3, 5),
-                            new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(5, 5))));
+                            new ArrayParameters.ArrayParameter(1, 2),
+                            new ArrayParameters.ArrayParameter(3, 5),
+                            new ArrayParameters.ArrayParameter(5, 5))));
   }
 
   @Test
   public void testUpdateQueryWithArrayParameters() {
     assertEquals(
             "SELECT * FROM user WHERE id IN(?,?,?,?,?)",
-            cn.taketoday.polaris.jdbc.ArrayParameters.updateQueryWithArrayParameters(
+            ArrayParameters.updateQueryWithArrayParameters(
                     "SELECT * FROM user WHERE id IN(?)",
-                    listOf(new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(1, 5))));
+                    listOf(new ArrayParameters.ArrayParameter(1, 5))));
 
     assertEquals(
             "SELECT * FROM user WHERE id IN(?)",
-            cn.taketoday.polaris.jdbc.ArrayParameters.updateQueryWithArrayParameters(
+            ArrayParameters.updateQueryWithArrayParameters(
                     "SELECT * FROM user WHERE id IN(?)",
-                    new ArrayList<cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter>()));
+                    new ArrayList<ArrayParameters.ArrayParameter>()));
 
     assertEquals(
             "SELECT * FROM user WHERE id IN(?)",
-            cn.taketoday.polaris.jdbc.ArrayParameters.updateQueryWithArrayParameters(
+            ArrayParameters.updateQueryWithArrayParameters(
                     "SELECT * FROM user WHERE id IN(?)",
-                    listOf(new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(1, 0))));
+                    listOf(new ArrayParameters.ArrayParameter(1, 0))));
 
     assertEquals(
             "SELECT * FROM user WHERE id IN(?)",
-            cn.taketoday.polaris.jdbc.ArrayParameters.updateQueryWithArrayParameters(
+            ArrayParameters.updateQueryWithArrayParameters(
                     "SELECT * FROM user WHERE id IN(?)",
-                    listOf(new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(1, 1))));
+                    listOf(new ArrayParameters.ArrayParameter(1, 1))));
 
     assertEquals(
             "SELECT * FROM user WHERE login = ? AND id IN(?,?)",
-            cn.taketoday.polaris.jdbc.ArrayParameters.updateQueryWithArrayParameters(
+            ArrayParameters.updateQueryWithArrayParameters(
                     "SELECT * FROM user WHERE login = ? AND id IN(?)",
-                    listOf(new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(2, 2))));
+                    listOf(new ArrayParameters.ArrayParameter(2, 2))));
 
     assertEquals(
             "SELECT * FROM user WHERE login = ? AND id IN(?,?) AND name = ?",
-            cn.taketoday.polaris.jdbc.ArrayParameters.updateQueryWithArrayParameters(
+            ArrayParameters.updateQueryWithArrayParameters(
                     "SELECT * FROM user WHERE login = ? AND id IN(?) AND name = ?",
-                    listOf(new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(2, 2))));
+                    listOf(new ArrayParameters.ArrayParameter(2, 2))));
 
     assertEquals(
             "SELECT ... WHERE other_id IN (?,?,?) login = ? AND id IN(?,?,?) AND name = ?",
-            cn.taketoday.polaris.jdbc.ArrayParameters.updateQueryWithArrayParameters(
+            ArrayParameters.updateQueryWithArrayParameters(
                     "SELECT ... WHERE other_id IN (?) login = ? AND id IN(?) AND name = ?",
                     listOf(
-                            new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(1, 3),
-                            new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(3, 3))));
+                            new ArrayParameters.ArrayParameter(1, 3),
+                            new ArrayParameters.ArrayParameter(3, 3))));
 
     assertEquals(
             "SELECT ... WHERE other_id IN (?,?,?,?,?) login = ? AND id IN(?,?,?) AND name = ?",
-            cn.taketoday.polaris.jdbc.ArrayParameters.updateQueryWithArrayParameters(
+            ArrayParameters.updateQueryWithArrayParameters(
                     "SELECT ... WHERE other_id IN (?) login = ? AND id IN(?) AND name = ?",
                     listOf(
-                            new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(1, 5),
-                            new cn.taketoday.polaris.jdbc.ArrayParameters.ArrayParameter(3, 3))));
+                            new ArrayParameters.ArrayParameter(1, 5),
+                            new ArrayParameters.ArrayParameter(3, 3))));
   }
 
 }

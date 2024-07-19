@@ -27,7 +27,7 @@ public final class LazyTable implements AutoCloseable {
 
   private ResultSetIterable<Row> rows;
 
-  private List<cn.taketoday.polaris.jdbc.Column> columns;
+  private List<Column> columns;
 
   public String getName() {
     return name;
@@ -45,7 +45,7 @@ public final class LazyTable implements AutoCloseable {
     this.rows = rows;
   }
 
-  public List<cn.taketoday.polaris.jdbc.Column> columns() {
+  public List<Column> columns() {
     return columns;
   }
 

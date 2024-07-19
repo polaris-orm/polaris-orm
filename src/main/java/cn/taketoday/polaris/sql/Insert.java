@@ -66,7 +66,7 @@ public class Insert implements StatementSequence {
   }
 
   @Override
-  public String toStatementString(cn.taketoday.polaris.dialect.Platform platform) {
+  public String toStatementString(Platform platform) {
     final StringBuilder buf = new StringBuilder(columns.size() * 15 + tableName.length() + 10);
     if (comment != null) {
       buf.append("/* ").append(Platform.escapeComment(comment)).append(" */ ");

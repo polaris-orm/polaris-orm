@@ -49,10 +49,10 @@ public final class Alias {
 
   public String toAliasString(String sqlIdentifier) {
     char begin = sqlIdentifier.charAt(0);
-    int quoteType = cn.taketoday.polaris.dialect.Platform.QUOTE.indexOf(begin);
+    int quoteType = Platform.QUOTE.indexOf(begin);
     String unquoted = getUnquotedAliasString(sqlIdentifier, quoteType);
     if (quoteType >= 0) {
-      char endQuote = cn.taketoday.polaris.dialect.Platform.CLOSED_QUOTE.charAt(quoteType);
+      char endQuote = Platform.CLOSED_QUOTE.charAt(quoteType);
       return begin + unquoted + endQuote;
     }
     else {

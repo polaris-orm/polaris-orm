@@ -25,21 +25,21 @@ import cn.taketoday.lang.TodayStrategies;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 4.0 2024/4/10 17:55
  */
-final class QueryHandlerFactories implements cn.taketoday.polaris.QueryHandlerFactory {
+final class QueryHandlerFactories implements QueryHandlerFactory {
 
-  final List<cn.taketoday.polaris.QueryHandlerFactory> factories;
+  final List<QueryHandlerFactory> factories;
 
   QueryHandlerFactories(EntityMetadataFactory entityMetadataFactory) {
-    List<cn.taketoday.polaris.QueryHandlerFactory> list = TodayStrategies.find(cn.taketoday.polaris.QueryHandlerFactory.class);
-    list.add(new cn.taketoday.polaris.MapQueryHandlerFactory());
-    list.add(new cn.taketoday.polaris.DefaultQueryHandlerFactory(entityMetadataFactory));
+    List<QueryHandlerFactory> list = TodayStrategies.find(QueryHandlerFactory.class);
+    list.add(new MapQueryHandlerFactory());
+    list.add(new DefaultQueryHandlerFactory(entityMetadataFactory));
     this.factories = List.copyOf(list);
   }
 
   @Nullable
   @Override
-  public cn.taketoday.polaris.QueryStatement createQuery(Object example) {
-    for (cn.taketoday.polaris.QueryHandlerFactory factory : factories) {
+  public QueryStatement createQuery(Object example) {
+    for (QueryHandlerFactory factory : factories) {
       QueryStatement query = factory.createQuery(example);
       if (query != null) {
         return query;
@@ -50,7 +50,7 @@ final class QueryHandlerFactories implements cn.taketoday.polaris.QueryHandlerFa
 
   @Nullable
   @Override
-  public cn.taketoday.polaris.ConditionStatement createCondition(Object example) {
+  public ConditionStatement createCondition(Object example) {
     for (QueryHandlerFactory factory : factories) {
       ConditionStatement condition = factory.createCondition(example);
       if (condition != null) {

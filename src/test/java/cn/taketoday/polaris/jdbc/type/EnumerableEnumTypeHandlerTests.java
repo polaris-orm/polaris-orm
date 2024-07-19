@@ -81,23 +81,23 @@ class EnumerableEnumTypeHandlerTests {
 
   @Test
   void test() {
-    Class<?> valueType = cn.taketoday.polaris.jdbc.type.EnumerableEnumTypeHandler.getValueType(Gender.class);
+    Class<?> valueType = EnumerableEnumTypeHandler.getValueType(Gender.class);
     assertThat(valueType).isNotNull().isEqualTo(Integer.class);
 
-    assertThat(cn.taketoday.polaris.jdbc.type.EnumerableEnumTypeHandler.getValueType(StringValue.class))
+    assertThat(EnumerableEnumTypeHandler.getValueType(StringValue.class))
             .isEqualTo(String.class);
 
   }
 
   @Test
   void setParameter() throws SQLException {
-    cn.taketoday.polaris.jdbc.type.TypeHandler<Integer> delegate = mock(cn.taketoday.polaris.jdbc.type.TypeHandler.class);
+    TypeHandler<Integer> delegate = mock(TypeHandler.class);
     PreparedStatement statement = mock(PreparedStatement.class);
 
-    cn.taketoday.polaris.jdbc.type.TypeHandlerManager registry = new cn.taketoday.polaris.jdbc.type.TypeHandlerManager();
+    TypeHandlerManager registry = new TypeHandlerManager();
     registry.register(Integer.class, delegate);
 
-    var handler = new cn.taketoday.polaris.jdbc.type.EnumerableEnumTypeHandler<>(Gender.class, registry);
+    var handler = new EnumerableEnumTypeHandler<>(Gender.class, registry);
 
     handler.setParameter(statement, 1, null);
     handler.setParameter(statement, 1, Gender.MALE);
@@ -108,7 +108,7 @@ class EnumerableEnumTypeHandlerTests {
 
   @Test
   void getResult() throws SQLException {
-    cn.taketoday.polaris.jdbc.type.TypeHandler<Integer> delegate = mock(TypeHandler.class);
+    TypeHandler<Integer> delegate = mock(TypeHandler.class);
     ResultSet resultSet = mock(ResultSet.class);
     CallableStatement callableStatement = mock(CallableStatement.class);
 
@@ -116,7 +116,7 @@ class EnumerableEnumTypeHandlerTests {
     given(delegate.getResult(resultSet, "gender")).willReturn(Gender.FEMALE.getValue());
     given(delegate.getResult(callableStatement, 1)).willReturn(Gender.FEMALE.getValue());
 
-    cn.taketoday.polaris.jdbc.type.TypeHandlerManager registry = new TypeHandlerManager();
+    TypeHandlerManager registry = new TypeHandlerManager();
     registry.register(Integer.class, delegate);
 
     var handler = new EnumerableEnumTypeHandler<>(Gender.class, registry);

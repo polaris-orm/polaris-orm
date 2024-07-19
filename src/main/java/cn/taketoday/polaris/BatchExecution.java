@@ -32,7 +32,7 @@ public class BatchExecution {
 
   public final EntityMetadata entityMetadata;
 
-  public final cn.taketoday.polaris.PropertyUpdateStrategy strategy;
+  public final PropertyUpdateStrategy strategy;
 
   public final ArrayList<Object> entities = new ArrayList<>();
 

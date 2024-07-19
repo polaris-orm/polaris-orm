@@ -50,7 +50,7 @@ public class ConnectionTransactionTest {
     when(connectionMock.getAutoCommit()).thenReturn(true);
     when(connectionMock.isClosed()).thenReturn(true);
 
-    cn.taketoday.polaris.jdbc.RepositoryManager manager = new RepositoryManager(dataSource);
+    RepositoryManager manager = new RepositoryManager(dataSource);
 
     try (JdbcConnection connection = manager.beginTransaction()) {
       connection.commit();

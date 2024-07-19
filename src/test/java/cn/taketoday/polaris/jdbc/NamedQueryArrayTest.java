@@ -45,9 +45,9 @@ public class NamedQueryArrayTest {
 
   @Test
   public void arrayTest() throws Exception {
-    final cn.taketoday.polaris.jdbc.RepositoryManager database = new cn.taketoday.polaris.jdbc.RepositoryManager(databaseRule.getDataSource());
-    try (final cn.taketoday.polaris.jdbc.JdbcConnection connection = database.open();
-            final cn.taketoday.polaris.jdbc.NamedQuery query = connection.createNamedQuery("SELECT * FROM FOO WHERE BAR IN (:bars)")) {
+    final RepositoryManager database = new RepositoryManager(databaseRule.getDataSource());
+    try (final JdbcConnection connection = database.open();
+            final NamedQuery query = connection.createNamedQuery("SELECT * FROM FOO WHERE BAR IN (:bars)")) {
 
       final List<Foo> foos = query.addParameters("bars", 1, 2)
               .fetch(Foo.class);
@@ -58,7 +58,7 @@ public class NamedQueryArrayTest {
 
   @Test
   public void emptyArrayTest() throws Exception {
-    final cn.taketoday.polaris.jdbc.RepositoryManager database = new RepositoryManager(databaseRule.getDataSource());
+    final RepositoryManager database = new RepositoryManager(databaseRule.getDataSource());
 
     try (final JdbcConnection connection = database.open();
             final NamedQuery query = connection.createNamedQuery("SELECT * FROM FOO WHERE BAR IN (:bars)")) {

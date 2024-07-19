@@ -30,18 +30,18 @@ import cn.taketoday.format.support.ApplicationConversionService;
 import cn.taketoday.jdbc.datasource.DataSourceUtils;
 import cn.taketoday.jdbc.datasource.DriverManagerDataSource;
 import cn.taketoday.jdbc.datasource.SingleConnectionDataSource;
-import cn.taketoday.polaris.DefaultEntityManager;
-import cn.taketoday.polaris.EntityManager;
 import cn.taketoday.jdbc.support.ClobToStringConverter;
 import cn.taketoday.jdbc.support.JdbcAccessor;
 import cn.taketoday.jdbc.support.JdbcTransactionManager;
 import cn.taketoday.jdbc.support.OffsetTimeToSQLTimeConverter;
-import cn.taketoday.polaris.jdbc.type.TypeHandler;
-import cn.taketoday.polaris.jdbc.type.TypeHandlerManager;
 import cn.taketoday.lang.Assert;
 import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.DefaultEntityManager;
+import cn.taketoday.polaris.EntityManager;
 import cn.taketoday.polaris.jdbc.parsing.QueryParameter;
 import cn.taketoday.polaris.jdbc.parsing.SqlParameterParser;
+import cn.taketoday.polaris.jdbc.type.TypeHandler;
+import cn.taketoday.polaris.jdbc.type.TypeHandlerManager;
 import cn.taketoday.transaction.PlatformTransactionManager;
 import cn.taketoday.transaction.TransactionDefinition;
 import cn.taketoday.transaction.TransactionException;
@@ -83,7 +83,7 @@ public class RepositoryManager extends JdbcAccessor implements QueryProducer, Tr
   @Nullable
   private Map<String, String> defaultColumnMappings;
 
-  private cn.taketoday.polaris.jdbc.parsing.SqlParameterParser sqlParameterParser = new cn.taketoday.polaris.jdbc.parsing.SqlParameterParser();
+  private SqlParameterParser sqlParameterParser = new SqlParameterParser();
 
   private ConversionService conversionService = DefaultConversionService.getSharedInstance();
 
@@ -196,7 +196,7 @@ public class RepositoryManager extends JdbcAccessor implements QueryProducer, Tr
     return generatedKeys;
   }
 
-  public void setSqlParameterParser(cn.taketoday.polaris.jdbc.parsing.SqlParameterParser sqlParameterParser) {
+  public void setSqlParameterParser(SqlParameterParser sqlParameterParser) {
     Assert.notNull(sqlParameterParser, "SqlParameterParser is required");
     this.sqlParameterParser = sqlParameterParser;
   }
@@ -456,7 +456,7 @@ public class RepositoryManager extends JdbcAccessor implements QueryProducer, Tr
    *
    * @throws CannotGetJdbcConnectionException Could not acquire a connection from connection-source
    */
-  public <T> void withConnection(cn.taketoday.polaris.jdbc.StatementRunnable<T> runnable) {
+  public <T> void withConnection(StatementRunnable<T> runnable) {
     withConnection(runnable, null);
   }
 
@@ -467,7 +467,7 @@ public class RepositoryManager extends JdbcAccessor implements QueryProducer, Tr
    *
    * @throws CannotGetJdbcConnectionException Could not acquire a connection from connection-source
    */
-  public <T> void withConnection(cn.taketoday.polaris.jdbc.StatementRunnable<T> runnable, @Nullable T argument) {
+  public <T> void withConnection(StatementRunnable<T> runnable, @Nullable T argument) {
     try (JdbcConnection connection = open()) {
       runnable.run(connection, argument);
     }
@@ -608,63 +608,63 @@ public class RepositoryManager extends JdbcAccessor implements QueryProducer, Tr
   }
 
   /**
-   * Calls the {@link cn.taketoday.polaris.jdbc.StatementRunnable#run(JdbcConnection, Object)} method on the
-   * {@link cn.taketoday.polaris.jdbc.StatementRunnable} parameter. All statements run on the
+   * Calls the {@link StatementRunnable#run(JdbcConnection, Object)} method on the
+   * {@link StatementRunnable} parameter. All statements run on the
    * {@link JdbcConnection} instance in the
-   * {@link cn.taketoday.polaris.jdbc.StatementRunnable#run(JdbcConnection, Object) run} method will be executed
+   * {@link StatementRunnable#run(JdbcConnection, Object) run} method will be executed
    * in a transaction. The transaction will automatically be committed if the
-   * {@link cn.taketoday.polaris.jdbc.StatementRunnable#run(JdbcConnection, Object) run} method finishes without
+   * {@link StatementRunnable#run(JdbcConnection, Object) run} method finishes without
    * throwing an exception. If an exception is thrown within the
-   * {@link cn.taketoday.polaris.jdbc.StatementRunnable#run(JdbcConnection, Object) run} method, the transaction
+   * {@link StatementRunnable#run(JdbcConnection, Object) run} method, the transaction
    * will automatically be rolled back.
    * <p>
    * The isolation level of the transaction will be set to
    * {@link Connection#TRANSACTION_READ_COMMITTED}
    *
-   * @param runnable The {@link cn.taketoday.polaris.jdbc.StatementRunnable} instance.
+   * @param runnable The {@link StatementRunnable} instance.
    * @throws CannotGetJdbcConnectionException Could not acquire a connection from connection-source
    */
-  public <T> void runInTransaction(cn.taketoday.polaris.jdbc.StatementRunnable<T> runnable) {
+  public <T> void runInTransaction(StatementRunnable<T> runnable) {
     runInTransaction(runnable, null);
   }
 
   /**
-   * Calls the {@link cn.taketoday.polaris.jdbc.StatementRunnable#run(JdbcConnection, Object)} method on the
-   * {@link cn.taketoday.polaris.jdbc.StatementRunnable} parameter. All statements run on the
+   * Calls the {@link StatementRunnable#run(JdbcConnection, Object)} method on the
+   * {@link StatementRunnable} parameter. All statements run on the
    * {@link JdbcConnection} instance in the
-   * {@link cn.taketoday.polaris.jdbc.StatementRunnable#run(JdbcConnection, Object) run} method will be executed
+   * {@link StatementRunnable#run(JdbcConnection, Object) run} method will be executed
    * in a transaction. The transaction will automatically be committed if the
-   * {@link cn.taketoday.polaris.jdbc.StatementRunnable#run(JdbcConnection, Object) run} method finishes without
+   * {@link StatementRunnable#run(JdbcConnection, Object) run} method finishes without
    * throwing an exception. If an exception is thrown within the
-   * {@link cn.taketoday.polaris.jdbc.StatementRunnable#run(JdbcConnection, Object) run} method, the transaction
+   * {@link StatementRunnable#run(JdbcConnection, Object) run} method, the transaction
    * will automatically be rolled back.
    * <p>
    * The isolation level of the transaction will be set to
    * {@link Connection#TRANSACTION_READ_COMMITTED}
    *
-   * @param runnable The {@link cn.taketoday.polaris.jdbc.StatementRunnable} instance.
+   * @param runnable The {@link StatementRunnable} instance.
    * @param argument An argument which will be forwarded to the
-   * {@link cn.taketoday.polaris.jdbc.StatementRunnable#run(JdbcConnection, Object) run} method
+   * {@link StatementRunnable#run(JdbcConnection, Object) run} method
    * @throws CannotGetJdbcConnectionException Could not acquire a connection from connection-source
    */
-  public <T> void runInTransaction(cn.taketoday.polaris.jdbc.StatementRunnable<T> runnable, @Nullable T argument) {
+  public <T> void runInTransaction(StatementRunnable<T> runnable, @Nullable T argument) {
     runInTransaction(runnable, argument, Connection.TRANSACTION_READ_COMMITTED);
   }
 
   /**
-   * Calls the {@link cn.taketoday.polaris.jdbc.StatementRunnable#run(JdbcConnection, Object)} method on the
-   * {@link cn.taketoday.polaris.jdbc.StatementRunnable} parameter. All statements run on the
+   * Calls the {@link StatementRunnable#run(JdbcConnection, Object)} method on the
+   * {@link StatementRunnable} parameter. All statements run on the
    * {@link JdbcConnection} instance in the
-   * {@link cn.taketoday.polaris.jdbc.StatementRunnable#run(JdbcConnection, Object) run} method will be executed
+   * {@link StatementRunnable#run(JdbcConnection, Object) run} method will be executed
    * in a transaction. The transaction will automatically be committed if the
-   * {@link cn.taketoday.polaris.jdbc.StatementRunnable#run(JdbcConnection, Object) run} method finishes without
+   * {@link StatementRunnable#run(JdbcConnection, Object) run} method finishes without
    * throwing an exception. If an exception is thrown within the
-   * {@link cn.taketoday.polaris.jdbc.StatementRunnable#run(JdbcConnection, Object) run} method, the transaction
+   * {@link StatementRunnable#run(JdbcConnection, Object) run} method, the transaction
    * will automatically be rolled back.
    *
-   * @param runnable The {@link cn.taketoday.polaris.jdbc.StatementRunnable} instance.
+   * @param runnable The {@link StatementRunnable} instance.
    * @param argument An argument which will be forwarded to the
-   * {@link cn.taketoday.polaris.jdbc.StatementRunnable#run(JdbcConnection, Object) run} method
+   * {@link StatementRunnable#run(JdbcConnection, Object) run} method
    * @param isolationLevel The isolation level of the transaction
    * @throws CannotGetJdbcConnectionException Could not acquire a connection from connection-source
    */

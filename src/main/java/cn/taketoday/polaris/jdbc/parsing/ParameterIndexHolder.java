@@ -51,7 +51,7 @@ public abstract class ParameterIndexHolder implements Iterable<Integer> {
   // static
 
   public static ParameterIndexHolder valueOf(int index) {
-    return new cn.taketoday.polaris.jdbc.parsing.DefaultParameterIndexHolder(index);
+    return new DefaultParameterIndexHolder(index);
   }
 
   public static ParameterIndexHolder valueOf(List<Integer> indices) {

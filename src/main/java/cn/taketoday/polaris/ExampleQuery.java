@@ -43,10 +43,10 @@ import cn.taketoday.polaris.support.WhereAnnotationConditionStrategy;
  */
 final class ExampleQuery extends SimpleSelectQueryStatement implements ConditionStatement, DebugDescriptive {
 
-  static final List<cn.taketoday.polaris.PropertyConditionStrategy> strategies;
+  static final List<PropertyConditionStrategy> strategies;
 
   static {
-    List<cn.taketoday.polaris.PropertyConditionStrategy> list = TodayStrategies.find(PropertyConditionStrategy.class);
+    List<PropertyConditionStrategy> list = TodayStrategies.find(PropertyConditionStrategy.class);
     list.add(new WhereAnnotationConditionStrategy());
     list.add(new FuzzyQueryConditionStrategy());
     list.add(new DefaultConditionStrategy());
@@ -124,7 +124,7 @@ final class ExampleQuery extends SimpleSelectQueryStatement implements Condition
       // apply class level order by
       applyOrderByClause();
 
-      for (cn.taketoday.polaris.EntityProperty entityProperty : exampleMetadata.entityProperties) {
+      for (EntityProperty entityProperty : exampleMetadata.entityProperties) {
         Object propertyValue = entityProperty.getValue(example);
         if (propertyValue != null) {
           for (var strategy : strategies) {
@@ -163,7 +163,7 @@ final class ExampleQuery extends SimpleSelectQueryStatement implements Condition
     if (!(orderByClause instanceof OrderByClause.Plain)) {
       MergedAnnotation<OrderBy> annotation = entityProperty.getAnnotation(OrderBy.class);
       if (annotation.isPresent()) {
-        cn.taketoday.polaris.Order direction = annotation.getEnum("direction", Order.class);
+        Order direction = annotation.getEnum("direction", Order.class);
         MutableOrderByClause mutable = (MutableOrderByClause) orderByClause;
         if (mutable == null) {
           mutable = OrderByClause.mutable();

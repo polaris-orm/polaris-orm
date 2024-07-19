@@ -23,7 +23,7 @@ package cn.taketoday.polaris.sql;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 4.0
  */
-public class ANSIJoinFragment extends cn.taketoday.polaris.sql.JoinFragment {
+public class ANSIJoinFragment extends JoinFragment {
   private StringBuilder buffer = new StringBuilder();
   private final StringBuilder conditions = new StringBuilder();
 
@@ -36,7 +36,7 @@ public class ANSIJoinFragment extends cn.taketoday.polaris.sql.JoinFragment {
    * @param pkColumns The columns (from the table being joined to) used to define the join-restriction (the ON)
    * @param joinType The type of join to produce (INNER, etc).
    */
-  public void addJoin(String tableName, String alias, String[] fkColumns, String[] pkColumns, cn.taketoday.polaris.sql.JoinType joinType) {
+  public void addJoin(String tableName, String alias, String[] fkColumns, String[] pkColumns, JoinType joinType) {
     addJoin(tableName, alias, fkColumns, pkColumns, joinType, null);
   }
 
@@ -52,7 +52,7 @@ public class ANSIJoinFragment extends cn.taketoday.polaris.sql.JoinFragment {
    * @param joinType The type of join to produce (INNER, etc).
    * @param on Any extra join restrictions
    */
-  public void addJoin(String rhsTableName, String rhsAlias, String[] lhsColumns, String[] rhsColumns, cn.taketoday.polaris.sql.JoinType joinType, String on) {
+  public void addJoin(String rhsTableName, String rhsAlias, String[] lhsColumns, String[] rhsColumns, JoinType joinType, String on) {
     String joinString = switch (joinType) {
       case INNER_JOIN -> " inner join ";
       case LEFT_OUTER_JOIN -> " left outer join ";

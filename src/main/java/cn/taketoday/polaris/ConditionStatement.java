@@ -51,7 +51,7 @@ public interface ConditionStatement {
    */
   @Nullable
   default OrderByClause getOrderByClause(EntityMetadata metadata) {
-    MergedAnnotation<cn.taketoday.polaris.OrderBy> orderBy = metadata.getAnnotation(OrderBy.class);
+    MergedAnnotation<OrderBy> orderBy = metadata.getAnnotation(OrderBy.class);
     if (orderBy.isPresent()) {
       String clause = orderBy.getStringValue();
       if (!Constant.DEFAULT_NONE.equals(clause)) {

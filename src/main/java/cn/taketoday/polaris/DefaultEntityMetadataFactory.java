@@ -30,16 +30,16 @@ import cn.taketoday.util.ClassUtils;
  * Default EntityHolderFactory
  * <p>
  * <ul>
- * <li> {@link cn.taketoday.polaris.TableNameGenerator} to generate table name
- * <li> {@link cn.taketoday.polaris.IdPropertyDiscover} to find the ID property
- * <li> {@link cn.taketoday.polaris.ColumnNameDiscover} to find column name
+ * <li> {@link TableNameGenerator} to generate table name
+ * <li> {@link IdPropertyDiscover} to find the ID property
+ * <li> {@link ColumnNameDiscover} to find column name
  * <li> {@link PropertyFilter} to filter the property
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @see PropertyFilter
- * @see cn.taketoday.polaris.TableNameGenerator
- * @see cn.taketoday.polaris.IdPropertyDiscover
- * @see cn.taketoday.polaris.ColumnNameDiscover
+ * @see TableNameGenerator
+ * @see IdPropertyDiscover
+ * @see ColumnNameDiscover
  * @since 4.0 2022/9/5 11:38
  */
 public class DefaultEntityMetadataFactory extends EntityMetadataFactory {
@@ -47,13 +47,13 @@ public class DefaultEntityMetadataFactory extends EntityMetadataFactory {
   private PropertyFilter propertyFilter = PropertyFilter.filteredNames(Set.of("class"))
           .and(PropertyFilter.forTransientAnnotation());
 
-  private cn.taketoday.polaris.TableNameGenerator tableNameGenerator = cn.taketoday.polaris.TableNameGenerator.defaultStrategy();
+  private TableNameGenerator tableNameGenerator = TableNameGenerator.defaultStrategy();
 
-  private cn.taketoday.polaris.IdPropertyDiscover idPropertyDiscover = cn.taketoday.polaris.IdPropertyDiscover.forIdAnnotation()
-          .and(cn.taketoday.polaris.IdPropertyDiscover.forPropertyName(cn.taketoday.polaris.IdPropertyDiscover.DEFAULT_ID_PROPERTY));
+  private IdPropertyDiscover idPropertyDiscover = IdPropertyDiscover.forIdAnnotation()
+          .and(IdPropertyDiscover.forPropertyName(IdPropertyDiscover.DEFAULT_ID_PROPERTY));
 
-  private cn.taketoday.polaris.ColumnNameDiscover columnNameDiscover = cn.taketoday.polaris.ColumnNameDiscover.forColumnAnnotation()
-          .and(cn.taketoday.polaris.ColumnNameDiscover.camelCaseToUnderscore());
+  private ColumnNameDiscover columnNameDiscover = ColumnNameDiscover.forColumnAnnotation()
+          .and(ColumnNameDiscover.camelCaseToUnderscore());
 
   private TypeHandlerManager typeHandlerManager = TypeHandlerManager.sharedInstance;
 
@@ -117,9 +117,9 @@ public class DefaultEntityMetadataFactory extends EntityMetadataFactory {
     BeanMetadata metadata = BeanMetadata.from(entityClass);
     ArrayList<String> columnNames = new ArrayList<>();
     ArrayList<BeanProperty> beanProperties = new ArrayList<>();
-    ArrayList<cn.taketoday.polaris.EntityProperty> entityProperties = new ArrayList<>();
+    ArrayList<EntityProperty> entityProperties = new ArrayList<>();
 
-    cn.taketoday.polaris.EntityProperty idProperty = null;
+    EntityProperty idProperty = null;
     for (BeanProperty property : metadata) {
       if (isFiltered(property)) {
         continue;
@@ -154,7 +154,7 @@ public class DefaultEntityMetadataFactory extends EntityMetadataFactory {
             idProperty, tableName, beanProperties, columnNames, entityProperties);
   }
 
-  private cn.taketoday.polaris.EntityProperty createEntityProperty(BeanProperty property, String columnName, boolean isId) {
+  private EntityProperty createEntityProperty(BeanProperty property, String columnName, boolean isId) {
     return new EntityProperty(property, columnName, typeHandlerManager.getTypeHandler(property), isId);
   }
 

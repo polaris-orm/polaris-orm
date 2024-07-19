@@ -36,13 +36,13 @@ class QueryConditionTests {
 
   @Test
   void and() {
-    cn.taketoday.polaris.DefaultQueryCondition condition = cn.taketoday.polaris.DefaultQueryCondition.isEqualsTo("name", "T");
+    DefaultQueryCondition condition = DefaultQueryCondition.isEqualsTo("name", "T");
 
     StringBuilder sql = new StringBuilder();
     condition.render(sql);
     assertThat(sql.toString()).isEqualTo(" `name` = ?");
 
-    condition.and(cn.taketoday.polaris.DefaultQueryCondition.isNull("age"));
+    condition.and(DefaultQueryCondition.isNull("age"));
 
     sql = new StringBuilder();
     condition.render(sql);
@@ -62,9 +62,9 @@ class QueryConditionTests {
 
   @Test
   void composite() {
-    NestedQueryCondition condition = cn.taketoday.polaris.QueryCondition.nested(
-            cn.taketoday.polaris.QueryCondition.isEqualsTo("name", "TODAY")
-                    .or(cn.taketoday.polaris.QueryCondition.isEqualsTo("age", 10))
+    NestedQueryCondition condition = QueryCondition.nested(
+            QueryCondition.isEqualsTo("name", "TODAY")
+                    .or(QueryCondition.isEqualsTo("age", 10))
     );
 
     StringBuilder sql = new StringBuilder();
@@ -73,9 +73,9 @@ class QueryConditionTests {
     //
 
     condition.and(
-            cn.taketoday.polaris.QueryCondition.nested(
-                    cn.taketoday.polaris.QueryCondition.isEqualsTo("gender", Gender.MALE)
-                            .and(cn.taketoday.polaris.QueryCondition.of("email", cn.taketoday.polaris.Operator.PREFIX_LIKE, "taketoday"))
+            QueryCondition.nested(
+                    QueryCondition.isEqualsTo("gender", Gender.MALE)
+                            .and(QueryCondition.of("email", Operator.PREFIX_LIKE, "taketoday"))
             )
     );
 
@@ -86,12 +86,12 @@ class QueryConditionTests {
     //
 
     condition.and(
-            cn.taketoday.polaris.QueryCondition.nested(
-                    cn.taketoday.polaris.QueryCondition.isEqualsTo("gender", Gender.MALE)
-                            .and(cn.taketoday.polaris.QueryCondition.of("email", cn.taketoday.polaris.Operator.PREFIX_LIKE, "taketoday")
-                                    .and(cn.taketoday.polaris.QueryCondition.nested(
-                                                    cn.taketoday.polaris.QueryCondition.isEqualsTo("name", "TODAY")
-                                                            .or(cn.taketoday.polaris.QueryCondition.isEqualsTo("age", 10))
+            QueryCondition.nested(
+                    QueryCondition.isEqualsTo("gender", Gender.MALE)
+                            .and(QueryCondition.of("email", Operator.PREFIX_LIKE, "taketoday")
+                                    .and(QueryCondition.nested(
+                                                    QueryCondition.isEqualsTo("name", "TODAY")
+                                                            .or(QueryCondition.isEqualsTo("age", 10))
                                             )
                                     )
                             )
@@ -108,11 +108,11 @@ class QueryConditionTests {
 
   @Test
   void andExprShouldAssignOnce() {
-    var condition = cn.taketoday.polaris.QueryCondition.isEqualsTo("gender", Gender.MALE)
-            .and(cn.taketoday.polaris.QueryCondition.of("email", cn.taketoday.polaris.Operator.PREFIX_LIKE, "taketoday"))
-            .and(cn.taketoday.polaris.QueryCondition.nested(
-                            cn.taketoday.polaris.QueryCondition.isEqualsTo("name", "TODAY")
-                                    .or(cn.taketoday.polaris.QueryCondition.isEqualsTo("age", 10))
+    var condition = QueryCondition.isEqualsTo("gender", Gender.MALE)
+            .and(QueryCondition.of("email", Operator.PREFIX_LIKE, "taketoday"))
+            .and(QueryCondition.nested(
+                            QueryCondition.isEqualsTo("name", "TODAY")
+                                    .or(QueryCondition.isEqualsTo("age", 10))
                     )
             );
 
@@ -125,19 +125,19 @@ class QueryConditionTests {
   void setParameter() throws SQLException {
     PreparedStatement statement = Mockito.mock(PreparedStatement.class);
 
-    cn.taketoday.polaris.QueryCondition condition = cn.taketoday.polaris.QueryCondition.nested(
-            cn.taketoday.polaris.QueryCondition.isEqualsTo("name", "TODAY").or(cn.taketoday.polaris.QueryCondition.isEqualsTo("age", 10))
-    ).and(cn.taketoday.polaris.QueryCondition.nested(
-                    cn.taketoday.polaris.QueryCondition.isEqualsTo("gender", Gender.MALE)
+    QueryCondition condition = QueryCondition.nested(
+            QueryCondition.isEqualsTo("name", "TODAY").or(QueryCondition.isEqualsTo("age", 10))
+    ).and(QueryCondition.nested(
+                    QueryCondition.isEqualsTo("gender", Gender.MALE)
                             .and(
-                                    cn.taketoday.polaris.QueryCondition.of("email", Operator.PREFIX_LIKE, "taketoday")
+                                    QueryCondition.of("email", Operator.PREFIX_LIKE, "taketoday")
                                             .and(
-                                                    cn.taketoday.polaris.QueryCondition.isEqualsTo("name", "TODAY")
-                                                            .or(cn.taketoday.polaris.QueryCondition.isEqualsTo("name", "TODAY"))
+                                                    QueryCondition.isEqualsTo("name", "TODAY")
+                                                            .or(QueryCondition.isEqualsTo("name", "TODAY"))
                                             )
                             )
             ).and(
-                    cn.taketoday.polaris.QueryCondition.isEqualsTo("name", "TODAY7")
+                    QueryCondition.isEqualsTo("name", "TODAY7")
                             .or(QueryCondition.isEqualsTo("name", "TODAY8"))
             )
     );

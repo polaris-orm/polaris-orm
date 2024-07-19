@@ -100,7 +100,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
 
     System.out.println("Datasource initialized.");
 
-    cn.taketoday.polaris.jdbc.RepositoryManager jndiSql2o = new cn.taketoday.polaris.jdbc.RepositoryManager("Sql2o");
+    RepositoryManager jndiSql2o = new RepositoryManager("Sql2o");
 
     assertNotNull(jndiSql2o);
   }
@@ -109,7 +109,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
   public void testExecuteAndFetch() {
     createAndFillUserTable();
 
-    try (cn.taketoday.polaris.jdbc.JdbcConnection con = repositoryManager.open()) {
+    try (JdbcConnection con = repositoryManager.open()) {
 
       Date before = new Date();
       List<User> allUsers = con.createNamedQuery("select * from User").fetch(User.class);
@@ -140,11 +140,11 @@ public class RepositoryManagerTests extends BaseMemDbTest {
             "text varchar(255), " +
             "aNumber int, " +
             "aLongNumber bigint)";
-    try (cn.taketoday.polaris.jdbc.JdbcConnection con = repositoryManager.open()) {
+    try (JdbcConnection con = repositoryManager.open()) {
       con.createNamedQuery(sql, "testExecuteAndFetchWithNulls").executeUpdate();
 
-      cn.taketoday.polaris.jdbc.JdbcConnection connection = repositoryManager.beginTransaction();
-      cn.taketoday.polaris.jdbc.NamedQuery insQuery = connection.createNamedQuery(
+      JdbcConnection connection = repositoryManager.beginTransaction();
+      NamedQuery insQuery = connection.createNamedQuery(
               "insert into testExecWithNullsTbl (text, aNumber, aLongNumber) values(:text, :number, :lnum)");
       insQuery.addParameter("text", "some text").addParameter("number", 2).addParameter("lnum", 10L).executeUpdate();
       insQuery.addParameter("text", "some text")
@@ -185,7 +185,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
 
     String insQuery = "insert into User(name, email, text) values (:name, :email, :text)";
 
-    cn.taketoday.polaris.jdbc.JdbcConnection con = repositoryManager.beginTransaction();
+    JdbcConnection con = repositoryManager.beginTransaction();
     int[] inserted = con.createNamedQuery(insQuery)
             .addParameter("name", "test")
             .addParameter("email", "test@test.com")
@@ -266,7 +266,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
             .createNamedQuery("create table testCI(id2 int primary key, value2 varchar(20), sometext varchar(20), valwithgetter varchar(20))")
             .executeUpdate();
 
-    cn.taketoday.polaris.jdbc.NamedQuery query = repositoryManager.createNamedQuery(
+    NamedQuery query = repositoryManager.createNamedQuery(
             "insert into testCI(id2, value2, sometext, valwithgetter) values(:id, :value, :someText, :valwithgetter)");
     for (int i = 0; i < 20; i++) {
       query.addParameter("id", i).addParameter("value", "some text " + i).addParameter("someText", "whatever " + i).addParameter(
@@ -288,8 +288,8 @@ public class RepositoryManagerTests extends BaseMemDbTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testSetMaxBatchRecords() {
-    try (cn.taketoday.polaris.jdbc.JdbcConnection conn = this.repositoryManager.open()) {
-      cn.taketoday.polaris.jdbc.NamedQuery q = conn.createNamedQuery("select 'test'");
+    try (JdbcConnection conn = this.repositoryManager.open()) {
+      NamedQuery q = conn.createNamedQuery("select 'test'");
       q.setMaxBatchRecords(20);
       assertEquals(20, q.getMaxBatchRecords());
 
@@ -302,14 +302,14 @@ public class RepositoryManagerTests extends BaseMemDbTest {
 
   @Test
   public void testBatchWithMaxBatchRecords() {
-    try (cn.taketoday.polaris.jdbc.JdbcConnection connection = repositoryManager.open()) {
+    try (JdbcConnection connection = repositoryManager.open()) {
       createAndFillUserTable(connection, true, 50);
       genericTestOnUserData(connection);
     }
 
     //also test with an odd number
 
-    try (cn.taketoday.polaris.jdbc.JdbcConnection connection = repositoryManager.open()) {
+    try (JdbcConnection connection = repositoryManager.open()) {
       createAndFillUserTable(connection, true, 29);
       genericTestOnUserData(connection);
     }
@@ -374,7 +374,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
 
   @Test
   public void testColumnAnnotation() {
-    try (cn.taketoday.polaris.jdbc.JdbcConnection connection = repositoryManager.open()) {
+    try (JdbcConnection connection = repositoryManager.open()) {
       connection.createNamedQuery("create table test_column_annotation(id int primary key, text_col varchar(20))").executeUpdate();
 
       connection.createNamedQuery("insert into test_column_annotation(id, text_col) values(:id, :text)")
@@ -445,7 +445,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
   @Test
   public void testUpdateNoTransaction() throws SQLException {
     String ddlQuery = "create table testUpdateNoTransaction(id int primary key, value varchar(50))";
-    cn.taketoday.polaris.jdbc.JdbcConnection connection =
+    JdbcConnection connection =
             repositoryManager.createNamedQuery(ddlQuery)
                     .executeUpdate()
                     .getConnection();
@@ -541,7 +541,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
       }
     };
 
-    cn.taketoday.polaris.jdbc.NamedQuery query = repositoryManager.createNamedQuery(insertSql, true);
+    NamedQuery query = repositoryManager.createNamedQuery(insertSql, true);
 
     for (String val : vals) {
       query.addParameter("val", val);
@@ -628,7 +628,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
 
   @Test
   public void testGlobalDbMappings() {
-    cn.taketoday.polaris.jdbc.RepositoryManager sql2o1 = new RepositoryManager(dbType.url, dbType.user, dbType.pass);
+    RepositoryManager sql2o1 = new RepositoryManager(dbType.url, dbType.user, dbType.pass);
 
     Map<String, String> defaultColMaps = new HashMap<>();
     defaultColMaps.put("caption", "text");
@@ -666,7 +666,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
             .addParameter("value", "something").addParameter("value2", new BigDecimal("3.4")).addToBatch()
             .addParameter("value", "bla").addParameter("value2", new BigDecimal("5.5")).addToBatch().executeBatch();
 
-    cn.taketoday.polaris.jdbc.Table table = repositoryManager.createNamedQuery("select * from tabletest order by id").fetchTable();
+    Table table = repositoryManager.createNamedQuery("select * from tabletest order by id").fetchTable();
 
     assertEquals(3, table.columns().size());
     assertEquals("ID", table.columns().get(0).getName());
@@ -675,8 +675,8 @@ public class RepositoryManagerTests extends BaseMemDbTest {
 
     assertEquals(2, table.rows().size());
 
-    cn.taketoday.polaris.jdbc.Row row0 = table.rows().get(0);
-    cn.taketoday.polaris.jdbc.Row row1 = table.rows().get(1);
+    Row row0 = table.rows().get(0);
+    Row row1 = table.rows().get(1);
 
     assertTrue(0 <= row0.getInteger("ID"));
     assertEquals("something", row0.getString(1));
@@ -692,8 +692,8 @@ public class RepositoryManagerTests extends BaseMemDbTest {
     createAndFillUserTable();
 
     List<Map<String, Object>> rows;
-    try (cn.taketoday.polaris.jdbc.JdbcConnection con = repositoryManager.open()) {
-      cn.taketoday.polaris.jdbc.Table table = con.createNamedQuery("select * from user").fetchTable();
+    try (JdbcConnection con = repositoryManager.open()) {
+      Table table = con.createNamedQuery("select * from user").fetchTable();
 
       rows = table.asList();
     }
@@ -782,14 +782,14 @@ public class RepositoryManagerTests extends BaseMemDbTest {
     boolean failed = false;
 
     try {
-      repositoryManager.runInTransaction((cn.taketoday.polaris.jdbc.StatementRunnable) (connection, argument) -> {
+      repositoryManager.runInTransaction((StatementRunnable) (connection, argument) -> {
         connection.createNamedQuery("insert into runinsidetransactiontable(value) values(:value)")
                 .addParameter("value", "test")
                 .executeUpdate();
         throw new RuntimeException("ouch!");
       });
     }
-    catch (cn.taketoday.polaris.jdbc.PersistenceException ex) {
+    catch (PersistenceException ex) {
       failed = true;
     }
 
@@ -833,7 +833,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
 
   private static class runnerWithResultTester implements ResultStatementRunnable<List<Integer>, String[]> {
 
-    public List<Integer> run(cn.taketoday.polaris.jdbc.JdbcConnection connection, String[] argument) throws Throwable {
+    public List<Integer> run(JdbcConnection connection, String[] argument) throws Throwable {
       List<Integer> keys = new ArrayList<>();
       for (String val : argument) {
         Integer key = connection.createNamedQuery(
@@ -1133,7 +1133,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
   public void testRowGetObjectWithConverters() {
     String sql = "select 1 col1, '23' col2 from (values(0))";
     Table t = repositoryManager.createNamedQuery(sql).fetchTable();
-    cn.taketoday.polaris.jdbc.Row r = t.rows().get(0);
+    Row r = t.rows().get(0);
 
     String col1AsString = r.getObject("col1", String.class);
     Integer col1AsInteger = r.getObject("col1", Integer.class);
@@ -1156,7 +1156,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
   public void testExecuteAndFetchLazy() {
     createAndFillUserTable();
 
-    cn.taketoday.polaris.jdbc.ResultSetIterable<User> allUsers = repositoryManager.createNamedQuery("select * from User")
+    ResultSetIterable<User> allUsers = repositoryManager.createNamedQuery("select * from User")
             .iterate(User.class)
             .asIterable();
 
@@ -1183,7 +1183,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
   public void testResultSetIterator_multipleHasNextWorks() {
     createAndFillUserTable();
 
-    cn.taketoday.polaris.jdbc.ResultSetIterable<User> allUsers = repositoryManager.createNamedQuery("select * from User").iterate(User.class).asIterable();
+    ResultSetIterable<User> allUsers = repositoryManager.createNamedQuery("select * from User").iterate(User.class).asIterable();
 
     Iterator<User> usersIterator = allUsers.iterator();
 
@@ -1228,7 +1228,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
   public void testExecuteAndFetchWithAutoclose() throws SQLException {
     createAndFillUserTable();
 
-    cn.taketoday.polaris.jdbc.JdbcConnection con = repositoryManager.open();
+    JdbcConnection con = repositoryManager.open();
 
     try (ResultSetIterable<User> userIterable = con.createNamedQuery("select * from User")
             .iterate(User.class).asIterable()) {
@@ -1248,7 +1248,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
   public void testLazyTable() throws SQLException {
     createAndFillUserTable();
 
-    cn.taketoday.polaris.jdbc.NamedQuery q = repositoryManager.createNamedQuery("select * from User");
+    NamedQuery q = repositoryManager.createNamedQuery("select * from User");
     try (LazyTable lt = q.fetchLazyTable()) {
       for (Row r : lt.rows()) {
         String name = r.getString("name");
@@ -1269,7 +1269,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
 
     repositoryManager.createNamedQuery("create table testTransactionAutoClosable(id int primary key, val varchar(20) not null)").executeUpdate();
 
-    cn.taketoday.polaris.jdbc.JdbcConnection connection = null;
+    JdbcConnection connection = null;
     try {
       connection = repositoryManager.beginTransaction();
       String sql = "insert into testTransactionAutoClosable(id, val) values (:id, :val);";
@@ -1304,15 +1304,15 @@ public class RepositoryManagerTests extends BaseMemDbTest {
   @Test
   public void testExternalTransactionCommit() {
 
-    try (cn.taketoday.polaris.jdbc.JdbcConnection connection1 = repositoryManager.open()) {
+    try (JdbcConnection connection1 = repositoryManager.open()) {
       connection1.createNamedQuery("create table testExternalTransactionCommit(id int primary key, val varchar(20) not null)")
               .executeUpdate();
     }
 
-    try (cn.taketoday.polaris.jdbc.JdbcConnection globalConnection = repositoryManager.beginTransaction()) {
+    try (JdbcConnection globalConnection = repositoryManager.beginTransaction()) {
       Connection globalTransaction = globalConnection.getJdbcConnection();
 
-      cn.taketoday.polaris.jdbc.JdbcConnection connection = repositoryManager.beginTransaction(globalTransaction);
+      JdbcConnection connection = repositoryManager.beginTransaction(globalTransaction);
       String sql = "insert into testExternalTransactionCommit(id, val) values (:id, :val);";
       connection.createNamedQuery(sql)
               .addParameter("id", 1)
@@ -1324,7 +1324,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
               .fetchFirst(Integer.class);
       assertThat(count).isEqualTo(1);
 
-      cn.taketoday.polaris.jdbc.JdbcConnection connection3 = repositoryManager.beginTransaction(globalTransaction);
+      JdbcConnection connection3 = repositoryManager.beginTransaction(globalTransaction);
       String sql1 = "insert into testExternalTransactionCommit(id, val) values (:id, :val);";
       connection3.createNamedQuery(sql1)
               .addParameter("id", 2)
@@ -1339,7 +1339,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
       globalConnection.commit();
     }
 
-    try (cn.taketoday.polaris.jdbc.JdbcConnection connection2 = repositoryManager.open()) {
+    try (JdbcConnection connection2 = repositoryManager.open()) {
       int count = connection2.createNamedQuery("select count(*) from testExternalTransactionCommit")
               .fetchFirst(Integer.class);
 
@@ -1352,25 +1352,25 @@ public class RepositoryManagerTests extends BaseMemDbTest {
   @Ignore
   public void testExternalTransactionRollback() {
 
-    try (cn.taketoday.polaris.jdbc.JdbcConnection connection1 = repositoryManager.open()) {
+    try (JdbcConnection connection1 = repositoryManager.open()) {
       connection1.createNamedQuery("create table testExternalTransactionRollback(id int primary key, val varchar(20) not null)")
               .executeUpdate();
     }
 
-    try (cn.taketoday.polaris.jdbc.JdbcConnection globalConnection = repositoryManager.beginTransaction(Connection.TRANSACTION_SERIALIZABLE)) {
+    try (JdbcConnection globalConnection = repositoryManager.beginTransaction(Connection.TRANSACTION_SERIALIZABLE)) {
       Connection globalTransaction = globalConnection.getJdbcConnection();
 
-      cn.taketoday.polaris.jdbc.JdbcConnection connection = repositoryManager.beginTransaction(globalTransaction);
+      JdbcConnection connection = repositoryManager.beginTransaction(globalTransaction);
       String sql = "insert into testExternalTransactionRollback(id, val) values (:id, :val);";
       connection.createNamedQuery(sql).addParameter("id", 1).addParameter("val", "foo").executeUpdate();
       connection.commit();
 
-      cn.taketoday.polaris.jdbc.JdbcConnection connection2 = repositoryManager.open(globalTransaction);
+      JdbcConnection connection2 = repositoryManager.open(globalTransaction);
       int count = connection2.createNamedQuery("select count(*) from testExternalTransactionRollback")
               .fetchFirst(Integer.class);
       assertThat(count).isEqualTo(1);
 
-      cn.taketoday.polaris.jdbc.JdbcConnection connection3 = repositoryManager.beginTransaction(globalTransaction);
+      JdbcConnection connection3 = repositoryManager.beginTransaction(globalTransaction);
       String sql2 = "insert into testExternalTransactionRollback(id, val) values (:id, :val);";
       connection3.createNamedQuery(sql2)
               .addParameter("id", 2)
@@ -1378,14 +1378,14 @@ public class RepositoryManagerTests extends BaseMemDbTest {
               .executeUpdate();
       connection3.commit();
 
-      cn.taketoday.polaris.jdbc.JdbcConnection connection4 = repositoryManager.open(globalTransaction);
+      JdbcConnection connection4 = repositoryManager.open(globalTransaction);
       int count1 = connection4.createNamedQuery("select count(*) from testExternalTransactionRollback")
               .fetchFirst(Integer.class);
       assertThat(count1).isEqualTo(2);
       globalConnection.rollback();
     }
 
-    try (cn.taketoday.polaris.jdbc.JdbcConnection connection2 = repositoryManager.open()) {
+    try (JdbcConnection connection2 = repositoryManager.open()) {
       int count = connection2.createNamedQuery("select count(*) from testExternalTransactionRollback")
               .fetchFirst(Integer.class);
 
@@ -1397,7 +1397,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
   @Test
   public void testOpenConnection() throws SQLException {
 
-    cn.taketoday.polaris.jdbc.JdbcConnection connection = repositoryManager.open();
+    JdbcConnection connection = repositoryManager.open();
 
     createAndFillUserTable(connection);
 
@@ -1493,7 +1493,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
     String insertSql = "insert into testAutoDeriveColumnNames values (:id, :val)";
     String selectSql = "select * from testAutoDeriveColumnNames";
 
-    try (cn.taketoday.polaris.jdbc.JdbcConnection con = repositoryManager.open()) {
+    try (JdbcConnection con = repositoryManager.open()) {
       con.createNamedQuery(createTableSql).executeUpdate();
       con.createNamedQuery(insertSql).addParameter("id", 1).addParameter("val", "test1").executeUpdate();
 
@@ -1523,7 +1523,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
 
   @Test
   public void testClob() {
-    try (cn.taketoday.polaris.jdbc.JdbcConnection connection = repositoryManager.open()) {
+    try (JdbcConnection connection = repositoryManager.open()) {
       connection.createNamedQuery("create table testClob(id integer primary key, val clob)")
               .executeUpdate();
 
@@ -1543,7 +1543,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
 
   @Test
   public void testBindInIteration() {
-    try (cn.taketoday.polaris.jdbc.JdbcConnection connection = repositoryManager.open()) {
+    try (JdbcConnection connection = repositoryManager.open()) {
       createAndFillUserTable(connection, true);
       genericTestOnUserData(connection);
     }
@@ -1554,7 +1554,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
   public void testArrayParameter() {
     createAndFillUserTable();
 
-    try (cn.taketoday.polaris.jdbc.JdbcConnection connection = repositoryManager.open()) {
+    try (JdbcConnection connection = repositoryManager.open()) {
       List<User> result = connection
               .createNamedQuery("select * from user where id in(:ids)")
               .addParameters("ids", 1, 2, 3)
@@ -1563,7 +1563,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
       assertEquals(3, result.size());
     }
 
-    try (cn.taketoday.polaris.jdbc.JdbcConnection connection = repositoryManager.open()) {
+    try (JdbcConnection connection = repositoryManager.open()) {
       List<User> result = connection
               .createNamedQuery("select * from user where" +
                       " email like :email" +
@@ -1577,7 +1577,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
       assertEquals(3, result.size());
     }
 
-    try (cn.taketoday.polaris.jdbc.JdbcConnection connection = repositoryManager.open()) {
+    try (JdbcConnection connection = repositoryManager.open()) {
       List<User> result = connection
               .createNamedQuery("select * from user where" +
                       " email like :email" +
@@ -1591,7 +1591,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
       assertEquals(0, result.size());
     }
 
-    try (cn.taketoday.polaris.jdbc.JdbcConnection connection = repositoryManager.open()) {
+    try (JdbcConnection connection = repositoryManager.open()) {
       List<User> result = connection
               .createNamedQuery("select * from user where" +
                       " email like :email" +
@@ -1605,7 +1605,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
       assertEquals(1, result.size());
     }
 
-    try (cn.taketoday.polaris.jdbc.JdbcConnection connection = repositoryManager.open()) {
+    try (JdbcConnection connection = repositoryManager.open()) {
       List<User> result = connection
               .createNamedQuery("select * from user where" +
                       " email like :email" +
@@ -1621,7 +1621,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
       assertEquals(3, result.size());
     }
 
-    try (cn.taketoday.polaris.jdbc.JdbcConnection connection = repositoryManager.open()) {
+    try (JdbcConnection connection = repositoryManager.open()) {
       connection.createNamedQuery("insert into user (id, text_col) values(:id, :text)")
               .addParameters("id", 1, 2, 3).addParameter("text", "test1").addToBatch();
       fail("Batch with array parameter is not supported");
@@ -1630,7 +1630,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
       // as expected
     }
 
-    try (cn.taketoday.polaris.jdbc.JdbcConnection connection = repositoryManager.open()) {
+    try (JdbcConnection connection = repositoryManager.open()) {
       List<User> result = connection
               .createNamedQuery("select * from user where id in(:ids)")
               .addParameter("ids", new int[]
@@ -1640,7 +1640,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
       assertEquals(3, result.size());
     }
 
-    try (cn.taketoday.polaris.jdbc.JdbcConnection connection = repositoryManager.open()) {
+    try (JdbcConnection connection = repositoryManager.open()) {
       List<User> result = connection
               .createNamedQuery("select * from user where id in(:ids)")
               .addParameter("ids", (Object) ImmutableList.of(1, 2, 3))
@@ -1652,7 +1652,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
 
   @Test
   public void testExecuteUpdate() {
-    try (cn.taketoday.polaris.jdbc.JdbcConnection connection = repositoryManager.open()) {
+    try (JdbcConnection connection = repositoryManager.open()) {
       connection.createNamedQuery("create table test_(id int identity primary key,  val int)")
               .executeUpdate();
 
@@ -1670,22 +1670,22 @@ public class RepositoryManagerTests extends BaseMemDbTest {
   /************** Helper stuff ******************/
 
   private void createAndFillUserTable() {
-    cn.taketoday.polaris.jdbc.JdbcConnection connection = repositoryManager.open();
+    JdbcConnection connection = repositoryManager.open();
 
     createAndFillUserTable(connection);
 
     connection.close();
   }
 
-  private void createAndFillUserTable(cn.taketoday.polaris.jdbc.JdbcConnection connection) {
+  private void createAndFillUserTable(JdbcConnection connection) {
     createAndFillUserTable(connection, false);
   }
 
-  private void createAndFillUserTable(cn.taketoday.polaris.jdbc.JdbcConnection connection, boolean useBind) {
+  private void createAndFillUserTable(JdbcConnection connection, boolean useBind) {
     createAndFillUserTable(connection, useBind, 0);
   }
 
-  private void createAndFillUserTable(cn.taketoday.polaris.jdbc.JdbcConnection connection, boolean useBind, int maxBatchRecords) {
+  private void createAndFillUserTable(JdbcConnection connection, boolean useBind, int maxBatchRecords) {
 
     try {
       connection.createNamedQuery("drop table User").executeUpdate();

@@ -33,7 +33,7 @@ import cn.taketoday.util.ClassUtils;
 public class UnknownTypeHandler extends BaseTypeHandler<Object> {
 
   private boolean useColumnLabel = true;
-  private final cn.taketoday.polaris.jdbc.type.TypeHandlerManager registry;
+  private final TypeHandlerManager registry;
 
   /**
    * The constructor that pass the type handler registry.
@@ -47,19 +47,19 @@ public class UnknownTypeHandler extends BaseTypeHandler<Object> {
   @Override
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public void setNonNullParameter(PreparedStatement ps, int i, Object parameter) throws SQLException {
-    cn.taketoday.polaris.jdbc.type.TypeHandler handler = resolveTypeHandler(parameter);
+    TypeHandler handler = resolveTypeHandler(parameter);
     handler.setParameter(ps, i, parameter);
   }
 
   @Override
   public Object getResult(ResultSet rs, String columnName) throws SQLException {
-    cn.taketoday.polaris.jdbc.type.TypeHandler<?> handler = resolveTypeHandler(rs, columnName);
+    TypeHandler<?> handler = resolveTypeHandler(rs, columnName);
     return handler.getResult(rs, columnName);
   }
 
   @Override
   public Object getResult(ResultSet rs, int columnIndex) throws SQLException {
-    cn.taketoday.polaris.jdbc.type.TypeHandler<?> handler = resolveTypeHandler(rs.getMetaData(), columnIndex);
+    TypeHandler<?> handler = resolveTypeHandler(rs.getMetaData(), columnIndex);
     if (handler == null || handler instanceof UnknownTypeHandler) {
       handler = ObjectTypeHandler.sharedInstance;
     }
@@ -71,11 +71,11 @@ public class UnknownTypeHandler extends BaseTypeHandler<Object> {
     return cs.getObject(columnIndex);
   }
 
-  protected cn.taketoday.polaris.jdbc.type.TypeHandler<?> resolveTypeHandler(@Nullable Object parameter) {
+  protected TypeHandler<?> resolveTypeHandler(@Nullable Object parameter) {
     if (parameter == null) {
       return ObjectTypeHandler.sharedInstance;
     }
-    cn.taketoday.polaris.jdbc.type.TypeHandler<?> handler = registry.getTypeHandler(parameter.getClass());
+    TypeHandler<?> handler = registry.getTypeHandler(parameter.getClass());
     // check if handler is null (issue #270)
     if (handler == null || handler instanceof UnknownTypeHandler) {
       handler = ObjectTypeHandler.sharedInstance;
@@ -83,12 +83,12 @@ public class UnknownTypeHandler extends BaseTypeHandler<Object> {
     return handler;
   }
 
-  private cn.taketoday.polaris.jdbc.type.TypeHandler<?> resolveTypeHandler(final ResultSet rs, final String column) {
+  private TypeHandler<?> resolveTypeHandler(final ResultSet rs, final String column) {
     try {
       ResultSetMetaData rsmd = rs.getMetaData();
       int count = rsmd.getColumnCount();
       boolean useColumnLabel = isUseColumnLabel();
-      cn.taketoday.polaris.jdbc.type.TypeHandler<?> handler = null;
+      TypeHandler<?> handler = null;
       for (int columnIdx = 1; columnIdx <= count; columnIdx++) {
         String name = useColumnLabel ? rsmd.getColumnLabel(columnIdx) : rsmd.getColumnName(columnIdx);
         if (column.equals(name)) {

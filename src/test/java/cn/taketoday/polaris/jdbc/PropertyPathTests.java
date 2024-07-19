@@ -52,7 +52,7 @@ class PropertyPathTests {
     nested.nested = nested1;
     nested1.nested = nested2;
 
-    cn.taketoday.polaris.jdbc.PropertyPath propertyPath = new cn.taketoday.polaris.jdbc.PropertyPath(nested.getClass(), "nested.nested.name");
+    PropertyPath propertyPath = new PropertyPath(nested.getClass(), "nested.nested.name");
 
     assertThat(propertyPath.next).isNotNull();
     assertThat(propertyPath.next.next).isNotNull();
@@ -69,7 +69,7 @@ class PropertyPathTests {
   @Test
   void getNestedObjectNull() {
     Nested nested = new Nested("yhj");
-    cn.taketoday.polaris.jdbc.PropertyPath propertyPath = new cn.taketoday.polaris.jdbc.PropertyPath(nested.getClass(), "nested.nested.name");
+    PropertyPath propertyPath = new PropertyPath(nested.getClass(), "nested.nested.name");
 
     assertThat(propertyPath.next).isNotNull();
     assertThat(propertyPath.next.next).isNotNull();
@@ -81,19 +81,19 @@ class PropertyPathTests {
     assertThat(nested.nested.nested.name).isEqualTo("yhj2-modified");
 
     // error case
-    cn.taketoday.polaris.jdbc.PropertyPath propertyPathError = new cn.taketoday.polaris.jdbc.PropertyPath(nested.getClass(), "nested.nested.names");
+    PropertyPath propertyPathError = new PropertyPath(nested.getClass(), "nested.nested.names");
     assertThat(propertyPathError.next).isNotNull();
     assertThat(propertyPathError.next.next).isNotNull();
     assertThat(propertyPathError.next.next.next).isNull();
     assertThat(propertyPathError.next.next.beanProperty).isNull();
-    assertThat(propertyPathError.toString()).isEqualTo("nested.nested." + cn.taketoday.polaris.jdbc.PropertyPath.emptyPlaceholder);
+    assertThat(propertyPathError.toString()).isEqualTo("nested.nested." + PropertyPath.emptyPlaceholder);
 
     // error case
-    cn.taketoday.polaris.jdbc.PropertyPath propertyPathnestedsError = new cn.taketoday.polaris.jdbc.PropertyPath(nested.getClass(), "nested.nesteds.names");
+    PropertyPath propertyPathnestedsError = new PropertyPath(nested.getClass(), "nested.nesteds.names");
 
     assertThat(propertyPathnestedsError.next).isNotNull();
     assertThat(propertyPathnestedsError.next.next).isNull();
-    assertThat(propertyPathnestedsError.toString()).isEqualTo("nested." + cn.taketoday.polaris.jdbc.PropertyPath.emptyPlaceholder);
+    assertThat(propertyPathnestedsError.toString()).isEqualTo("nested." + PropertyPath.emptyPlaceholder);
   }
 
 }

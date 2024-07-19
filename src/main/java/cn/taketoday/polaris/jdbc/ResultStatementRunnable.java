@@ -19,7 +19,7 @@ package cn.taketoday.polaris.jdbc;
 import cn.taketoday.lang.Nullable;
 
 /**
- * Represents a method with a {@link cn.taketoday.polaris.jdbc.JdbcConnection} and an optional argument.
+ * Represents a method with a {@link JdbcConnection} and an optional argument.
  * Implementations of this interface be used as a parameter to one of the
  * {@link RepositoryManager#runInTransaction(ResultStatementRunnable)}
  * overloads, to run code safely in a transaction.
