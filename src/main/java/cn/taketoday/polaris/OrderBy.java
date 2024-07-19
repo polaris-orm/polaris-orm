@@ -28,7 +28,7 @@ import cn.taketoday.lang.Constant;
  * clause and direction cannot present same time
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/3/31 17:21
+ * @since 1.0 2024/3/31 17:21
  */
 @Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)

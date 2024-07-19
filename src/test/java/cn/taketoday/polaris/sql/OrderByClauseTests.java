@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/3/31 12:53
+ * @since 1.0 2024/3/31 12:53
  */
 class OrderByClauseTests {
 

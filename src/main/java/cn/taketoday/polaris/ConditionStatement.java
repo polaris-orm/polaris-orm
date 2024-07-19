@@ -34,7 +34,7 @@ import cn.taketoday.polaris.sql.Restriction;
  * @see Pageable
  * @see Descriptive
  * @see DebugDescriptive
- * @since 4.0 2024/3/31 15:51
+ * @since 1.0 2024/3/31 15:51
  */
 public interface ConditionStatement {
 

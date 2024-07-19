@@ -44,7 +44,7 @@ import java.lang.annotation.Target;
  * </p>
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/8/2 17:41
+ * @since 1.0 2022/8/2 17:41
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

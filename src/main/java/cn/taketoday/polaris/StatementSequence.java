@@ -20,7 +20,7 @@ import cn.taketoday.polaris.dialect.Platform;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/2/21 22:45
+ * @since 1.0 2024/2/21 22:45
  */
 public interface StatementSequence {
 

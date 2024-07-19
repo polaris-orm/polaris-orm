@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2023/1/10 14:36
+ * @since 1.0 2023/1/10 14:36
  */
 class PropertyUpdateStrategyTests {
 

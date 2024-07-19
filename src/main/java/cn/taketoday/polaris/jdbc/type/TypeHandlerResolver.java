@@ -31,7 +31,7 @@ import cn.taketoday.lang.Nullable;
  * BeanProperty {@link TypeHandler} resolver
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/7/30 23:32
+ * @since 1.0 2022/7/30 23:32
  */
 public interface TypeHandlerResolver {
 

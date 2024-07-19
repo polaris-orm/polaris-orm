@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris.jdbc.format;
+package cn.taketoday.polaris.format;
 
 import java.sql.Statement;
 import java.util.concurrent.TimeUnit;
@@ -31,11 +31,13 @@ import cn.taketoday.util.LogFormatUtils;
  *
  * @author Steve Ebersole
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/9/12 19:19
+ * @since 1.0 2022/9/12 19:19
  */
 public class SqlStatementLogger {
-  private static final Logger sqlLogger = LoggerFactory.getLogger("today.SQL");
-  private static final Logger slowLogger = LoggerFactory.getLogger("today.SQL_SLOW");
+
+  private static final Logger sqlLogger = LoggerFactory.getLogger("polaris.SQL");
+
+  private static final Logger slowLogger = LoggerFactory.getLogger("polaris.SQL_SLOW");
 
   public static final SqlStatementLogger sharedInstance = new SqlStatementLogger(
           TodayStrategies.getFlag("sql.logToStdout", false),
@@ -188,7 +190,7 @@ public class SqlStatementLogger {
     }
 
     if (stdoutOnly || logToStdout) {
-      String prefix = highlight ? "\u001b[35m[today-infrastructure]\u001b[0m " : "today-infrastructure: ";
+      String prefix = highlight ? "\u001b[35m[polaris-orm]\u001b[0m " : "polaris-orm: ";
       System.out.println(prefix + statement);
     }
   }
@@ -217,13 +219,13 @@ public class SqlStatementLogger {
       return;
     }
     if (startTimeNanos <= 0) {
-      throw new IllegalArgumentException("startTimeNanos [" + startTimeNanos + "] should be greater than 0!");
+      throw new IllegalArgumentException("startTimeNanos [%d] should be greater than 0!".formatted(startTimeNanos));
     }
 
     long queryExecutionMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTimeNanos);
 
     if (queryExecutionMillis > logSlowQuery) {
-      String logData = "SlowQuery: " + queryExecutionMillis + " milliseconds. SQL: '" + sql + "'";
+      String logData = "SlowQuery: %d milliseconds. SQL: '%s'".formatted(queryExecutionMillis, sql);
       slowLogger.info(logData);
       if (logToStdout) {
         System.out.println(logData);

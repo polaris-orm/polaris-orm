@@ -28,7 +28,7 @@ import cn.taketoday.lang.Nullable;
  * Duration Type handler
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2023/7/11 14:23
+ * @since 1.0 2023/7/11 14:23
  */
 public class DurationTypeHandler extends BaseTypeHandler<Duration> {
 

@@ -29,7 +29,7 @@ import cn.taketoday.lang.Constant;
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @see String#trim()
- * @since 4.0 2024/2/24 22:45
+ * @since 1.0 2024/2/24 22:45
  */
 @Where
 @Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })

@@ -82,7 +82,7 @@ public final class JdbcConnection implements Closeable, QueryProducer {
   /**
    * @throws DataAccessException Could not acquire a connection from data-source
    * @see DataSource#getConnection()
-   * @since 4.0
+   * @since 1.0
    */
   @Override
   public Query createQuery(String queryText) {
@@ -93,7 +93,7 @@ public final class JdbcConnection implements Closeable, QueryProducer {
   /**
    * @throws CannotGetJdbcConnectionException Could not acquire a connection from connection-source
    * @see DataSource#getConnection()
-   * @since 4.0
+   * @since 1.0
    */
   @Override
   public Query createQuery(String queryText, boolean returnGeneratedKeys) {
@@ -104,7 +104,7 @@ public final class JdbcConnection implements Closeable, QueryProducer {
   /**
    * @throws CannotGetJdbcConnectionException Could not acquire a connection from connection-source
    * @see DataSource#getConnection()
-   * @since 4.0
+   * @since 1.0
    */
   public Query createQuery(String queryText, String... columnNames) {
     createConnectionIfNecessary();

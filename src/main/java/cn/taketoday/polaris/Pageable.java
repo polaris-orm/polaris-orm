@@ -22,7 +22,7 @@ import cn.taketoday.lang.Nullable;
  * for page query
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/3/31 15:09
+ * @since 1.0 2024/3/31 15:09
  * @see Page
  */
 public interface Pageable {

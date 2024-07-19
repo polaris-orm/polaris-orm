@@ -25,7 +25,7 @@ import cn.taketoday.dao.DataRetrievalFailureException;
  * @author Juergen Hoeller
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @see cn.taketoday.dao.IncorrectResultSizeDataAccessException
- * @since 4.0
+ * @since 1.0
  */
 public class IncorrectResultSetColumnCountException extends DataRetrievalFailureException {
 

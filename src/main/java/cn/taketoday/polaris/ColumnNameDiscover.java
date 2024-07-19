@@ -31,7 +31,7 @@ import cn.taketoday.util.StringUtils;
  * Column name discover
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/8/16 22:03
+ * @since 1.0 2022/8/16 22:03
  */
 public interface ColumnNameDiscover {
 

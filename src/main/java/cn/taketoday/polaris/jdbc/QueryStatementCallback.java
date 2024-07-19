@@ -23,7 +23,7 @@ import java.sql.SQLException;
  * User defined operations when build a PreparedStatement
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/9/10 00:33
+ * @since 1.0 2022/9/10 00:33
  */
 public interface QueryStatementCallback {
 

@@ -21,7 +21,7 @@ package cn.taketoday.polaris;
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @see PropertyUpdateStrategy
- * @since 4.0 2024/4/11 10:24
+ * @since 1.0 2024/4/11 10:24
  */
 public interface UpdateStrategySource {
 

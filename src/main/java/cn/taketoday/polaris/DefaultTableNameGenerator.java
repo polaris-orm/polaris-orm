@@ -24,7 +24,7 @@ import cn.taketoday.util.StringUtils;
  * default {@link TableNameGenerator}
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/8/16 23:09
+ * @since 1.0 2022/8/16 23:09
  */
 public class DefaultTableNameGenerator implements TableNameGenerator {
 

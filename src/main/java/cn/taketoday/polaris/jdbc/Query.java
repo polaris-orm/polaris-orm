@@ -44,7 +44,7 @@ import cn.taketoday.lang.Nullable;
  * </p>
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2023/1/18 23:17
+ * @since 1.0 2023/1/18 23:17
  */
 public final class Query extends AbstractQuery {
 

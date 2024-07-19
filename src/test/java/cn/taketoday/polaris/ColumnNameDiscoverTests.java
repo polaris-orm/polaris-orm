@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2023/1/31 11:16
+ * @since 1.0 2023/1/31 11:16
  */
 class ColumnNameDiscoverTests {
 

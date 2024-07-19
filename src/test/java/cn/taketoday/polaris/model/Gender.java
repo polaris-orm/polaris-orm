@@ -20,7 +20,7 @@ import cn.taketoday.lang.Enumerable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/9/7 20:05
+ * @since 1.0 2022/9/7 20:05
  */
 public enum Gender implements Enumerable<Integer> {
 

@@ -22,7 +22,7 @@ package cn.taketoday.polaris.jdbc.type;
  * field of an enumerated type should be persisted.
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/8/3 9:19
+ * @since 1.0 2022/8/3 9:19
  */
 public enum EnumType {
   /** Persist enumerated type property or field as an integer. */

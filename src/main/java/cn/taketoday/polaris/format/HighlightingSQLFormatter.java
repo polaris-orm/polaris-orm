@@ -15,7 +15,7 @@
  */
 
 
-package cn.taketoday.polaris.jdbc.format;
+package cn.taketoday.polaris.format;
 
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -25,7 +25,7 @@ import java.util.StringTokenizer;
  *
  * @author Gavin King
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/9/12 19:20
+ * @since 1.0 2022/9/12 19:20
  */
 public final class HighlightingSQLFormatter implements SQLFormatter {
 

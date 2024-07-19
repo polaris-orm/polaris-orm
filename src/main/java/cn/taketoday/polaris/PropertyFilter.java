@@ -29,7 +29,7 @@ import cn.taketoday.lang.Assert;
  * an entity
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/8/16 22:29
+ * @since 1.0 2022/8/16 22:29
  */
 public interface PropertyFilter {
 

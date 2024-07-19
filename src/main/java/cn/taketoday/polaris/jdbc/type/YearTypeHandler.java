@@ -25,7 +25,7 @@ import java.time.Year;
 /**
  * @author Björn Raupach
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0
+ * @since 1.0
  */
 public class YearTypeHandler extends BaseTypeHandler<Year> {
 

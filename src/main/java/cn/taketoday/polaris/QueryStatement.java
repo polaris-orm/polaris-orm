@@ -27,7 +27,7 @@ import cn.taketoday.lang.Descriptive;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @see DebugDescriptive
  * @see Descriptive
- * @since 4.0 2024/2/16 14:45
+ * @since 1.0 2024/2/16 14:45
  */
 public interface QueryStatement {
 

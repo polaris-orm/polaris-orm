@@ -48,7 +48,7 @@ import java.lang.annotation.Target;
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @see EntityManager#update
- * @since 4.0 2024/4/11 10:43
+ * @since 1.0 2024/4/11 10:43
  */
 @Documented
 @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })

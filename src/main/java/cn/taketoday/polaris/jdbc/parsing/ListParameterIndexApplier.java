@@ -26,7 +26,7 @@ import cn.taketoday.polaris.jdbc.ParameterBinder;
 
 /**
  * @author TODAY 2021/6/8 23:53
- * @since 4.0
+ * @since 1.0
  */
 final class ListParameterIndexApplier extends ParameterIndexHolder {
   private final List<Integer> indices;

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris.jdbc.format;
+package cn.taketoday.polaris.format;
 
 /**
  * Formatter contract
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @author Steve Ebersole
- * @since 4.0 2022/9/12 19:20
+ * @since 1.0 2022/9/12 19:20
  */
 public interface SQLFormatter {
   String WHITESPACE = " \n\r\f\t";

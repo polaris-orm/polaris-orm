@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris.jdbc.format;
+package cn.taketoday.polaris.format;
 
 import java.util.Locale;
 import java.util.StringTokenizer;
@@ -27,7 +27,7 @@ import cn.taketoday.util.StringUtils;
  * @author Gavin King
  * @author Steve Ebersole
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/9/12 19:20
+ * @since 1.0 2022/9/12 19:20
  */
 public class DDLSQLFormatter implements SQLFormatter {
 

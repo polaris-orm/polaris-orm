@@ -33,7 +33,7 @@ import cn.taketoday.util.ReflectionUtils;
  * TypeHandler for Enumerable
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/8/1 22:15
+ * @since 1.0 2022/8/1 22:15
  */
 public class EnumerableEnumTypeHandler<V> implements TypeHandler<Enumerable<V>> {
 

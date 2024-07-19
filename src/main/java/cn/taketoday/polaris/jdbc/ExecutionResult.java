@@ -29,7 +29,7 @@ import cn.taketoday.transaction.UnexpectedRollbackException;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2023/1/17 11:26
+ * @since 1.0 2023/1/17 11:26
  */
 public class ExecutionResult implements QueryProducer {
   private final JdbcConnection connection;

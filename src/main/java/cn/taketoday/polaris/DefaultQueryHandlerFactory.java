@@ -18,7 +18,7 @@ package cn.taketoday.polaris;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/4/10 16:53
+ * @since 1.0 2024/4/10 16:53
  */
 final class DefaultQueryHandlerFactory implements QueryHandlerFactory {
 

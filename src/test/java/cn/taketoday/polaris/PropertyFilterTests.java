@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2023/3/3 18:33
+ * @since 1.0 2023/3/3 18:33
  */
 class PropertyFilterTests {
 

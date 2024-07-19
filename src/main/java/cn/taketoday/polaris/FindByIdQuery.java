@@ -24,7 +24,7 @@ import cn.taketoday.polaris.sql.Select;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/2/19 19:31
+ * @since 1.0 2024/2/19 19:31
  */
 class FindByIdQuery extends ColumnsQueryStatement implements QueryStatement, DebugDescriptive {
   private final Object id;

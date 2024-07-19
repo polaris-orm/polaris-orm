@@ -38,7 +38,7 @@ import cn.taketoday.lang.Nullable;
  * without calling {@link #next()}.
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0
+ * @since 1.0
  */
 public abstract class ResultSetIterator<T> implements Iterator<T>, Spliterator<T>, AutoCloseable {
   // fields needed to read rows set
@@ -177,7 +177,7 @@ public abstract class ResultSetIterator<T> implements Iterator<T>, Spliterator<T
    *     while (hasNext())
    *         action.accept(next());
    * }</pre>
-   * @since 4.0
+   * @since 1.0
    */
   @Override
   public void forEachRemaining(Consumer<? super T> action) {
@@ -206,7 +206,7 @@ public abstract class ResultSetIterator<T> implements Iterator<T>, Spliterator<T
    * @apiNote This method must be used within a try-with-resources statement or similar
    * control structure to ensure that the stream's open connection is closed
    * promptly after the stream's operations have completed.
-   * @since 4.0
+   * @since 1.0
    */
   public Stream<T> stream() {
     return StreamSupport.stream(this, false)
@@ -222,7 +222,7 @@ public abstract class ResultSetIterator<T> implements Iterator<T>, Spliterator<T
    * @apiNote This method must be used within a try-with-resources statement or similar
    * control structure to ensure that the stream's open connection is closed
    * promptly after the stream's operations have completed.
-   * @since 4.0
+   * @since 1.0
    */
   public Stream<T> parallelStream() {
     return StreamSupport.stream(this, true)
@@ -230,7 +230,7 @@ public abstract class ResultSetIterator<T> implements Iterator<T>, Spliterator<T
   }
 
   /**
-   * @since 4.0
+   * @since 1.0
    */
   public ResultSetIterable<T> asIterable() {
     return new ResultSetIterable<>() {
@@ -255,7 +255,7 @@ public abstract class ResultSetIterator<T> implements Iterator<T>, Spliterator<T
   /**
    * consume elements
    *
-   * @since 4.0
+   * @since 1.0
    */
   public void consume(Consumer<T> consumer) {
     final ResultSet rows = this.resultSet;
@@ -275,7 +275,7 @@ public abstract class ResultSetIterator<T> implements Iterator<T>, Spliterator<T
   /**
    * Fetch unique element
    *
-   * @since 4.0
+   * @since 1.0
    */
   @Nullable
   public T unique() {
@@ -294,7 +294,7 @@ public abstract class ResultSetIterator<T> implements Iterator<T>, Spliterator<T
   /**
    * Fetch first element
    *
-   * @since 4.0
+   * @since 1.0
    */
   @Nullable
   public T first() {
@@ -309,7 +309,7 @@ public abstract class ResultSetIterator<T> implements Iterator<T>, Spliterator<T
   /**
    * Fetch list of elements
    *
-   * @since 4.0
+   * @since 1.0
    */
   public List<T> list() {
     ArrayList<T> entities = new ArrayList<>();
@@ -320,7 +320,7 @@ public abstract class ResultSetIterator<T> implements Iterator<T>, Spliterator<T
   /**
    * Fetch list of elements
    *
-   * @since 4.0
+   * @since 1.0
    */
   public List<T> list(int initialCapacity) {
     ArrayList<T> entities = new ArrayList<>(initialCapacity);
@@ -331,7 +331,7 @@ public abstract class ResultSetIterator<T> implements Iterator<T>, Spliterator<T
   /**
    * Fetch list of elements
    *
-   * @since 4.0
+   * @since 1.0
    */
   public void collect(Collection<T> entities) {
     final ResultSet resultSet = this.resultSet;

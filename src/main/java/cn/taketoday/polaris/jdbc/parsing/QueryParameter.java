@@ -26,7 +26,7 @@ import cn.taketoday.polaris.jdbc.ParameterBinder;
  * optimized Query-Parameter resolving
  *
  * @author TODAY 2021/8/22 10:15
- * @since 4.0
+ * @since 1.0
  */
 public final class QueryParameter {
   private final String name;

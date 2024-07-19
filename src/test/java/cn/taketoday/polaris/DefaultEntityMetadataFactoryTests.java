@@ -34,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/8/18 16:55
+ * @since 1.0 2022/8/18 16:55
  */
 class DefaultEntityMetadataFactoryTests {
   DefaultEntityMetadataFactory factory = new DefaultEntityMetadataFactory();

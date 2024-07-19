@@ -27,7 +27,7 @@ import cn.taketoday.polaris.jdbc.ParameterBinder;
  * parameter index holder
  *
  * @author TODAY 2021/6/8 23:51
- * @since 4.0
+ * @since 1.0
  */
 public abstract class ParameterIndexHolder implements Iterable<Integer> {
 

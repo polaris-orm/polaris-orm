@@ -18,7 +18,7 @@ package cn.taketoday.polaris;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/9/11 21:47
+ * @since 1.0 2022/9/11 21:47
  */
 class OperatorTests {
 

@@ -31,7 +31,7 @@ import cn.taketoday.polaris.jdbc.RepositoryManager;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/9/7 20:10
+ * @since 1.0 2022/9/7 20:10
  */
 public abstract class AbstractRepositoryManagerTests {
 

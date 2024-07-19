@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/4/11 14:56
+ * @since 1.0 2024/4/11 14:56
  */
 class PageableTests {
 

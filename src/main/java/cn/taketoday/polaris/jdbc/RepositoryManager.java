@@ -68,7 +68,7 @@ import cn.taketoday.transaction.support.TransactionTemplate;
  * @author Hubery Huang
  * @author <a href="https://github.com/aaberg">Lars Aaberg</a>
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0
+ * @since 1.0
  */
 public class RepositoryManager extends JdbcAccessor implements QueryProducer, TransactionOperations {
 

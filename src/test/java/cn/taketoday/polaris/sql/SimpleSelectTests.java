@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/2/28 21:16
+ * @since 1.0 2024/2/28 21:16
  */
 class SimpleSelectTests {
 

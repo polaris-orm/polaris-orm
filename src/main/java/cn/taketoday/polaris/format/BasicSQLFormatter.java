@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris.jdbc.format;
+package cn.taketoday.polaris.format;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -29,7 +29,7 @@ import cn.taketoday.lang.TodayStrategies;
  * @author Gavin King
  * @author Steve Ebersole
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/9/12 19:20
+ * @since 1.0 2022/9/12 19:20
  */
 public class BasicSQLFormatter implements SQLFormatter {
   private static final boolean SKIP_DDL = TodayStrategies.getFlag("sql.BasicSQLFormatter.skip-ddl", true);

@@ -53,7 +53,7 @@ import cn.taketoday.polaris.jdbc.JdbcBeanMetadata;
 import cn.taketoday.polaris.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException;
 import cn.taketoday.polaris.jdbc.PersistenceException;
 import cn.taketoday.polaris.jdbc.RepositoryManager;
-import cn.taketoday.polaris.jdbc.format.SqlStatementLogger;
+import cn.taketoday.polaris.format.SqlStatementLogger;
 import cn.taketoday.polaris.sql.Insert;
 import cn.taketoday.polaris.sql.OrderByClause;
 import cn.taketoday.polaris.sql.Restriction;

@@ -35,22 +35,24 @@ import cn.taketoday.core.conversion.support.DefaultConversionService;
 import cn.taketoday.dao.DataAccessException;
 import cn.taketoday.jdbc.core.ResultSetExtractor;
 import cn.taketoday.jdbc.support.JdbcUtils;
-import cn.taketoday.polaris.jdbc.type.TypeHandler;
-import cn.taketoday.polaris.jdbc.type.TypeHandlerManager;
 import cn.taketoday.lang.Nullable;
 import cn.taketoday.logging.Logger;
 import cn.taketoday.logging.LoggerFactory;
-import cn.taketoday.polaris.jdbc.format.SqlStatementLogger;
+import cn.taketoday.polaris.format.SqlStatementLogger;
 import cn.taketoday.polaris.jdbc.type.ObjectTypeHandler;
+import cn.taketoday.polaris.jdbc.type.TypeHandler;
+import cn.taketoday.polaris.jdbc.type.TypeHandlerManager;
 import cn.taketoday.util.CollectionUtils;
 import cn.taketoday.util.ObjectUtils;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2023/1/18 23:17
+ * @since 1.0 2023/1/18 23:17
  */
 public sealed abstract class AbstractQuery implements AutoCloseable permits NamedQuery, Query {
+
   private static final Logger log = LoggerFactory.getLogger(AbstractQuery.class);
+
   static final SqlStatementLogger stmtLogger = SqlStatementLogger.sharedInstance;
 
   private final JdbcConnection connection;
@@ -730,7 +732,7 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
   /**
    * Iterable {@link ResultSet} that wraps {@link ResultSetHandlerIterator}.
    *
-   * @since 4.0
+   * @since 1.0
    */
   private class ResultIterable<T> extends ResultSetIterable<T> {
 
@@ -768,7 +770,7 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
   }
 
   /**
-   * @since 4.0
+   * @since 1.0
    */
   abstract class CloseResultSetIterator<T> extends ResultSetIterator<T> {
 
@@ -801,7 +803,7 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
   }
 
   /**
-   * @since 4.0
+   * @since 1.0
    */
   final class ResultSetHandlerIterator<T> extends CloseResultSetIterator<T> {
     private final ResultSetExtractor<T> handler;
@@ -829,7 +831,7 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
   }
 
   /**
-   * @since 4.0
+   * @since 1.0
    */
   final class TableResultSetIterator extends CloseResultSetIterator<Row> {
     private final List<Column> columns;

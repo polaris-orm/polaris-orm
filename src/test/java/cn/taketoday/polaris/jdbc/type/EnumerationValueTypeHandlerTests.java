@@ -36,7 +36,7 @@ import static org.mockito.Mockito.verify;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/8/2 21:19
+ * @since 1.0 2022/8/2 21:19
  */
 class EnumerationValueTypeHandlerTests {
   enum StringCode {

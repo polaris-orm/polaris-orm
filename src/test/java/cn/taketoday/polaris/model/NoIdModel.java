@@ -21,7 +21,7 @@ import lombok.Data;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/2/20 21:18
+ * @since 1.0 2024/2/20 21:18
  */
 @Data
 @Table("t_no_id")

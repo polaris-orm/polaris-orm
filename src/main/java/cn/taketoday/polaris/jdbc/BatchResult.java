@@ -33,7 +33,7 @@ import cn.taketoday.util.CollectionUtils;
  * Batch execution result
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2023/1/17 11:25
+ * @since 1.0 2023/1/17 11:25
  */
 public class BatchResult extends ExecutionResult {
 

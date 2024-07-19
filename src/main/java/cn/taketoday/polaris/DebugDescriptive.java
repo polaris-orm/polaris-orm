@@ -23,7 +23,7 @@ import cn.taketoday.logging.LogMessage;
  * Debug descriptive message provider
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/3/31 16:47
+ * @since 1.0 2024/3/31 16:47
  */
 public interface DebugDescriptive extends Descriptive {
 

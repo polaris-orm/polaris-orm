@@ -23,7 +23,7 @@ import cn.taketoday.polaris.sql.SimpleSelect;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/2/28 22:19
+ * @since 1.0 2024/2/28 22:19
  */
 public abstract class SimpleSelectQueryStatement implements QueryStatement {
 

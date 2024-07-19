@@ -34,7 +34,7 @@ import cn.taketoday.lang.TodayStrategies;
  * resolve EnumerationValue
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/8/2 20:42
+ * @since 1.0 2022/8/2 20:42
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class EnumerationValueTypeHandler<T extends Enum<T>> implements TypeHandler<T> {

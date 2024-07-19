@@ -20,12 +20,12 @@ import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import cn.taketoday.polaris.jdbc.format.DDLSQLFormatter;
-import cn.taketoday.polaris.jdbc.format.SqlStatementLogger;
+import cn.taketoday.polaris.format.DDLSQLFormatter;
+import cn.taketoday.polaris.format.SqlStatementLogger;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/9/12 19:38
+ * @since 1.0 2022/9/12 19:38
  */
 class SqlStatementLoggerTests {
   SqlStatementLogger logger = new SqlStatementLogger(true, true, true, 20);

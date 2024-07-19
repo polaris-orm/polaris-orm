@@ -34,7 +34,7 @@ import cn.taketoday.util.CollectionUtils;
  *
  * @param <T> generatedKey type
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2023/1/17 10:28
+ * @since 1.0 2023/1/17 10:28
  */
 public class UpdateResult<T> extends ExecutionResult {
 

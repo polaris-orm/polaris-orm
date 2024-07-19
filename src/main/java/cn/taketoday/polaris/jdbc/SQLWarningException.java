@@ -32,7 +32,7 @@ import cn.taketoday.dao.UncategorizedDataAccessException;
  * @author Juergen Hoeller
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @see cn.taketoday.jdbc.core.JdbcTemplate#setIgnoreWarnings
- * @since 4.0
+ * @since 1.0
  */
 public class SQLWarningException extends UncategorizedDataAccessException {
 

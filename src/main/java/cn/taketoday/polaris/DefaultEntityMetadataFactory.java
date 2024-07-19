@@ -40,7 +40,7 @@ import cn.taketoday.util.ClassUtils;
  * @see TableNameGenerator
  * @see IdPropertyDiscover
  * @see ColumnNameDiscover
- * @since 4.0 2022/9/5 11:38
+ * @since 1.0 2022/9/5 11:38
  */
 public class DefaultEntityMetadataFactory extends EntityMetadataFactory {
 

@@ -18,7 +18,7 @@ package cn.taketoday.polaris.jdbc;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2023/1/22 14:00
+ * @since 1.0 2023/1/22 14:00
  */
 public interface QueryProducer {
 

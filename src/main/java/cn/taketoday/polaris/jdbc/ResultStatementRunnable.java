@@ -25,7 +25,7 @@ import cn.taketoday.lang.Nullable;
  * overloads, to run code safely in a transaction.
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0
+ * @since 1.0
  */
 public interface ResultStatementRunnable<V, P> {
 

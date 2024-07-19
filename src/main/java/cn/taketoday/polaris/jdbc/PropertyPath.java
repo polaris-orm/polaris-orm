@@ -23,7 +23,7 @@ import cn.taketoday.lang.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/7/30 20:31
+ * @since 1.0 2022/7/30 20:31
  */
 final class PropertyPath {
   static final String emptyPlaceholder = "<not-found>";

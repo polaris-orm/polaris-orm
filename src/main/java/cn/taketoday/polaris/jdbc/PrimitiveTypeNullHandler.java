@@ -25,7 +25,7 @@ import cn.taketoday.beans.BeanProperty;
  * handle {@link ObjectPropertySetter#setTo(Object, ResultSet, int)}
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/7/30 09:24
+ * @since 1.0 2022/7/30 09:24
  */
 public interface PrimitiveTypeNullHandler {
 

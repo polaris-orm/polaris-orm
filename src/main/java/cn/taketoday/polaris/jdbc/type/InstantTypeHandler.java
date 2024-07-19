@@ -28,7 +28,7 @@ import cn.taketoday.lang.Nullable;
 /**
  * @author Tomas Rohovsky
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0
+ * @since 1.0
  */
 public class InstantTypeHandler extends BaseTypeHandler<Instant> {
 

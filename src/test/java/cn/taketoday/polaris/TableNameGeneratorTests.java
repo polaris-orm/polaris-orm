@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/8/16 22:56
+ * @since 1.0 2022/8/16 22:56
  */
 class TableNameGeneratorTests {
 

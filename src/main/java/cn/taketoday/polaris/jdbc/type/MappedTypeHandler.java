@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/7/30 23:17
+ * @since 1.0 2022/7/30 23:17
  */
 @Documented
 @Target({ ElementType.FIELD })

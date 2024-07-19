@@ -32,7 +32,7 @@ import cn.taketoday.lang.Nullable;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @see BadSqlGrammarException
  * @see cn.taketoday.jdbc.support.rowset.SqlRowSet
- * @since 4.0
+ * @since 1.0
  */
 public class InvalidResultSetAccessException extends InvalidDataAccessResourceUsageException {
 

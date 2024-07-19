@@ -31,7 +31,7 @@ import java.time.YearMonth;
  *
  * @author Björn Raupach
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0
+ * @since 1.0
  */
 public class YearMonthTypeHandler extends BaseTypeHandler<YearMonth> {
 

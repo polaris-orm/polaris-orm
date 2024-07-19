@@ -53,7 +53,7 @@ import cn.taketoday.lang.Nullable;
  * @author Clinton Begin
  * @author Kazuki Shimizu
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0
+ * @since 1.0
  */
 @SuppressWarnings("rawtypes")
 public class TypeHandlerManager implements TypeHandlerResolver {
@@ -120,7 +120,7 @@ public class TypeHandlerManager implements TypeHandlerResolver {
   }
 
   /**
-   * @since 4.0
+   * @since 1.0
    */
   @SuppressWarnings("unchecked")
   public <T> TypeHandler<T> getTypeHandler(BeanProperty property) {
