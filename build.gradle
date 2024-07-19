@@ -6,7 +6,7 @@ plugins {
 }
 
 description = "Polaris ORM framework"
-group = "cn.taketoday"
+
 
 apply plugin: 'jacoco'
 apply plugin: "java-test-fixtures"
@@ -107,7 +107,6 @@ dependencies {
 
   testFixturesImplementation("cn.taketoday:today-aop")
   testFixturesImplementation("cn.taketoday:today-context")
-  testFixturesImplementation("cn.taketoday:today-web")
   testFixturesImplementation("io.netty:netty-codec-http")
   testFixturesImplementation("com.google.code.findbugs:jsr305")
   testFixturesImplementation("org.junit.platform:junit-platform-launcher")
