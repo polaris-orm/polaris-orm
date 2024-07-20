@@ -30,12 +30,14 @@ import cn.taketoday.core.conversion.ConversionService;
 public final class Row {
 
   private final Object[] values;
+
   private final boolean isCaseSensitive;
+
   private final ConversionService conversionService;
+
   private final Map<String, Integer> columnNameToIdxMap;
 
-  public Row(
-          Map<String, Integer> columnNameToIdxMap,
+  public Row(Map<String, Integer> columnNameToIdxMap,
           int columnCnt, boolean isCaseSensitive, ConversionService conversionService) {
     this.columnNameToIdxMap = columnNameToIdxMap;
     this.isCaseSensitive = isCaseSensitive;
@@ -53,9 +55,7 @@ public final class Row {
   }
 
   public Object getObject(String columnName) {
-    Integer index = columnNameToIdxMap.get(
-            isCaseSensitive ? columnName
-                            : columnName.toLowerCase());
+    Integer index = columnNameToIdxMap.get(isCaseSensitive ? columnName : columnName.toLowerCase());
     if (index != null) {
       return getObject(index);
     }

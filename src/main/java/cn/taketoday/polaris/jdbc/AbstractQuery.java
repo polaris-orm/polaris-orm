@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Spliterator;
@@ -349,9 +350,7 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
   }
 
   public LazyTable fetchLazyTable(@Nullable ConversionService conversionService) {
-    LazyTable lt = new LazyTable();
-    lt.setRows(new TableResultSetIterator(executeQuery(), isCaseSensitive(), lt, conversionService).asIterable());
-    return lt;
+    return new TableResultSetIterator(executeQuery(), isCaseSensitive(), conversionService).createLazyTable();
   }
 
   public Table fetchTable() {
@@ -495,7 +494,7 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
    */
   public AbstractQuery setMaxBatchRecords(int maxBatchRecords) {
     if (maxBatchRecords < 0) {
-      throw new IllegalArgumentException("maxBatchRecords should be a nonnegative value");
+      throw new IllegalArgumentException("maxBatchRecords should be a non-negative value");
     }
     this.maxBatchRecords = maxBatchRecords;
     return this;
@@ -839,6 +838,9 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
    * @since 1.0
    */
   final class TableResultSetIterator extends CloseResultSetIterator<Row> {
+
+    private final String tableName;
+
     private final List<Column> columns;
 
     private final boolean isCaseSensitive;
@@ -847,17 +849,14 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
 
     private final Map<String, Integer> columnNameToIdxMap;
 
-    private TableResultSetIterator(ResultSet rs, boolean isCaseSensitive, LazyTable lt, @Nullable ConversionService conversionService) {
+    private TableResultSetIterator(ResultSet rs, boolean isCaseSensitive, @Nullable ConversionService conversionService) {
       super(rs);
       this.isCaseSensitive = isCaseSensitive;
       this.conversionService = conversionService == null ? DefaultConversionService.getSharedInstance() : conversionService;
       try {
         ResultSetMetaData meta = rs.getMetaData();
         ArrayList<Column> columns = new ArrayList<>();
-        HashMap<String, Integer> columnNameToIdxMap = new HashMap<>();
-
-        lt.setName(meta.getTableName(1));
-        lt.setColumns(columns);
+        var columnNameToIdxMap = new LinkedHashMap<String, Integer>();
 
         int columnCount = meta.getColumnCount();
         for (int colIdx = 1; colIdx <= columnCount; colIdx++) {
@@ -869,11 +868,16 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
           columnNameToIdxMap.put(colMapName, colIdx - 1);
         }
         this.columns = columns;
+        this.tableName = meta.getTableName(1);
         this.columnNameToIdxMap = columnNameToIdxMap;
       }
       catch (SQLException e) {
         throw new PersistenceException("Error while reading metadata from database", e);
       }
+    }
+
+    private LazyTable createLazyTable() {
+      return new LazyTable(tableName, asIterable(), columns);
     }
 
     @Override
