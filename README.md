@@ -1,7 +1,6 @@
 # Polaris ORM
 
-Polaris is Java ORM framework
-
+Polaris 是一个 Java ORM 框架
 
 ![Java17](https://img.shields.io/badge/JDK-17+-success.svg)
 [![Apache](https://img.shields.io/badge/License-Apache_v2-blue.svg)](./LICENSE)
@@ -9,7 +8,9 @@ Polaris is Java ORM framework
 [![CI](https://github.com/polaris-orm/polaris/actions/workflows/multi-env.yaml/badge.svg)](https://github.com/polaris-orm/polaris/actions/workflows/multi-env.yaml)
 [![Coverage Status](https://coveralls.io/repos/github/polaris-orm/polaris/badge.svg?branch=main)](https://coveralls.io/github/polaris-orm/polaris?branch=main)
 
-**You ask me what the elegant code looks like? Then I have to show it!**
+
+本项目是 [TAKETODAY/today-infrastructure/today-jdbc](https://github.com/TAKETODAY/today-infrastructure/tree/master/today-jdbc) 的一个分支。
+
 
 ## 🛠️ 安装
 
