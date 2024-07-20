@@ -32,17 +32,18 @@ import java.util.Map;
 
 import cn.taketoday.beans.BeanMetadata;
 import cn.taketoday.beans.BeanProperty;
-import cn.taketoday.polaris.jdbc.parsing.QueryParameter;
-import cn.taketoday.polaris.jdbc.type.TypeHandler;
 import cn.taketoday.lang.Assert;
 import cn.taketoday.lang.Nullable;
 import cn.taketoday.logging.Logger;
 import cn.taketoday.logging.LoggerFactory;
+import cn.taketoday.polaris.jdbc.parsing.QueryParameter;
+import cn.taketoday.polaris.jdbc.type.TypeHandler;
 
 /**
  * Represents a sql statement.
  */
 public final class NamedQuery extends AbstractQuery {
+
   private static final Logger log = LoggerFactory.getLogger(NamedQuery.class);
 
   /** parameter name to parameter index and setter */
@@ -97,8 +98,7 @@ public final class NamedQuery extends AbstractQuery {
     QueryParameter queryParameter = queryParameters.get(name);
     if (queryParameter == null) {
       throw new PersistenceException(
-              "Failed to add parameter with name '"
-                      + name + "'. No parameter with that name is declared in the sql.");
+              "Failed to add parameter with name '%s'. No parameter with that name is declared in the sql.".formatted(name));
     }
     queryParameter.setSetter(parameterBinder);
   }
@@ -135,8 +135,8 @@ public final class NamedQuery extends AbstractQuery {
   @SuppressWarnings("unchecked")
   public NamedQuery addParameter(String name, @Nullable Object value) {
     return value == null
-           ? addNullParameter(name)
-           : addParameter(name, (Class<Object>) value.getClass(), value);
+            ? addNullParameter(name)
+            : addParameter(name, (Class<Object>) value.getClass(), value);
   }
 
   public NamedQuery addNullParameter(String name) {
@@ -275,7 +275,7 @@ public final class NamedQuery extends AbstractQuery {
       }
       catch (SQLException e) {
         throw new ParameterBindFailedException(
-                "Error binding parameter '" + parameter.getName() + "' - " + e.getMessage(), e);
+                "Error binding parameter '%s' - %s".formatted(parameter.getName(), e.getMessage()), e);
       }
     }
   }

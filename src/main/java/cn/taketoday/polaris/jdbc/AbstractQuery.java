@@ -59,17 +59,22 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
 
   @Nullable
   private final String[] columnNames;
+
   private final boolean returnGeneratedKeys;
 
   @Nullable
   private String name;
 
   private final String querySQL;
+
   private int maxBatchRecords = 0;
+
   private int currentBatchRecords = 0;
 
   private boolean caseSensitive;
+
   private boolean autoDerivingColumns = true;
+
   private boolean throwOnMappingFailure = true;
 
   @Nullable
