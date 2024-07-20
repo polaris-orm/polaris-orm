@@ -52,6 +52,7 @@ public Pagination<ArticleItem> getHomeArticles(Pageable pageable) {
 }
 ```
 
+### EntityManager
 
 ### 
 ```java
