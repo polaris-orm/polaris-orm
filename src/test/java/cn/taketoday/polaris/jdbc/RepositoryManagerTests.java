@@ -18,7 +18,6 @@ package cn.taketoday.polaris.jdbc;
 
 import com.google.common.collect.ImmutableList;
 
-import org.hsqldb.jdbc.JDBCDataSource;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,19 +41,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-
 import cn.taketoday.dao.DataAccessException;
 import cn.taketoday.polaris.jdbc.pojos.BigDecimalPojo;
 import cn.taketoday.polaris.jdbc.pojos.ComplexEntity;
 import cn.taketoday.polaris.jdbc.pojos.EntityWithPrivateFields;
 import cn.taketoday.polaris.jdbc.pojos.StringConversionPojo;
 import cn.taketoday.polaris.jdbc.pojos.SuperPojo;
-import cn.taketoday.polaris.jdbc.utils.IOUtils;
 import cn.taketoday.polaris.jdbc.type.BytesInputStreamTypeHandler;
 import cn.taketoday.polaris.jdbc.type.Enumerated;
 import cn.taketoday.polaris.jdbc.type.TypeHandlerManager;
+import cn.taketoday.polaris.jdbc.utils.IOUtils;
 import cn.taketoday.util.StreamUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -78,31 +74,6 @@ public class RepositoryManagerTests extends BaseMemDbTest {
 
   public RepositoryManagerTests(DbType dbType, String testName) {
     super(dbType, testName);
-  }
-
-  //@Test  TODO. commented out. Can't get test to work without an application server.
-  public void testCreateSql2oFromJndi() throws Exception {
-    System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory");
-    System.setProperty(Context.URL_PKG_PREFIXES, "org.apache.naming");
-
-    InitialContext ic = new InitialContext();
-
-    ic.createSubcontext("java:");
-    ic.createSubcontext("java:comp");
-    ic.createSubcontext("java:comp/env");
-
-    JDBCDataSource datasource = new JDBCDataSource();
-    datasource.setUrl(dbType.url);
-    datasource.setUser(dbType.user);
-    datasource.setPassword(dbType.pass);
-
-    ic.bind("java:comp/env/Sql2o", datasource);
-
-    System.out.println("Datasource initialized.");
-
-    RepositoryManager jndiSql2o = new RepositoryManager("Sql2o");
-
-    assertNotNull(jndiSql2o);
   }
 
   @Test

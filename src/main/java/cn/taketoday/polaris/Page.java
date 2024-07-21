@@ -23,13 +23,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import cn.taketoday.core.style.ToStringBuilder;
+import cn.taketoday.lang.Unmodifiable;
 
 /**
  * Page result
  *
  * @param <T> content type
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0
+ * @since 1.0
  */
 public class Page<T> {
 
@@ -170,6 +171,7 @@ public class Page<T> {
     return totalRows;
   }
 
+  @Unmodifiable
   public List<T> getRows() {
     return rows;
   }

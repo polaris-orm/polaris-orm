@@ -18,7 +18,7 @@ package cn.taketoday.polaris.dialect;
 
 /**
  * @author TODAY 2021/10/10 13:12
- * @since 4.0
+ * @since 1.0
  */
 public class MySQLPlatform extends Platform {
 

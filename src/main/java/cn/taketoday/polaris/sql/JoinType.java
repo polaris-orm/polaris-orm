@@ -19,7 +19,7 @@ package cn.taketoday.polaris.sql;
 /**
  * @author Strong Liu
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0
+ * @since 1.0
  */
 public enum JoinType {
   NONE(-666, null),

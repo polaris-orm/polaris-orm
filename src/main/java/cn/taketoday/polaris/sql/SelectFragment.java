@@ -29,7 +29,7 @@ import static cn.taketoday.polaris.sql.CaseFragment.qualify;
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @author Gavin King
- * @since 4.0
+ * @since 1.0
  */
 public class SelectFragment {
 

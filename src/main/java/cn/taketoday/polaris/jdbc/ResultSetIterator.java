@@ -29,8 +29,8 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import cn.taketoday.dao.IncorrectResultSizeDataAccessException;
-import cn.taketoday.jdbc.support.JdbcUtils;
 import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.jdbc.support.JdbcUtils;
 
 /**
  * Iterator for a {@link ResultSet}. Tricky part here is getting

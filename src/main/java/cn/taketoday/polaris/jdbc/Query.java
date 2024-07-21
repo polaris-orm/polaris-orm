@@ -27,8 +27,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
-import cn.taketoday.polaris.jdbc.type.TypeHandler;
 import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.jdbc.type.TypeHandler;
 
 /**
  * <p>

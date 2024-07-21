@@ -40,7 +40,7 @@ import cn.taketoday.core.annotation.AliasFor;
  * }</pre>
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/8/16 21:05
+ * @since 1.0 2022/8/16 21:05
  */
 @Documented
 @Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE })

@@ -23,7 +23,7 @@ import cn.taketoday.polaris.dialect.Platform;
  *
  * @author Gavin King
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0
+ * @since 1.0
  */
 public final class Alias {
 

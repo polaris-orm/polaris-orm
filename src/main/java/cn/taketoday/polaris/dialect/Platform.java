@@ -29,7 +29,7 @@ import cn.taketoday.util.StringUtils;
  * SQL generate strategy
  *
  * @author TODAY 2021/10/10 13:11
- * @since 4.0
+ * @since 1.0
  */
 public abstract class Platform {
 

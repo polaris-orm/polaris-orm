@@ -23,7 +23,7 @@ import cn.taketoday.polaris.sql.Restriction;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/2/28 22:43
+ * @since 1.0 2024/2/28 22:43
  */
 public class DefaultConditionStrategy implements PropertyConditionStrategy {
 

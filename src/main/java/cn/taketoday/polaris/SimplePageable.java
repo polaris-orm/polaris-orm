@@ -22,7 +22,7 @@ import cn.taketoday.core.style.ToStringBuilder;
  * Simple Pageable
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/4/10 11:34
+ * @since 1.0 2024/4/10 11:34
  */
 record SimplePageable(int pageNumber, int pageSize) implements Pageable {
 

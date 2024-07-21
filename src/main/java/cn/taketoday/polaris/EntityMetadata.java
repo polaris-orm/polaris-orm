@@ -32,7 +32,7 @@ import cn.taketoday.util.StringUtils;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/8/16 22:43
+ * @since 1.0 2022/8/16 22:43
  */
 public class EntityMetadata {
   public final String tableName;

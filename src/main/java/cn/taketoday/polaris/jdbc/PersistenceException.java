@@ -20,7 +20,7 @@ import cn.taketoday.dao.DataAccessException;
 import cn.taketoday.lang.Nullable;
 
 /**
- * Represents an exception thrown by today-jdbc.
+ * Represents an exception thrown by polaris.
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0

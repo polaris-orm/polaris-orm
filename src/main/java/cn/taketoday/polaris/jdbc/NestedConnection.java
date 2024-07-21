@@ -19,14 +19,15 @@ package cn.taketoday.polaris.jdbc;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import cn.taketoday.jdbc.datasource.WrappedConnection;
 import cn.taketoday.logging.Logger;
 import cn.taketoday.logging.LoggerFactory;
+import cn.taketoday.polaris.jdbc.datasource.WrappedConnection;
 
 /**
  * @author TODAY
  */
 final class NestedConnection extends WrappedConnection {
+
   private final static Logger log = LoggerFactory.getLogger(NestedConnection.class);
 
   private boolean autocommit = true;

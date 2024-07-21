@@ -27,32 +27,23 @@ import cn.taketoday.core.conversion.ConversionService;
 import cn.taketoday.core.conversion.support.DefaultConversionService;
 import cn.taketoday.dao.DataAccessException;
 import cn.taketoday.format.support.ApplicationConversionService;
-import cn.taketoday.jdbc.datasource.DataSourceUtils;
-import cn.taketoday.jdbc.datasource.DriverManagerDataSource;
-import cn.taketoday.jdbc.datasource.SingleConnectionDataSource;
-import cn.taketoday.jdbc.support.ClobToStringConverter;
-import cn.taketoday.jdbc.support.JdbcAccessor;
-import cn.taketoday.jdbc.support.JdbcTransactionManager;
-import cn.taketoday.jdbc.support.OffsetTimeToSQLTimeConverter;
 import cn.taketoday.lang.Assert;
 import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.DefaultEntityManager;
 import cn.taketoday.polaris.EntityManager;
+import cn.taketoday.polaris.jdbc.datasource.ConnectionSource;
 import cn.taketoday.polaris.jdbc.parsing.QueryParameter;
 import cn.taketoday.polaris.jdbc.parsing.SqlParameterParser;
+import cn.taketoday.polaris.jdbc.support.JdbcAccessor;
+import cn.taketoday.polaris.jdbc.support.JdbcTransactionManager;
 import cn.taketoday.polaris.jdbc.type.TypeHandler;
 import cn.taketoday.polaris.jdbc.type.TypeHandlerManager;
-import cn.taketoday.transaction.PlatformTransactionManager;
-import cn.taketoday.transaction.TransactionDefinition;
-import cn.taketoday.transaction.TransactionException;
+import cn.taketoday.polaris.transaction.TransactionConfig;
+import cn.taketoday.polaris.transaction.TransactionManager;
 import cn.taketoday.transaction.annotation.Isolation;
-import cn.taketoday.transaction.support.TransactionCallback;
-import cn.taketoday.transaction.support.TransactionCallbackWithoutResult;
-import cn.taketoday.transaction.support.TransactionOperations;
-import cn.taketoday.transaction.support.TransactionTemplate;
 
 /**
- * RepositoryManager is the main class for the today-jdbc library.
+ * RepositoryManager is the main class for the polaris library.
  * <p>
  * An <code>RepositoryManager</code> instance represents a way of connecting to one specific
  * database. To create a new instance, one need to specify either jdbc-url,
@@ -70,7 +61,7 @@ import cn.taketoday.transaction.support.TransactionTemplate;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0
  */
-public class RepositoryManager extends JdbcAccessor implements QueryProducer, TransactionOperations {
+public class RepositoryManager extends JdbcAccessor implements QueryProducer {
 
   private TypeHandlerManager typeHandlerManager = TypeHandlerManager.sharedInstance;
 
@@ -93,55 +84,41 @@ public class RepositoryManager extends JdbcAccessor implements QueryProducer, Tr
   @Nullable
   private EntityManager entityManager;
 
-  private final PlatformTransactionManager transactionManager;
-
-  private final TransactionTemplate txOperations;
-
-  static {
-    DefaultConversionService sharedInstance = DefaultConversionService.getSharedInstance();
-    sharedInstance.addConverter(new ClobToStringConverter());
-    sharedInstance.addConverter(new OffsetTimeToSQLTimeConverter());
-  }
-
-  public RepositoryManager(String jndiLookup) {
-    this(DataSourceUtils.getJndiDatasource(jndiLookup));
-  }
+  private final TransactionManager transactionManager;
 
   /**
-   * Creates a new instance of the RepositoryManager class.
-   * Internally this constructor will create a DriverManagerDataSource
+   * 创建一个 RepositoryManager 实例
    *
    * @param url JDBC database url
    * @param user database username
    * @param pass database password
-   * @see DriverManagerDataSource
    */
   public RepositoryManager(String url, String user, String pass) {
-    this(new DriverManagerDataSource(url, user, pass));
+    this(ConnectionSource.of(url, user, pass));
   }
 
   /**
-   * Creates a new instance of the RepositoryManager class, which uses the given DataSource to
-   * acquire connections to the database.
+   * 创建一个 RepositoryManager 实例，使用 JDBC 连接源
    *
    * @param dataSource The DataSource RepositoryManager uses to acquire connections to the database.
    */
   public RepositoryManager(DataSource dataSource) {
-    this(dataSource, new JdbcTransactionManager(dataSource));
+    this(ConnectionSource.forDataSource(dataSource));
   }
 
   /**
-   * Creates a new instance of the RepositoryManager class, which uses the given DataSource to
-   * acquire connections to the database.
+   * 创建一个 RepositoryManager 实例，使用 JDBC 连接源和事务管理器
    *
-   * @param dataSource The DataSource RepositoryManager uses to
-   * acquire connections to the database.
+   * @param connectionSource JDBC 连接源，RepositoryManager 用来获取 JDBC 的连接
    */
-  public RepositoryManager(DataSource dataSource, PlatformTransactionManager transactionManager) {
+  public RepositoryManager(ConnectionSource connectionSource) {
+    this(connectionSource, new JdbcTransactionManager(connectionSource));
+  }
+
+  public RepositoryManager(ConnectionSource connectionSource, TransactionManager transactionManager) {
+    super(connectionSource);
     Assert.notNull(transactionManager, "transactionManager is required");
-    setDataSource(dataSource);
     this.transactionManager = transactionManager;
-    this.txOperations = new TransactionTemplate(transactionManager);
   }
 
   /**
@@ -268,7 +245,7 @@ public class RepositoryManager extends JdbcAccessor implements QueryProducer, Tr
   /**
    * Return the transaction management strategy to be used.
    */
-  public PlatformTransactionManager getTransactionManager() {
+  public TransactionManager getTransactionManager() {
     return this.transactionManager;
   }
 
@@ -390,7 +367,7 @@ public class RepositoryManager extends JdbcAccessor implements QueryProducer, Tr
    * @throws CannotGetJdbcConnectionException Could not acquire a connection from connection-source
    */
   public JdbcConnection open(boolean autoClose) {
-    return new JdbcConnection(this, getDataSource(), autoClose);
+    return new JdbcConnection(this, getConnectionSource(), autoClose);
   }
 
   /**
@@ -401,7 +378,7 @@ public class RepositoryManager extends JdbcAccessor implements QueryProducer, Tr
    */
   public JdbcConnection open(Connection connection) {
     NestedConnection nested = new NestedConnection(connection);
-    return new JdbcConnection(this, new SingleConnectionDataSource(nested, false), false);
+    return new JdbcConnection(this, ConnectionSource.valueOf(nested), false);
   }
 
   /**
@@ -413,7 +390,7 @@ public class RepositoryManager extends JdbcAccessor implements QueryProducer, Tr
    * @throws CannotGetJdbcConnectionException Could not acquire a connection from connection-source
    */
   public JdbcConnection open(DataSource dataSource) {
-    return new JdbcConnection(this, dataSource, false);
+    return new JdbcConnection(this, ConnectionSource.forDataSource(dataSource), false);
   }
 
   /**
@@ -513,7 +490,7 @@ public class RepositoryManager extends JdbcAccessor implements QueryProducer, Tr
    * @throws CannotGetJdbcConnectionException Could not acquire a connection from connection-source
    */
   public JdbcConnection beginTransaction(int isolationLevel) {
-    return beginTransaction(getDataSource(), TransactionDefinition.forIsolationLevel(isolationLevel));
+    return beginTransaction(getConnectionSource(), TransactionConfig.forIsolationLevel(isolationLevel));
   }
 
   /**
@@ -530,29 +507,29 @@ public class RepositoryManager extends JdbcAccessor implements QueryProducer, Tr
    * @throws CannotGetJdbcConnectionException Could not acquire a connection from connection-source
    */
   public JdbcConnection beginTransaction(Isolation isolationLevel) {
-    return beginTransaction(getDataSource(), TransactionDefinition.forIsolationLevel(isolationLevel));
+    return beginTransaction(getConnectionSource(), TransactionConfig.forIsolationLevel(isolationLevel));
   }
 
   /**
-   * Begins a transaction with the given {@link TransactionDefinition}.
+   * Begins a transaction with the given {@link TransactionConfig}.
    * Every statement executed on the return {@link JdbcConnection} instance,
    * will be executed in the transaction. It is very important to always
    * call either the {@link JdbcConnection#commit()} method or the
    * {@link JdbcConnection#rollback()} method to close the transaction. Use
    * proper try-catch logic.
    *
-   * @param definition the TransactionDefinition instance (can be {@code null} for defaults),
+   * @param config the TransactionConfig instance (can be {@code null} for defaults),
    * describing propagation behavior, isolation level, timeout etc.
    * @return the {@link JdbcConnection} instance to use to run statements in the
    * transaction.
    * @throws CannotGetJdbcConnectionException Could not acquire a connection from connection-source
    */
-  public JdbcConnection beginTransaction(@Nullable TransactionDefinition definition) {
-    return beginTransaction(getDataSource(), definition);
+  public JdbcConnection beginTransaction(@Nullable TransactionConfig config) {
+    return beginTransaction(getConnectionSource(), config);
   }
 
   /**
-   * Begins a transaction with the {@link TransactionDefinition}. Every statement executed
+   * Begins a transaction with the {@link TransactionConfig}. Every statement executed
    * on the return {@link JdbcConnection} instance, will be executed in the
    * transaction. It is very important to always call either the
    * {@link JdbcConnection#commit()} method or the
@@ -561,16 +538,15 @@ public class RepositoryManager extends JdbcAccessor implements QueryProducer, Tr
    *
    * @param source the {@link DataSource} implementation substitution, that
    * will be used instead of one from {@link RepositoryManager} instance.
-   * @param definition the TransactionDefinition instance (can be {@code null} for defaults),
+   * @param config the TransactionConfig instance (can be {@code null} for defaults),
    * describing propagation behavior, isolation level, timeout etc.
    * @return the {@link JdbcConnection} instance to use to run statements in the
    * transaction.
    * @throws CannotGetJdbcConnectionException Could not acquire a connection from connection-source
    */
-  public JdbcConnection beginTransaction(DataSource source, @Nullable TransactionDefinition definition) {
-    JdbcConnection connection = new JdbcConnection(this, source);
-    connection.beginTransaction(definition);
-    connection.createConnection();
+  public JdbcConnection beginTransaction(ConnectionSource source, @Nullable TransactionConfig config) {
+    JdbcConnection connection = new JdbcConnection(this, source, false);
+    connection.beginTransaction(config);
     return connection;
   }
 
@@ -706,21 +682,21 @@ public class RepositoryManager extends JdbcAccessor implements QueryProducer, Tr
    * @throws CannotGetJdbcConnectionException Could not acquire a connection from connection-source
    */
   public <V, P> V runInTransaction(ResultStatementRunnable<V, P> runnable, @Nullable P argument, int isolationLevel) {
-    return runInTransaction(runnable, argument, TransactionDefinition.forIsolationLevel(isolationLevel));
+    return runInTransaction(runnable, argument, TransactionConfig.forIsolationLevel(isolationLevel));
   }
 
   /**
    * @throws CannotGetJdbcConnectionException Could not acquire a connection from connection-source
    */
   public <V, P> V runInTransaction(ResultStatementRunnable<V, P> runnable, @Nullable P argument, Isolation isolation) {
-    return runInTransaction(runnable, argument, TransactionDefinition.forIsolationLevel(isolation));
+    return runInTransaction(runnable, argument, TransactionConfig.forIsolationLevel(isolation));
   }
 
   /**
    * @throws CannotGetJdbcConnectionException Could not acquire a connection from connection-source
    */
   public <V, P> V runInTransaction(ResultStatementRunnable<V, P> runnable,
-          @Nullable P argument, @Nullable TransactionDefinition definition) {
+          @Nullable P argument, @Nullable TransactionConfig definition) {
     JdbcConnection connection = beginTransaction(definition);
     V result;
     try {
@@ -739,44 +715,6 @@ public class RepositoryManager extends JdbcAccessor implements QueryProducer, Tr
     }
     connection.commit();
     return result;
-  }
-
-  // ---------------------------------------------------------------------
-  // Implementation of TransactionOperations methods
-  // ---------------------------------------------------------------------
-
-  @Nullable
-  @Override
-  public <T> T execute(TransactionCallback<T> action) throws TransactionException {
-    return txOperations.execute(action);
-  }
-
-  @Nullable
-  @Override
-  public <T> T execute(TransactionCallback<T> action, @Nullable TransactionDefinition definition) throws TransactionException {
-    return txOperations.execute(action, definition);
-  }
-
-  @Override
-  public void executeWithoutResult(TransactionCallbackWithoutResult action) throws TransactionException {
-    txOperations.executeWithoutResult(action);
-  }
-
-  @Override
-  public void executeWithoutResult(TransactionCallbackWithoutResult action, @Nullable TransactionDefinition config) throws TransactionException {
-    txOperations.executeWithoutResult(action, config);
-  }
-
-  //
-
-  /**
-   * persist an entity to underlying repository
-   *
-   * @param entity entity instance
-   * @throws IllegalArgumentException if the instance is not an entity
-   */
-  public void persist(Object entity) {
-    getEntityManager().persist(entity);
   }
 
   //

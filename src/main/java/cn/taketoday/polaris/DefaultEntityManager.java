@@ -32,45 +32,39 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import javax.sql.DataSource;
-
 import cn.taketoday.core.Pair;
 import cn.taketoday.dao.DataAccessException;
 import cn.taketoday.dao.DataRetrievalFailureException;
 import cn.taketoday.dao.InvalidDataAccessApiUsageException;
-import cn.taketoday.jdbc.core.ResultSetExtractor;
-import cn.taketoday.jdbc.datasource.DataSourceUtils;
 import cn.taketoday.lang.Assert;
 import cn.taketoday.lang.Descriptive;
 import cn.taketoday.lang.Nullable;
 import cn.taketoday.logging.LogMessage;
-import cn.taketoday.logging.Logger;
-import cn.taketoday.logging.LoggerFactory;
 import cn.taketoday.polaris.dialect.Platform;
+import cn.taketoday.polaris.jdbc.CannotGetJdbcConnectionException;
 import cn.taketoday.polaris.jdbc.DefaultResultSetHandlerFactory;
 import cn.taketoday.polaris.jdbc.GeneratedKeysException;
 import cn.taketoday.polaris.jdbc.JdbcBeanMetadata;
 import cn.taketoday.polaris.jdbc.JdbcUpdateAffectedIncorrectNumberOfRowsException;
 import cn.taketoday.polaris.jdbc.PersistenceException;
 import cn.taketoday.polaris.jdbc.RepositoryManager;
-import cn.taketoday.polaris.format.SqlStatementLogger;
+import cn.taketoday.polaris.jdbc.ResultSetExtractor;
+import cn.taketoday.polaris.jdbc.support.JdbcAccessor;
 import cn.taketoday.polaris.sql.Insert;
 import cn.taketoday.polaris.sql.OrderByClause;
 import cn.taketoday.polaris.sql.Restriction;
 import cn.taketoday.polaris.sql.SimpleSelect;
 import cn.taketoday.polaris.sql.Update;
-import cn.taketoday.transaction.TransactionDefinition;
+import cn.taketoday.polaris.transaction.TransactionConfig;
 import cn.taketoday.util.CollectionUtils;
 
 /**
  * Default EntityManager implementation
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/9/10 22:28
+ * @since 1.0 2022/9/10 22:28
  */
-public class DefaultEntityManager implements EntityManager {
-
-  private static final Logger logger = LoggerFactory.getLogger(DefaultEntityManager.class);
+public class DefaultEntityManager extends JdbcAccessor implements EntityManager {
 
   private EntityMetadataFactory entityMetadataFactory = new DefaultEntityMetadataFactory();
 
@@ -92,18 +86,15 @@ public class DefaultEntityManager implements EntityManager {
 
   private Platform platform = Platform.forClasspath();
 
-  private SqlStatementLogger stmtLogger = SqlStatementLogger.sharedInstance;
-
   @Nullable
-  private TransactionDefinition transactionConfig = TransactionDefinition.withDefaults();
+  private TransactionConfig transactionConfig = TransactionConfig.forDefaults();
 
   private QueryHandlerFactories handlerFactories = new QueryHandlerFactories(entityMetadataFactory);
 
-  private final DataSource dataSource;
-
   public DefaultEntityManager(RepositoryManager repositoryManager) {
-    this.dataSource = repositoryManager.getDataSource();
+    super(repositoryManager.getConnectionSource());
     this.repositoryManager = repositoryManager;
+    setExceptionTranslator(repositoryManager.getExceptionTranslator());
   }
 
   public void setPlatform(@Nullable Platform platform) {
@@ -189,19 +180,14 @@ public class DefaultEntityManager implements EntityManager {
     }
   }
 
-  public void setStatementLogger(SqlStatementLogger stmtLogger) {
-    Assert.notNull(stmtLogger, "SqlStatementLogger is required");
-    this.stmtLogger = stmtLogger;
-  }
-
   /**
    * Set transaction config
    *
-   * @param definition the TransactionDefinition instance (can be {@code null} for defaults),
+   * @param config the TransactionConfig instance (can be {@code null} for defaults),
    * describing propagation behavior, isolation level, timeout etc.
    */
-  public void setTransactionConfig(@Nullable TransactionDefinition definition) {
-    this.transactionConfig = definition;
+  public void setTransactionConfig(@Nullable TransactionConfig config) {
+    this.transactionConfig = config;
   }
 
   // ---------------------------------------------------------------------
@@ -236,7 +222,7 @@ public class DefaultEntityManager implements EntityManager {
       stmtLogger.logStatement(LogMessage.format("Persisting entity: {}", entity), pair.first);
     }
 
-    Connection con = DataSourceUtils.getConnection(dataSource);
+    Connection con = getConnection();
     PreparedStatement statement = null;
     ResultSet generatedKeys = null;
     try {
@@ -287,7 +273,7 @@ public class DefaultEntityManager implements EntityManager {
   public void persist(Iterable<?> entities, @Nullable PropertyUpdateStrategy strategy, boolean autoGenerateId)
           throws DataAccessException //
   {
-    try (var transaction = repositoryManager.beginTransaction(transactionConfig)) {
+    try (var transaction = repositoryManager.beginTransaction(connectionSource, transactionConfig)) {
       int maxBatchRecords = getMaxBatchRecords();
       var statements = new HashMap<Class<?>, PreparedBatch>(8);
       try {
@@ -374,7 +360,7 @@ public class DefaultEntityManager implements EntityManager {
       stmtLogger.logStatement(LogMessage.format("Updating entity using: '{}'", updateByProperties), sql);
     }
 
-    Connection con = DataSourceUtils.getConnection(dataSource);
+    Connection con = getConnection();
     PreparedStatement statement = null;
     try {
       statement = con.prepareStatement(sql);
@@ -465,7 +451,7 @@ public class DefaultEntityManager implements EntityManager {
       stmtLogger.logStatement(LogMessage.format("Updating entity using ID: '{}'", id), sql);
     }
 
-    Connection con = DataSourceUtils.getConnection(dataSource);
+    Connection con = getConnection();
     PreparedStatement statement = null;
     try {
       statement = con.prepareStatement(sql);
@@ -528,7 +514,7 @@ public class DefaultEntityManager implements EntityManager {
       stmtLogger.logStatement(LogMessage.format("Updating entity using {} : '{}'", where, updateByValue), sql);
     }
 
-    Connection con = DataSourceUtils.getConnection(dataSource);
+    Connection con = getConnection();
     PreparedStatement statement = null;
     try {
       statement = con.prepareStatement(sql);
@@ -564,7 +550,7 @@ public class DefaultEntityManager implements EntityManager {
       stmtLogger.logStatement(LogMessage.format("Deleting entity using ID: {}", id), sql);
     }
 
-    Connection con = DataSourceUtils.getConnection(dataSource);
+    Connection con = getConnection();
     PreparedStatement statement = null;
     try {
       statement = con.prepareStatement(sql.toString());
@@ -608,7 +594,7 @@ public class DefaultEntityManager implements EntityManager {
       stmtLogger.logStatement(LogMessage.format("Deleting entity: [{}]", entityOrExample), sql);
     }
 
-    Connection con = DataSourceUtils.getConnection(dataSource);
+    Connection con = getConnection();
     PreparedStatement statement = null;
     try {
       statement = con.prepareStatement(sql.toString());
@@ -844,7 +830,7 @@ public class DefaultEntityManager implements EntityManager {
     EntityMetadata metadata = entityMetadataFactory.getEntityMetadata(entityClass);
     String statement = handler.render(metadata).toStatementString(platform);
 
-    Connection con = DataSourceUtils.getConnection(dataSource);
+    Connection con = getConnection();
     try {
       PreparedStatement stmt = con.prepareStatement(statement);
       handler.setParameter(metadata, stmt);
@@ -856,7 +842,7 @@ public class DefaultEntityManager implements EntityManager {
       return new DefaultEntityIterator<>(con, stmt, entityClass, metadata);
     }
     catch (SQLException ex) {
-      DataSourceUtils.releaseConnection(con, dataSource);
+      closeResource(con);
       throw translateException(getDescription(handler), statement, ex);
     }
   }
@@ -870,13 +856,12 @@ public class DefaultEntityManager implements EntityManager {
 
     ArrayList<Restriction> restrictions = new ArrayList<>();
     handler.renderWhereClause(metadata, restrictions);
-
-    Connection con = DataSourceUtils.getConnection(dataSource);
+    Connection con = getConnection();
     try {
       return doQueryCount(metadata, handler, restrictions, con);
     }
     finally {
-      DataSourceUtils.releaseConnection(con, dataSource);
+      closeResource(con);
     }
   }
 
@@ -894,14 +879,14 @@ public class DefaultEntityManager implements EntityManager {
     EntityMetadata metadata = entityMetadataFactory.getEntityMetadata(entityClass);
     handler.renderWhereClause(metadata, restrictions);
 
-    Connection con = DataSourceUtils.getConnection(dataSource);
+    Connection con = getConnection();
     String statement = null;
     PreparedStatement stmt = null;
     try {
       Number count = doQueryCount(metadata, handler, restrictions, con);
       if (count.intValue() < 1) {
         // no record
-        DataSourceUtils.releaseConnection(con, dataSource);
+        closeResource(con);
         return new Page<>(pageable, 0, Collections.emptyList());
       }
 
@@ -958,11 +943,26 @@ public class DefaultEntityManager implements EntityManager {
       return 0;
     }
     catch (SQLException ex) {
-      DataSourceUtils.releaseConnection(con, dataSource);
+      closeResource(con);
       throw translateException(getDescription(handler), statement, ex);
     }
     finally {
       closeResource(null, stmt, resultSet);
+    }
+  }
+
+  /**
+   * 获取 JDBC 连接
+   *
+   * @return JDBC 连接
+   * @throws CannotGetJdbcConnectionException JDBC 连接获取失败
+   */
+  protected Connection getConnection() throws CannotGetJdbcConnectionException {
+    try {
+      return connectionSource.getConnection();
+    }
+    catch (SQLException | IllegalStateException ex) {
+      throw new CannotGetJdbcConnectionException("Failed to obtain JDBC Connection", ex);
     }
   }
 
@@ -993,10 +993,6 @@ public class DefaultEntityManager implements EntityManager {
     return connection.prepareStatement(sql);
   }
 
-  private DataAccessException translateException(String task, @Nullable String sql, SQLException ex) {
-    return repositoryManager.translateException(task, sql, ex);
-  }
-
   private Pair<String, ArrayList<EntityProperty>> insertStatement(PropertyUpdateStrategy strategy, Object entity, EntityMetadata entityMetadata) {
     Insert insert = new Insert(entityMetadata.tableName);
     var properties = new ArrayList<EntityProperty>(entityMetadata.entityProperties.length);
@@ -1010,19 +1006,24 @@ public class DefaultEntityManager implements EntityManager {
     return Pair.of(insert.toStatementString(platform), properties);
   }
 
-  private void closeResource(@Nullable Connection connection, @Nullable PreparedStatement statement) {
-    try {
-      DataSourceUtils.doReleaseConnection(connection, dataSource);
-    }
-    catch (SQLException e) {
-      if (repositoryManager.isCatchResourceCloseErrors()) {
-        throw translateException("Closing Connection", null, e);
+  private void closeResource(@Nullable Connection connection) {
+    if (connection != null) {
+      try {
+        connectionSource.releaseConnection(connection);
       }
-      else {
-        logger.debug("Could not close JDBC Connection", e);
+      catch (SQLException e) {
+        if (repositoryManager.isCatchResourceCloseErrors()) {
+          throw translateException("Closing Connection", null, e);
+        }
+        else {
+          logger.debug("Could not close JDBC Connection", e);
+        }
       }
     }
+  }
 
+  private void closeResource(@Nullable Connection connection, @Nullable PreparedStatement statement) {
+    closeResource(connection);
     if (statement != null) {
       try {
         statement.close();

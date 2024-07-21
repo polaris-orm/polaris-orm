@@ -39,7 +39,7 @@ import cn.taketoday.polaris.support.WhereAnnotationConditionStrategy;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/2/19 19:56
+ * @since 1.0 2024/2/19 19:56
  */
 final class ExampleQuery extends SimpleSelectQueryStatement implements ConditionStatement, DebugDescriptive {
 

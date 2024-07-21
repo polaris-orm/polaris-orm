@@ -20,7 +20,7 @@ import cn.taketoday.lang.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/4/10 13:54
+ * @since 1.0 2024/4/10 13:54
  */
 public interface QueryHandlerFactory {
 

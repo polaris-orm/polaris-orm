@@ -17,48 +17,58 @@
 package cn.taketoday.polaris;
 
 /**
- * Property Update Strategy
+ * 字段更新策略
+ * <p>
+ * {@link #shouldUpdate} 方法决定你要不要更新这个字段
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @see UpdateStrategySource
- * @since 4.0 2022/12/18 22:20
+ * @since 1.0 2022/12/18 22:20
  */
 public interface PropertyUpdateStrategy {
 
   /**
-   * Test input property should be updated?
+   * 决定该字段要不要更新
+   *
+   * @return 如果返回 true 说明输入的 {@code property} 需要更新。
    */
   boolean shouldUpdate(Object entity, EntityProperty property);
 
   /**
-   * returns a new resolving chain
+   * 返回一个新的实例，这个新对象组合了当前对象和 {@code next} 对象。
+   * <p>
+   * 新的策略要在这两个策略都要满足才会返回 true
    *
-   * @param next next resolver
-   * @return returns a new Strategy
+   * @param next 下一个策略
+   * @return 返回一个组合的策略
    */
   default PropertyUpdateStrategy and(PropertyUpdateStrategy next) {
     return (entity, property) -> shouldUpdate(entity, property) && next.shouldUpdate(entity, property);
   }
 
   /**
-   * returns a new chain
+   * 返回一个新的实例，这个新对象组合了当前对象和 {@code next} 对象。
+   * <p>
+   * 新的策略要在这两个策略其中一个满足就会返回 true
    *
-   * @param next next resolver
-   * @return returns a new Strategy
+   * @param next 下一个策略
+   * @return 返回一个组合的策略
    */
   default PropertyUpdateStrategy or(PropertyUpdateStrategy next) {
     return (entity, property) -> shouldUpdate(entity, property) || next.shouldUpdate(entity, property);
   }
 
+  // Static factory methods
+
   /**
-   * Update the none null property
+   * 创建一个更新字段不为 {@code null} 的策略
    */
   static PropertyUpdateStrategy noneNull() {
     return (entity, property) -> property.getValue(entity) != null;
   }
 
   /**
-   * Always update
+   * 创建一个 所有字段都更新的策略
    */
   static PropertyUpdateStrategy always() {
     return (entity, property) -> true;

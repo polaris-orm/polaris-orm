@@ -23,7 +23,7 @@ import cn.taketoday.lang.TodayStrategies;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/4/10 17:55
+ * @since 1.0 2024/4/10 17:55
  */
 final class QueryHandlerFactories implements QueryHandlerFactory {
 

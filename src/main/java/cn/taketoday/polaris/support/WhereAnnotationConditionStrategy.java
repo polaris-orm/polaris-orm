@@ -27,7 +27,7 @@ import cn.taketoday.polaris.sql.Restriction;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/2/25 00:02
+ * @since 1.0 2024/2/25 00:02
  */
 public class WhereAnnotationConditionStrategy implements PropertyConditionStrategy {
 

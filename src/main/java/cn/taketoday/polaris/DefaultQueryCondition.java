@@ -30,7 +30,7 @@ import cn.taketoday.util.CollectionUtils;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/9/10 21:34
+ * @since 1.0 2022/9/10 21:34
  */
 public class DefaultQueryCondition extends QueryCondition {
 

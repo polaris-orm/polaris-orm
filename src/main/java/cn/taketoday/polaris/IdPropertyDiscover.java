@@ -28,7 +28,7 @@ import cn.taketoday.lang.Assert;
  * Determine ID property
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/8/16 21:48
+ * @since 1.0 2022/8/16 21:48
  */
 public interface IdPropertyDiscover {
 

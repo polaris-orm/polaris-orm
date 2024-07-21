@@ -23,7 +23,7 @@ import cn.taketoday.lang.Nullable;
  * Entity definition is not legal
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/11/15 15:50
+ * @since 1.0 2022/11/15 15:50
  */
 public class IllegalEntityException extends PersistenceException {
 

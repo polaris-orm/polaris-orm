@@ -19,8 +19,6 @@ package cn.taketoday.polaris.jdbc;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import cn.taketoday.jdbc.core.ResultSetExtractor;
-
 /**
  * @author TODAY 2021/1/2 18:28
  */

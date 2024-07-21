@@ -22,7 +22,7 @@ import java.util.ArrayList;
  * Batch execution metadata
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/2/20 23:25
+ * @since 1.0 2024/2/20 23:25
  */
 public class BatchExecution {
 

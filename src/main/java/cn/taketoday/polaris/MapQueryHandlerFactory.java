@@ -26,7 +26,7 @@ import cn.taketoday.polaris.sql.SimpleSelect;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/4/10 16:54
+ * @since 1.0 2024/4/10 16:54
  */
 final class MapQueryHandlerFactory implements QueryHandlerFactory {
 

@@ -28,7 +28,7 @@ import cn.taketoday.util.StringUtils;
  * OrderBy Clause
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/3/31 12:39
+ * @since 1.0 2024/3/31 12:39
  */
 public interface OrderByClause {
 

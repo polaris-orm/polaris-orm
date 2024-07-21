@@ -40,7 +40,6 @@ dependencies {
   api("cn.taketoday:today-beans")
   api("cn.taketoday:today-core")
   api("cn.taketoday:today-tx")
-  api("cn.taketoday:today-jdbc") // todo remove
   optional("cn.taketoday:today-aop")
   optional("cn.taketoday:today-context")
   optional("cn.taketoday:today-framework")

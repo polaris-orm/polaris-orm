@@ -22,9 +22,8 @@ import java.util.Map;
 
 import cn.taketoday.beans.BeanProperty;
 import cn.taketoday.beans.BeanUtils;
-import cn.taketoday.jdbc.core.ResultSetExtractor;
-import cn.taketoday.jdbc.support.JdbcUtils;
 import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.jdbc.support.JdbcUtils;
 import cn.taketoday.polaris.jdbc.type.TypeHandler;
 import cn.taketoday.util.ConcurrentReferenceHashMap;
 import cn.taketoday.util.MapCache;

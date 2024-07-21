@@ -22,7 +22,7 @@ import cn.taketoday.polaris.sql.Select;
  * Render select columns from table
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/2/16 18:10
+ * @since 1.0 2024/2/16 18:10
  */
 public abstract class ColumnsQueryStatement implements QueryStatement {
 

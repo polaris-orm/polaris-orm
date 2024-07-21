@@ -20,7 +20,7 @@ import cn.taketoday.lang.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/9/20 12:47
+ * @since 1.0 2022/9/20 12:47
  */
 public interface BatchPersistListener {
 

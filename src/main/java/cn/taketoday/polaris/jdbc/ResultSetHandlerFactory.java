@@ -19,10 +19,9 @@ package cn.taketoday.polaris.jdbc;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-import cn.taketoday.jdbc.core.ResultSetExtractor;
-
 /**
- * User: dimzon Date: 4/7/14 Time: 12:02 AM
+ * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
+ * @since 1.0
  */
 public interface ResultSetHandlerFactory<T> {
 
@@ -30,4 +29,5 @@ public interface ResultSetHandlerFactory<T> {
    * Get one row ResultSetExtractor
    */
   ResultSetExtractor<T> getResultSetHandler(ResultSetMetaData resultSetMetaData) throws SQLException;
+
 }

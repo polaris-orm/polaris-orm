@@ -21,7 +21,7 @@ import java.sql.SQLException;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/9/11 21:49
+ * @since 1.0 2022/9/11 21:49
  */
 public class NestedQueryCondition extends QueryCondition {
 

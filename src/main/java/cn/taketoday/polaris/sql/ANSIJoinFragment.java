@@ -21,7 +21,7 @@ package cn.taketoday.polaris.sql;
  *
  * @author Gavin King
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0
+ * @since 1.0
  */
 public class ANSIJoinFragment extends JoinFragment {
   private StringBuilder buffer = new StringBuilder();

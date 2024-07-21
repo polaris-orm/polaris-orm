@@ -24,7 +24,7 @@ import java.util.LinkedHashMap;
  *
  * @author Gavin King, Simon Harris
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0
+ * @since 1.0
  */
 public abstract class CaseFragment {
 

@@ -19,7 +19,6 @@ package cn.taketoday.polaris.jdbc;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import cn.taketoday.jdbc.core.ResultSetExtractor;
 import cn.taketoday.polaris.jdbc.type.TypeHandler;
 
 /**

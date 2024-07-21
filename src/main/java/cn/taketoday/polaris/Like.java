@@ -26,7 +26,7 @@ import cn.taketoday.lang.Constant;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/2/24 23:53
+ * @since 1.0 2024/2/24 23:53
  */
 @Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)

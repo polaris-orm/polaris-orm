@@ -29,7 +29,7 @@ import cn.taketoday.polaris.sql.Select;
  * resolving {@link OrderByClause} from entity
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/2/20 17:03
+ * @since 1.0 2024/2/20 17:03
  */
 final class NoConditionsQuery extends ColumnsQueryStatement implements ConditionStatement, DebugDescriptive {
 

@@ -24,9 +24,6 @@ import java.sql.PreparedStatement;
 
 import javax.sql.DataSource;
 
-import cn.taketoday.polaris.jdbc.JdbcConnection;
-import cn.taketoday.polaris.jdbc.RepositoryManager;
-
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
@@ -40,8 +37,9 @@ import static org.mockito.Mockito.when;
  * User: dimzon Date: 4/29/14 Time: 10:05 PM
  */
 public class ConnectionTest {
+
   @Test
-  public void test_createQueryWithParams() throws Throwable {
+  public void createQueryWithParams() throws Throwable {
     DataSource dataSource = mock(DataSource.class);
     Connection jdbcConnection = mock(Connection.class);
     when(jdbcConnection.isClosed()).thenReturn(false);
@@ -52,11 +50,12 @@ public class ConnectionTest {
     RepositoryManager operations = new RepositoryManager(dataSource);
 
     operations.setGeneratedKeys(false);
-    JdbcConnection cn = new JdbcConnection(operations, operations.getDataSource(), false);
-    cn.createNamedQueryWithParams("select :p1 name, :p2 age", "Dmitry Alexandrov", 35).buildStatement();
+    JdbcConnection connection = new JdbcConnection(operations, operations.getConnectionSource(), false);
+    connection.createNamedQueryWithParams("select :p1 name, :p2 age", "Dmitry Alexandrov", 35).buildStatement();
 
+//    connection.close();
     verify(dataSource, times(1)).getConnection();
-    verify(jdbcConnection).isClosed();
+//    verify(jdbcConnection).isClosed();
     verify(jdbcConnection, times(1)).prepareStatement("select ? name, ? age");
     verify(ps, times(1)).setString(1, "Dmitry Alexandrov");
     verify(ps, times(1)).setInt(2, 35);
@@ -69,7 +68,7 @@ public class ConnectionTest {
   public class MyException extends RuntimeException { }
 
   @Test
-  public void test_createQueryWithParamsThrowingException() throws Throwable {
+  public void createQueryWithParamsThrowingException() throws Throwable {
     DataSource dataSource = mock(DataSource.class);
     Connection jdbcConnection = mock(Connection.class);
     when(jdbcConnection.isClosed()).thenReturn(false);

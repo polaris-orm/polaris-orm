@@ -28,7 +28,7 @@ import cn.taketoday.polaris.SuffixLike;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2024/2/28 22:48
+ * @since 1.0 2024/2/28 22:48
  */
 public class FuzzyQueryConditionStrategy implements PropertyConditionStrategy {
 

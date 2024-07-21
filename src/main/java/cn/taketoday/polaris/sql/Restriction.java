@@ -26,7 +26,7 @@ import cn.taketoday.util.CollectionUtils;
  *
  * @author Steve Ebersole
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0
+ * @since 1.0
  */
 public interface Restriction {
 

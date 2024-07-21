@@ -46,7 +46,7 @@ import java.lang.annotation.Target;
  * }</pre>
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/8/16 20:58
+ * @since 1.0 2022/8/16 20:58
  */
 @Documented
 @Target({ ElementType.ANNOTATION_TYPE, ElementType.FIELD, ElementType.METHOD })
