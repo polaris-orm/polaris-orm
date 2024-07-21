@@ -16,8 +16,6 @@
 
 package cn.taketoday.polaris.jdbc;
 
-import cn.taketoday.polaris.jdbc.NamedQuery;
-
 /**
  * Created by zsoltjanos on 01/08/15.
  */

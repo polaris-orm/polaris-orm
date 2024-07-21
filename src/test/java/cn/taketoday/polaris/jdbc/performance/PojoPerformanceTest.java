@@ -605,7 +605,7 @@ public class PojoPerformanceTest {
   interface MyBatisPostMapper {
     @Select(SELECT_TYPICAL + " WHERE id = #{id}")
     @Results({ @Result(property = "creationDate", column = "creation_date"), @Result(property = "lastChangeDate",
-                                                                                     column = "last_change_date")
+            column = "last_change_date")
     })
     Post selectPost(int id);
   }

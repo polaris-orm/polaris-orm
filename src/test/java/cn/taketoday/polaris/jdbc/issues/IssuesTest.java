@@ -30,13 +30,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import cn.taketoday.polaris.jdbc.issues.pojos.Issue1Pojo;
-import cn.taketoday.polaris.jdbc.issues.pojos.KeyValueEntity;
 import cn.taketoday.polaris.jdbc.JdbcConnection;
 import cn.taketoday.polaris.jdbc.PersistenceException;
 import cn.taketoday.polaris.jdbc.RepositoryManager;
 import cn.taketoday.polaris.jdbc.Row;
 import cn.taketoday.polaris.jdbc.Table;
+import cn.taketoday.polaris.jdbc.issues.pojos.Issue1Pojo;
+import cn.taketoday.polaris.jdbc.issues.pojos.KeyValueEntity;
 import lombok.Setter;
 
 import static org.junit.Assert.assertEquals;

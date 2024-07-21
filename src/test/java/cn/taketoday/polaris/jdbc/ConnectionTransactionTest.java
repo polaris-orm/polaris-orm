@@ -24,9 +24,6 @@ import java.sql.Connection;
 
 import javax.sql.DataSource;
 
-import cn.taketoday.polaris.jdbc.JdbcConnection;
-import cn.taketoday.polaris.jdbc.RepositoryManager;
-
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;

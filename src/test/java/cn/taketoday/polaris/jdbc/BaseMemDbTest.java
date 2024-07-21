@@ -21,9 +21,6 @@ import org.junit.runners.Parameterized;
 import java.util.Arrays;
 import java.util.Collection;
 
-import cn.taketoday.polaris.jdbc.JdbcConnection;
-import cn.taketoday.polaris.jdbc.RepositoryManager;
-
 /**
  * Created by lars on 01.11.14.
  */

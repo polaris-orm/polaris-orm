@@ -24,10 +24,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import cn.taketoday.beans.BeanProperty;
-import cn.taketoday.polaris.jdbc.type.EnumerationValue;
-import cn.taketoday.polaris.jdbc.type.EnumerationValueTypeHandler;
-import cn.taketoday.polaris.jdbc.type.TypeHandler;
-import cn.taketoday.polaris.jdbc.type.TypeHandlerManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;

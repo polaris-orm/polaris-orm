@@ -23,10 +23,6 @@ import java.util.List;
 
 import cn.taketoday.polaris.AbstractRepositoryManagerTests;
 import cn.taketoday.polaris.DefaultEntityManager;
-import cn.taketoday.polaris.jdbc.JdbcConnection;
-import cn.taketoday.polaris.jdbc.NamedQuery;
-import cn.taketoday.polaris.jdbc.Query;
-import cn.taketoday.polaris.jdbc.RepositoryManager;
 import cn.taketoday.polaris.model.UserModel;
 
 import static org.assertj.core.api.Assertions.assertThat;

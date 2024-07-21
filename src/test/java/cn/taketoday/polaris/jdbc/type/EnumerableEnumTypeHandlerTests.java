@@ -24,9 +24,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import cn.taketoday.lang.Enumerable;
-import cn.taketoday.polaris.jdbc.type.EnumerableEnumTypeHandler;
-import cn.taketoday.polaris.jdbc.type.TypeHandler;
-import cn.taketoday.polaris.jdbc.type.TypeHandlerManager;
 import lombok.Data;
 
 import static org.assertj.core.api.Assertions.assertThat;

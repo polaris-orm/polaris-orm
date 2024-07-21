@@ -229,7 +229,8 @@ class SQLErrorCodesFactoryTests {
     assertThat(translation.getExceptionClass()).isEqualTo(CustomErrorCodeException.class);
     assertThat(translation.getErrorCodes()).hasSize(1);
   }
-@Disabled
+
+  @Disabled
   @Test
   void dataSourceWithNullMetadata() throws Exception {
     Connection connection = mock();

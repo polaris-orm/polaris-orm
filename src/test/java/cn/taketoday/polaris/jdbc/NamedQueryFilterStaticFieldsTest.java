@@ -24,10 +24,6 @@ import org.zapodot.junit.db.EmbeddedDatabaseRule;
 
 import java.util.Comparator;
 
-import cn.taketoday.polaris.jdbc.JdbcConnection;
-import cn.taketoday.polaris.jdbc.NamedQuery;
-import cn.taketoday.polaris.jdbc.RepositoryManager;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class NamedQueryFilterStaticFieldsTest {
