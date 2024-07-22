@@ -18,17 +18,40 @@ package cn.taketoday.polaris.jdbc.support;
 
 import java.sql.SQLException;
 
+import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.DataAccessException;
+
 /**
- * 默认实现
+ * SQLException 转化为运行时异常
  *
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
- * @since 1.0 2024/7/22 11:44
+ * @since 1.0 2024/7/22 21:16
  */
-public class PolarisSQLExceptionTranslator implements SQLExceptionTranslator {
+public class PolarisSQLRuntimeException extends DataAccessException {
 
-  @Override
-  public RuntimeException translate(String task, String sql, SQLException ex) {
-    return new PolarisSQLRuntimeException(task, sql, ex);
+  /** SQL that led to the problem. */
+
+  @Nullable
+  private final String sql;
+
+  public PolarisSQLRuntimeException(String task, @Nullable String sql, SQLException cause) {
+    super(task + " failed", cause);
+    this.sql = sql;
+  }
+
+  /**
+   * Return the underlying SQLException.
+   */
+  public SQLException getSQLException() {
+    return (SQLException) getCause();
+  }
+
+  /**
+   * Return the SQL that led to the problem (if known).
+   */
+  @Nullable
+  public String getSql() {
+    return this.sql;
   }
 
 }

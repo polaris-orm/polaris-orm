@@ -35,9 +35,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * User: dimzon Date: 4/29/14 Time: 10:05 PM
- */
 class JdbcConnectionTests {
 
   @Test

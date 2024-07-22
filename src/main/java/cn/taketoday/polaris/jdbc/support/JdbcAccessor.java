@@ -51,20 +51,16 @@ public abstract class JdbcAccessor {
   }
 
   /**
-   * Set the exception translator for this instance.
-   * <p>If no custom translator is provided, a default
-   * {@link SQLErrorCodeSQLExceptionTranslator} is used
-   * which examines the SQLException's vendor-specific error code.
+   * 设置 SQL 异常转换器, 可以将对应的 {@link SQLException} 异常转化为运行时异常
    */
   public void setExceptionTranslator(@Nullable SQLExceptionTranslator exceptionTranslator) {
     this.exceptionTranslator = exceptionTranslator;
   }
 
   /**
-   * Return the exception translator for this instance.
-   * <p>Creates a default {@link SQLErrorCodeSQLExceptionTranslator}
-   * for the specified DataSource if none set, or a
-   * {@link SQLStateSQLExceptionTranslator} in case of no DataSource.
+   * 返回异常转换器
+   * <p>
+   * 如果用户没有手动设计将返回 PolarisSQLExceptionTranslator
    *
    * @see #getConnectionSource()
    */
