@@ -40,14 +40,7 @@ dependencies {
   api("cn.taketoday:today-beans")
   api("cn.taketoday:today-core")
 
-  optional("org.hsqldb:hsqldb")
-  optional("com.h2database:h2")
-  optional("org.apache.derby:derby")
-  optional("org.apache.derby:derbyclient")
-  optional("org.apache.derby:derbytools")
-  optional 'com.zaxxer:HikariCP'
 
-  testImplementation("cn.taketoday:today-context")
   testImplementation 'jakarta.transaction:jakarta.transaction-api:2.0.0'
   testImplementation 'com.google.guava:guava:33.1.0-jre'
   testImplementation 'org.zapodot:embedded-db-junit:1.0.0'
@@ -63,14 +56,10 @@ dependencies {
   testImplementation 'ch.qos.logback:logback-classic'
   testImplementation 'com.mysql:mysql-connector-j'
 
-  compileOnly 'com.oracle.database.jdbc:ucp:21.7.0.0'
-  compileOnly 'org.postgresql:postgresql'
-  compileOnly 'com.mchange:c3p0:0.9.5.5'
-  compileOnly 'com.h2database:h2'
-  compileOnly 'org.apache.commons:commons-dbcp2'
-  compileOnly 'com.zaxxer:HikariCP:5.0.0'
-  compileOnly 'com.oracle.database.jdbc:ojdbc8:21.7.0.0'
-  compileOnly 'org.apache.derby:derby:10.14.2.0'
+  testImplementation 'org.hsqldb:hsqldb'
+  testImplementation 'com.h2database:h2'
+  testImplementation 'org.apache.commons:commons-dbcp2'
+  testImplementation 'com.zaxxer:HikariCP'
 
   testImplementation("org.junit.jupiter:junit-jupiter-api")
   testImplementation("org.junit.jupiter:junit-jupiter-params")
@@ -89,7 +78,6 @@ dependencies {
   // JSR-305 only used for non-required meta-annotations
   compileOnly("com.google.code.findbugs:jsr305")
   compileOnly("com.google.code.findbugs:findbugs")
-  compileOnly('org.jboss.logging:jboss-logging:3.5.3.Final')
 
   testImplementation("cn.taketoday:today-test")
   testImplementation("cn.taketoday:today-test-support")
@@ -98,17 +86,6 @@ dependencies {
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
   testRuntimeOnly("org.junit.platform:junit-platform-suite-engine")
-
-  testFixturesImplementation("cn.taketoday:today-aop")
-  testFixturesImplementation("cn.taketoday:today-context")
-  testFixturesImplementation("io.netty:netty-codec-http")
-  testFixturesImplementation("com.google.code.findbugs:jsr305")
-  testFixturesImplementation("org.junit.platform:junit-platform-launcher")
-  testFixturesImplementation("org.junit.jupiter:junit-jupiter-api")
-  testFixturesImplementation("org.junit.jupiter:junit-jupiter-params")
-  testFixturesImplementation("org.assertj:assertj-core")
-  testFixturesImplementation("org.xmlunit:xmlunit-assertj")
-  testFixturesImplementation("io.projectreactor:reactor-test")
 
 }
 
