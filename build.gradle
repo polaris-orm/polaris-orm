@@ -5,7 +5,7 @@ plugins {
   id "io.github.gradle-nexus.publish-plugin" version "1.3.0"
 }
 
-description = "Polaris ORM framework"
+description = "Polaris is Java ORM framework"
 
 
 apply plugin: 'jacoco'

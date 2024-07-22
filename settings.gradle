@@ -36,4 +36,4 @@ gradleEnterprise {
   }
 }
 
-rootProject.name = 'polaris'
+rootProject.name = 'polaris-orm'

@@ -17,7 +17,7 @@ Polaris 是一个 Java ORM 框架
 ### Gradle
 
 ```groovy
-implementation 'cn.taketoday:polaris:0.0.1-SNAPSHOT'
+implementation 'cn.taketoday:polaris-orm:0.0.1-SNAPSHOT'
 ```
 
 
