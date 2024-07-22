@@ -21,9 +21,11 @@ import org.mockito.ArgumentMatchers;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
@@ -36,10 +38,10 @@ import static org.mockito.Mockito.when;
 /**
  * User: dimzon Date: 4/29/14 Time: 10:05 PM
  */
-public class ConnectionTest {
+class JdbcConnectionTests {
 
   @Test
-  public void createQueryWithParams() throws Throwable {
+  void createQueryWithParams() throws Throwable {
     DataSource dataSource = mock(DataSource.class);
     Connection jdbcConnection = mock(Connection.class);
     when(jdbcConnection.isClosed()).thenReturn(false);
@@ -68,7 +70,7 @@ public class ConnectionTest {
   public class MyException extends RuntimeException { }
 
   @Test
-  public void createQueryWithParamsThrowingException() throws Throwable {
+  void createQueryWithParamsThrowingException() throws Throwable {
     DataSource dataSource = mock(DataSource.class);
     Connection jdbcConnection = mock(Connection.class);
     when(jdbcConnection.isClosed()).thenReturn(false);
@@ -93,4 +95,40 @@ public class ConnectionTest {
     // check statement was closed
     verify(ps, times(1)).close();
   }
+
+  @Test
+  void isTransactional() throws SQLException {
+    DataSource dataSource = mock(DataSource.class);
+    Connection jdbcConnection = mock(Connection.class);
+    when(jdbcConnection.isClosed()).thenReturn(false);
+    when(dataSource.getConnection()).thenReturn(jdbcConnection);
+    PreparedStatement ps = mock(PreparedStatement.class);
+    when(jdbcConnection.prepareStatement(ArgumentMatchers.anyString())).thenReturn(ps);
+
+    RepositoryManager operations = new RepositoryManager(dataSource);
+
+    JdbcConnection connection = operations.open();
+    assertThat(connection.isTransactional()).isFalse();
+    connection.beginTransaction();
+    assertThat(connection.isTransactional()).isTrue();
+  }
+
+  @Test
+  void getTransaction() throws SQLException {
+    DataSource dataSource = mock(DataSource.class);
+    Connection jdbcConnection = mock(Connection.class);
+    when(jdbcConnection.isClosed()).thenReturn(false);
+    when(dataSource.getConnection()).thenReturn(jdbcConnection);
+    PreparedStatement ps = mock(PreparedStatement.class);
+    when(jdbcConnection.prepareStatement(ArgumentMatchers.anyString())).thenReturn(ps);
+
+    RepositoryManager operations = new RepositoryManager(dataSource);
+
+    JdbcConnection connection = operations.open();
+    assertThat(connection.isTransactional()).isFalse();
+    connection.beginTransaction();
+    assertThat(connection.isTransactional()).isTrue();
+    assertThat(connection.getTransaction().getConnection()).isSameAs(jdbcConnection);
+  }
+
 }

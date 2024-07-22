@@ -24,19 +24,15 @@ import java.util.HashSet;
 
 import javax.sql.DataSource;
 
-import cn.taketoday.dao.DataAccessException;
-import cn.taketoday.dao.InvalidDataAccessApiUsageException;
 import cn.taketoday.lang.Assert;
 import cn.taketoday.lang.Nullable;
 import cn.taketoday.logging.Logger;
 import cn.taketoday.logging.LoggerFactory;
+import cn.taketoday.polaris.DataAccessException;
+import cn.taketoday.polaris.InvalidDataAccessApiUsageException;
 import cn.taketoday.polaris.jdbc.datasource.ConnectionSource;
 import cn.taketoday.polaris.transaction.Transaction;
 import cn.taketoday.polaris.transaction.TransactionConfig;
-import cn.taketoday.transaction.IllegalTransactionStateException;
-import cn.taketoday.transaction.TransactionException;
-import cn.taketoday.transaction.TransactionStatus;
-import cn.taketoday.transaction.TransactionSystemException;
 
 /**
  * Represents a connection to the database with a transaction.
@@ -147,10 +143,6 @@ public final class JdbcConnection implements Closeable, QueryProducer {
    * read-only flag is just a hint for potential optimization.
    *
    * @return transaction status object representing the new or current transaction
-   * @throws TransactionException in case of lookup, creation, or system errors
-   * @throws IllegalTransactionStateException if the given transaction definition
-   * cannot be executed (for example, if a currently active transaction is in
-   * conflict with the specified propagation behavior)
    * @see TransactionConfig#getPropagationBehavior
    * @see TransactionConfig#getIsolationLevel
    * @see TransactionConfig#getTimeout
@@ -175,10 +167,6 @@ public final class JdbcConnection implements Closeable, QueryProducer {
    * @param config the TransactionConfig instance (can be {@code null} for defaults),
    * describing propagation behavior, isolation level, timeout etc.
    * @return transaction status object representing the new or current transaction
-   * @throws TransactionException in case of lookup, creation, or system errors
-   * @throws IllegalTransactionStateException if the given transaction definition
-   * cannot be executed (for example, if a currently active transaction is in
-   * conflict with the specified propagation behavior)
    * @see TransactionConfig#getPropagationBehavior
    * @see TransactionConfig#getIsolationLevel
    * @see TransactionConfig#getTimeout
@@ -216,10 +204,6 @@ public final class JdbcConnection implements Closeable, QueryProducer {
    * this method is called while participating in a distributed transaction,
    * this method is called on a closed connection or this
    * <code>Connection</code> object is in auto-commit mode
-   * @throws TransactionSystemException in case of rollback or system errors
-   * (typically caused by fundamental resource failures)
-   * @throws IllegalTransactionStateException if the given transaction
-   * is already completed (that is, committed or rolled back)
    */
   public RepositoryManager rollback() {
     rollback(true);
@@ -236,10 +220,6 @@ public final class JdbcConnection implements Closeable, QueryProducer {
    * this method is called while participating in a distributed transaction,
    * this method is called on a closed connection or this
    * <code>Connection</code> object is in auto-commit mode
-   * @throws TransactionSystemException in case of rollback or system errors
-   * (typically caused by fundamental resource failures)
-   * @throws IllegalTransactionStateException if the given transaction
-   * is already completed (that is, committed or rolled back)
    */
   public JdbcConnection rollback(boolean closeConnection) {
     try {
@@ -288,7 +268,6 @@ public final class JdbcConnection implements Closeable, QueryProducer {
    * this method is called while participating in a distributed transaction,
    * if this method is called on a closed connection or this
    * <code>Connection</code> object is in auto-commit mode
-   * @see TransactionStatus#setRollbackOnly
    */
   public void commit(boolean closeConnection) {
     try {
@@ -440,7 +419,7 @@ public final class JdbcConnection implements Closeable, QueryProducer {
     return manager;
   }
 
-  private DataAccessException translateException(String task, SQLException ex) {
+  private RuntimeException translateException(String task, SQLException ex) {
     return manager.translateException(task, null, ex);
   }
 

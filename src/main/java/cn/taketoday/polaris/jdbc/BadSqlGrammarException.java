@@ -18,15 +18,10 @@ package cn.taketoday.polaris.jdbc;
 
 import java.sql.SQLException;
 
-import cn.taketoday.dao.InvalidDataAccessResourceUsageException;
+import cn.taketoday.polaris.InvalidDataAccessResourceUsageException;
 
 /**
- * Exception thrown when SQL specified is invalid. Such exceptions always have
- * a {@code java.sql.SQLException} root cause.
- *
- * <p>It would be possible to have subclasses for no such table, no such column etc.
- * A custom SQLExceptionTranslator could create such more specific exceptions,
- * without affecting code using this class.
+ * SQL 无效时抛出的异常。这类异常总是有一个{@code java.sql.SQLException} 作为 root cause。
  *
  * @author Rod Johnson
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>

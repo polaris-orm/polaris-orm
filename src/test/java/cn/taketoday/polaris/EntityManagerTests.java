@@ -27,8 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import cn.taketoday.dao.IncorrectResultSizeDataAccessException;
-import cn.taketoday.dao.InvalidDataAccessApiUsageException;
 import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.jdbc.NamedQuery;
 import cn.taketoday.polaris.jdbc.RepositoryManager;

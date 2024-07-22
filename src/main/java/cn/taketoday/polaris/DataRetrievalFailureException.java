@@ -14,38 +14,36 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris.jdbc;
+package cn.taketoday.polaris;
 
-import java.io.IOException;
-
-import cn.taketoday.dao.DataRetrievalFailureException;
+import cn.taketoday.lang.Nullable;
 
 /**
- * Exception to be thrown when a LOB could not be retrieved.
+ * 如果无法检索到某些预期的数据，例如在通过已知标识符查找特定数据时，将抛出此异常。
  *
  * @author Juergen Hoeller
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0
  */
-public class LobRetrievalFailureException extends DataRetrievalFailureException {
+public class DataRetrievalFailureException extends NonTransientDataAccessException {
 
   /**
-   * Constructor for LobRetrievalFailureException.
+   * Constructor for DataRetrievalFailureException.
    *
    * @param msg the detail message
    */
-  public LobRetrievalFailureException(String msg) {
+  public DataRetrievalFailureException(String msg) {
     super(msg);
   }
 
   /**
-   * Constructor for LobRetrievalFailureException.
+   * Constructor for DataRetrievalFailureException.
    *
    * @param msg the detail message
-   * @param ex the root cause IOException
+   * @param cause the root cause from the data access API in use
    */
-  public LobRetrievalFailureException(String msg, IOException ex) {
-    super(msg, ex);
+  public DataRetrievalFailureException(String msg, @Nullable Throwable cause) {
+    super(msg, cause);
   }
 
 }

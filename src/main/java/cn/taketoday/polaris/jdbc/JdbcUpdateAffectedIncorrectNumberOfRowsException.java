@@ -16,12 +16,11 @@
 
 package cn.taketoday.polaris.jdbc;
 
-import cn.taketoday.dao.IncorrectUpdateSemanticsDataAccessException;
+import cn.taketoday.polaris.IncorrectUpdateSemanticsDataAccessException;
 
 /**
- * Exception thrown when a JDBC update affects an unexpected number of rows.
- * Typically we expect an update to affect a single row, meaning it's an
- * error if it affects multiple rows.
+ * 当 JDBC 更新影响到非预期的行数时抛出的异常。
+ * 通常我们期望更新只影响单行，如果它影响到多行，则意味着发生了错误。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller

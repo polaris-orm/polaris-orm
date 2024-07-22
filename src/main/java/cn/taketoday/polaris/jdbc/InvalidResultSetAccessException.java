@@ -18,8 +18,8 @@ package cn.taketoday.polaris.jdbc;
 
 import java.sql.SQLException;
 
-import cn.taketoday.dao.InvalidDataAccessResourceUsageException;
 import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.InvalidDataAccessResourceUsageException;
 
 /**
  * Exception thrown when a ResultSet has been accessed in an invalid fashion.
@@ -31,7 +31,6 @@ import cn.taketoday.lang.Nullable;
  * @author Juergen Hoeller
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @see BadSqlGrammarException
- * @see cn.taketoday.polaris.jdbc.support.rowset.SqlRowSet
  * @since 1.0
  */
 public class InvalidResultSetAccessException extends InvalidDataAccessResourceUsageException {

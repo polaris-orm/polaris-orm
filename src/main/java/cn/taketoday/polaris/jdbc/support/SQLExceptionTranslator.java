@@ -18,8 +18,8 @@ package cn.taketoday.polaris.jdbc.support;
 
 import java.sql.SQLException;
 
-import cn.taketoday.dao.DataAccessException;
 import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.DataAccessException;
 
 /**
  * 转换 {@link SQLException SQLExceptions} 到 {@link DataAccessException} 的策略接口
@@ -39,6 +39,6 @@ public interface SQLExceptionTranslator {
    * @see DataAccessException#getRootCause()
    */
   @Nullable
-  DataAccessException translate(String task, @Nullable String sql, SQLException ex);
+  RuntimeException translate(String task, @Nullable String sql, SQLException ex);
 
 }

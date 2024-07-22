@@ -40,7 +40,7 @@ import java.util.concurrent.Executor;
  * Simple {@link Connection wrapper}
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0
+ * @since 1.0
  */
 public class WrappedConnection implements Connection {
   protected final Connection delegate;

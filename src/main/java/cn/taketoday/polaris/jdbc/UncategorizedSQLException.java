@@ -18,12 +18,11 @@ package cn.taketoday.polaris.jdbc;
 
 import java.sql.SQLException;
 
-import cn.taketoday.dao.UncategorizedDataAccessException;
 import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.UncategorizedDataAccessException;
 
 /**
- * Exception thrown when we can't classify an SQLException into
- * one of our generic data access exceptions.
+ * 当我们无法将 SQLException 归类为通用数据访问异常时，就会抛出异常。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller

@@ -16,13 +16,11 @@
 
 package cn.taketoday.polaris.transaction;
 
-import cn.taketoday.transaction.TransactionDefinition;
-
 /**
  * 事物隔离级别
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0
+ * @since 1.0
  */
 public enum Isolation {
 
@@ -33,7 +31,7 @@ public enum Isolation {
    *
    * @see java.sql.Connection
    */
-  DEFAULT(TransactionDefinition.ISOLATION_DEFAULT),
+  DEFAULT(TransactionConfig.ISOLATION_DEFAULT),
 
   /**
    * 表示可能发生脏读、不可重复读和幻读的常量。
@@ -43,7 +41,7 @@ public enum Isolation {
    *
    * @see java.sql.Connection#TRANSACTION_READ_UNCOMMITTED
    */
-  READ_UNCOMMITTED(TransactionDefinition.ISOLATION_READ_UNCOMMITTED),
+  READ_UNCOMMITTED(TransactionConfig.ISOLATION_READ_UNCOMMITTED),
 
   /**
    * 表示阻止脏读；可能发生不可重复读和幻读。
@@ -52,7 +50,7 @@ public enum Isolation {
    *
    * @see java.sql.Connection#TRANSACTION_READ_COMMITTED
    */
-  READ_COMMITTED(TransactionDefinition.ISOLATION_READ_COMMITTED),
+  READ_COMMITTED(TransactionConfig.ISOLATION_READ_COMMITTED),
 
   /**
    * 表示防止脏读和不可重复读；可能会发生幻读。
@@ -62,7 +60,7 @@ public enum Isolation {
    *
    * @see java.sql.Connection#TRANSACTION_REPEATABLE_READ
    */
-  REPEATABLE_READ(TransactionDefinition.ISOLATION_REPEATABLE_READ),
+  REPEATABLE_READ(TransactionConfig.ISOLATION_REPEATABLE_READ),
 
   /**
    * 表示阻止脏读、不可重复读和幻读。
@@ -73,7 +71,7 @@ public enum Isolation {
    *
    * @see java.sql.Connection#TRANSACTION_SERIALIZABLE
    */
-  SERIALIZABLE(TransactionDefinition.ISOLATION_SERIALIZABLE);
+  SERIALIZABLE(TransactionConfig.ISOLATION_SERIALIZABLE);
 
   private final int value;
 

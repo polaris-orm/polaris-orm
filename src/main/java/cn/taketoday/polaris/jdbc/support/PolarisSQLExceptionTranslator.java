@@ -16,20 +16,20 @@
 
 package cn.taketoday.polaris.jdbc.support;
 
-import cn.taketoday.dao.DataAccessException;
+import java.sql.SQLException;
 
 /**
- * @author Thomas Risberg
+ * 默认实现
+ *
+ * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
+ * @since 1.0 2024/7/22 11:44
  */
-@SuppressWarnings("serial")
-public class CustomErrorCodeException extends DataAccessException {
+public class PolarisSQLExceptionTranslator implements SQLExceptionTranslator {
 
-  public CustomErrorCodeException(String msg) {
-    super(msg);
-  }
+  @Override
+  public RuntimeException translate(String task, String sql, SQLException ex) {
 
-  public CustomErrorCodeException(String msg, Throwable ex) {
-    super(msg, ex);
+    return null;
   }
 
 }

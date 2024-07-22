@@ -28,8 +28,8 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import cn.taketoday.dao.IncorrectResultSizeDataAccessException;
 import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.IncorrectResultSizeDataAccessException;
 import cn.taketoday.polaris.jdbc.support.JdbcUtils;
 
 /**

@@ -25,7 +25,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import cn.taketoday.core.Pair;
-import cn.taketoday.dao.DataAccessException;
 import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.sql.Select;
 import cn.taketoday.util.StreamIterable;

@@ -20,12 +20,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import cn.taketoday.dao.DataAccessException;
-import cn.taketoday.transaction.HeuristicCompletionException;
-import cn.taketoday.transaction.IllegalTransactionStateException;
-import cn.taketoday.transaction.TransactionStatus;
-import cn.taketoday.transaction.TransactionSystemException;
-import cn.taketoday.transaction.UnexpectedRollbackException;
+import cn.taketoday.polaris.DataAccessException;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -100,15 +95,6 @@ public class ExecutionResult implements QueryProducer {
    * this method is called while participating in a distributed transaction,
    * if this method is called on a closed connection or this
    * <code>Connection</code> object is in auto-commit mode
-   * @throws UnexpectedRollbackException in case of an unexpected rollback
-   * that the transaction coordinator initiated
-   * @throws HeuristicCompletionException in case of a transaction failure
-   * caused by a heuristic decision on the side of the transaction coordinator
-   * @throws TransactionSystemException in case of commit or system errors
-   * (typically caused by fundamental resource failures)
-   * @throws IllegalTransactionStateException if the given transaction
-   * is already completed (that is, committed or rolled back)
-   * @see TransactionStatus#setRollbackOnly
    */
   public void commit(boolean closeConnection) {
     connection.commit(closeConnection);
@@ -124,10 +110,6 @@ public class ExecutionResult implements QueryProducer {
    * this method is called while participating in a distributed transaction,
    * this method is called on a closed connection or this
    * <code>Connection</code> object is in auto-commit mode
-   * @throws TransactionSystemException in case of rollback or system errors
-   * (typically caused by fundamental resource failures)
-   * @throws IllegalTransactionStateException if the given transaction
-   * is already completed (that is, committed or rolled back)
    */
   public void rollback() {
     connection.rollback();
@@ -143,16 +125,12 @@ public class ExecutionResult implements QueryProducer {
    * this method is called while participating in a distributed transaction,
    * this method is called on a closed connection or this
    * <code>Connection</code> object is in auto-commit mode
-   * @throws TransactionSystemException in case of rollback or system errors
-   * (typically caused by fundamental resource failures)
-   * @throws IllegalTransactionStateException if the given transaction
-   * is already completed (that is, committed or rolled back)
    */
   public void rollback(boolean closeConnection) {
     connection.rollback(closeConnection);
   }
 
-  protected DataAccessException translateException(String task, SQLException ex) {
+  protected RuntimeException translateException(String task, SQLException ex) {
     return getManager().translateException(task, null, ex);
   }
 

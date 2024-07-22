@@ -22,7 +22,6 @@ import cn.taketoday.polaris.transaction.DefaultTransaction;
 import cn.taketoday.polaris.transaction.Transaction;
 import cn.taketoday.polaris.transaction.TransactionConfig;
 import cn.taketoday.polaris.transaction.TransactionManager;
-import cn.taketoday.transaction.TransactionException;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
@@ -37,7 +36,7 @@ public class JdbcTransactionManager implements TransactionManager {
   }
 
   @Override
-  public Transaction getTransaction(@Nullable TransactionConfig config) throws TransactionException {
+  public Transaction getTransaction(@Nullable TransactionConfig config) {
     if (config == null) {
       config = TransactionConfig.forDefaults();
     }

@@ -17,7 +17,6 @@
 package cn.taketoday.polaris.transaction;
 
 import cn.taketoday.lang.Nullable;
-import cn.taketoday.transaction.annotation.Isolation;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>

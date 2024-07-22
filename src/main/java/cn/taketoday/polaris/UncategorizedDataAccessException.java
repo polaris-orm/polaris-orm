@@ -14,24 +14,29 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris.transaction;
+package cn.taketoday.polaris;
 
 import cn.taketoday.lang.Nullable;
 
 /**
- * 事务管理器
+ * 未分类的数据访问异常
+ * <p>
+ * 当我们无法区分具体的异常的超类：例如，我们无法更精确地确定的来自 JDBC 的 SQLException。
  *
- * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
- * @since 1.0 2024/7/21 16:55
+ * @author Rod Johnson
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 4.0
  */
-public interface TransactionManager {
+public abstract class UncategorizedDataAccessException extends NonTransientDataAccessException {
 
   /**
-   * @see TransactionConfig#getPropagationBehavior
-   * @see TransactionConfig#getIsolationLevel
-   * @see TransactionConfig#getTimeout
-   * @see TransactionConfig#isReadOnly
+   * Constructor for UncategorizedDataAccessException.
+   *
+   * @param msg the detail message
+   * @param cause the exception thrown by underlying data access API
    */
-  Transaction getTransaction(@Nullable TransactionConfig config);
+  public UncategorizedDataAccessException(@Nullable String msg, @Nullable Throwable cause) {
+    super(msg, cause);
+  }
 
 }

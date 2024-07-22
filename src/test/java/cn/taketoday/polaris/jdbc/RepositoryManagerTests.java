@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import cn.taketoday.dao.DataAccessException;
+import cn.taketoday.polaris.DataAccessException;
 import cn.taketoday.polaris.jdbc.pojos.BigDecimalPojo;
 import cn.taketoday.polaris.jdbc.pojos.ComplexEntity;
 import cn.taketoday.polaris.jdbc.pojos.EntityWithPrivateFields;

@@ -14,24 +14,37 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris.transaction;
+package cn.taketoday.polaris;
 
+import cn.taketoday.core.NestedRuntimeException;
 import cn.taketoday.lang.Nullable;
 
 /**
- * 事务管理器
+ * 数据访问异常
  *
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
- * @since 1.0 2024/7/21 16:55
+ * @since 1.0 2024/7/22 11:00
  */
-public interface TransactionManager {
+public abstract class DataAccessException extends NestedRuntimeException {
 
   /**
-   * @see TransactionConfig#getPropagationBehavior
-   * @see TransactionConfig#getIsolationLevel
-   * @see TransactionConfig#getTimeout
-   * @see TransactionConfig#isReadOnly
+   * Constructor for DataAccessException.
+   *
+   * @param msg the detail message
    */
-  Transaction getTransaction(@Nullable TransactionConfig config);
+  public DataAccessException(@Nullable String msg) {
+    super(msg);
+  }
+
+  /**
+   * Constructor for DataAccessException.
+   *
+   * @param msg the detail message
+   * @param cause the root cause (usually from using a underlying
+   * data access API such as JDBC)
+   */
+  public DataAccessException(@Nullable String msg, @Nullable Throwable cause) {
+    super(msg, cause);
+  }
 
 }

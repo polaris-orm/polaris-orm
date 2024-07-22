@@ -33,7 +33,6 @@ import java.util.Spliterator;
 
 import cn.taketoday.core.conversion.ConversionService;
 import cn.taketoday.core.conversion.support.DefaultConversionService;
-import cn.taketoday.dao.DataAccessException;
 import cn.taketoday.lang.Nullable;
 import cn.taketoday.logging.Logger;
 import cn.taketoday.logging.LoggerFactory;
@@ -728,7 +727,7 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
     return querySQL;
   }
 
-  protected DataAccessException translateException(String task, SQLException ex) {
+  protected RuntimeException translateException(String task, SQLException ex) {
     return this.connection.getManager().translateException(task, querySQL, ex);
   }
 

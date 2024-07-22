@@ -22,7 +22,6 @@ import java.util.Map;
 
 import cn.taketoday.lang.Assert;
 import cn.taketoday.lang.Nullable;
-import cn.taketoday.transaction.TransactionDefinition;
 
 /**
  * 默认配置
@@ -35,10 +34,10 @@ public class DefaultTransactionConfig implements TransactionConfig, Serializable
   @Serial
   private static final long serialVersionUID = 1L;
 
-  /** Prefix for the propagation constants defined in TransactionDefinition. */
+  /** Prefix for the propagation constants defined in TransactionConfig. */
   public static final String PREFIX_PROPAGATION = "PROPAGATION_";
 
-  /** Prefix for the isolation constants defined in TransactionDefinition. */
+  /** Prefix for the isolation constants defined in TransactionConfig. */
   public static final String PREFIX_ISOLATION = "ISOLATION_";
 
   /** Prefix for transaction timeout values in description strings. */
@@ -49,28 +48,28 @@ public class DefaultTransactionConfig implements TransactionConfig, Serializable
 
   /**
    * Map of constant names to constant values for the propagation constants
-   * defined in {@link TransactionDefinition}.
+   * defined in {@link TransactionConfig}.
    */
   static final Map<String, Integer> propagationConstants = Map.of(
-          "PROPAGATION_REQUIRED", TransactionDefinition.PROPAGATION_REQUIRED,
-          "PROPAGATION_SUPPORTS", TransactionDefinition.PROPAGATION_SUPPORTS,
-          "PROPAGATION_MANDATORY", TransactionDefinition.PROPAGATION_MANDATORY,
-          "PROPAGATION_REQUIRES_NEW", TransactionDefinition.PROPAGATION_REQUIRES_NEW,
-          "PROPAGATION_NOT_SUPPORTED", TransactionDefinition.PROPAGATION_NOT_SUPPORTED,
-          "PROPAGATION_NEVER", TransactionDefinition.PROPAGATION_NEVER,
-          "PROPAGATION_NESTED", TransactionDefinition.PROPAGATION_NESTED
+          "PROPAGATION_REQUIRED", TransactionConfig.PROPAGATION_REQUIRED,
+          "PROPAGATION_SUPPORTS", TransactionConfig.PROPAGATION_SUPPORTS,
+          "PROPAGATION_MANDATORY", TransactionConfig.PROPAGATION_MANDATORY,
+          "PROPAGATION_REQUIRES_NEW", TransactionConfig.PROPAGATION_REQUIRES_NEW,
+          "PROPAGATION_NOT_SUPPORTED", TransactionConfig.PROPAGATION_NOT_SUPPORTED,
+          "PROPAGATION_NEVER", TransactionConfig.PROPAGATION_NEVER,
+          "PROPAGATION_NESTED", TransactionConfig.PROPAGATION_NESTED
   );
 
   /**
    * Map of constant names to constant values for the isolation constants
-   * defined in {@link TransactionDefinition}.
+   * defined in {@link TransactionConfig}.
    */
   static final Map<String, Integer> isolationConstants = Map.of(
-          "ISOLATION_DEFAULT", TransactionDefinition.ISOLATION_DEFAULT,
-          "ISOLATION_READ_UNCOMMITTED", TransactionDefinition.ISOLATION_READ_UNCOMMITTED,
-          "ISOLATION_READ_COMMITTED", TransactionDefinition.ISOLATION_READ_COMMITTED,
-          "ISOLATION_REPEATABLE_READ", TransactionDefinition.ISOLATION_REPEATABLE_READ,
-          "ISOLATION_SERIALIZABLE", TransactionDefinition.ISOLATION_SERIALIZABLE
+          "ISOLATION_DEFAULT", TransactionConfig.ISOLATION_DEFAULT,
+          "ISOLATION_READ_UNCOMMITTED", TransactionConfig.ISOLATION_READ_UNCOMMITTED,
+          "ISOLATION_READ_COMMITTED", TransactionConfig.ISOLATION_READ_COMMITTED,
+          "ISOLATION_REPEATABLE_READ", TransactionConfig.ISOLATION_REPEATABLE_READ,
+          "ISOLATION_SERIALIZABLE", TransactionConfig.ISOLATION_SERIALIZABLE
   );
 
   private int propagationBehavior = PROPAGATION_REQUIRED;
@@ -85,7 +84,7 @@ public class DefaultTransactionConfig implements TransactionConfig, Serializable
   private String name;
 
   /**
-   * Create a new DefaultTransactionDefinition, with default settings.
+   * Create a new DefaultTransactionConfig, with default settings.
    * Can be modified through bean property setters.
    *
    * @see #setPropagationBehavior
@@ -105,7 +104,7 @@ public class DefaultTransactionConfig implements TransactionConfig, Serializable
    * @see #setReadOnly
    * @see #setName
    */
-  public DefaultTransactionConfig(TransactionDefinition other) {
+  public DefaultTransactionConfig(TransactionConfig other) {
     this.propagationBehavior = other.getPropagationBehavior();
     this.isolationLevel = other.getIsolationLevel();
     this.timeout = other.getTimeout();
@@ -114,11 +113,11 @@ public class DefaultTransactionConfig implements TransactionConfig, Serializable
   }
 
   /**
-   * Create a new DefaultTransactionDefinition with the given
+   * Create a new DefaultTransactionConfig with the given
    * propagation behavior. Can be modified through bean property setters.
    *
    * @param propagationBehavior one of the propagation constants in the
-   * TransactionDefinition interface
+   * TransactionConfig interface
    * @see #setIsolationLevel
    * @see #setTimeout
    * @see #setReadOnly
@@ -129,7 +128,7 @@ public class DefaultTransactionConfig implements TransactionConfig, Serializable
 
   /**
    * Set the propagation behavior by the name of the corresponding constant in
-   * {@link TransactionDefinition} &mdash; for example, {@code "PROPAGATION_REQUIRED"}.
+   * {@link TransactionConfig} &mdash; for example, {@code "PROPAGATION_REQUIRED"}.
    *
    * @param constantName name of the constant
    * @throws IllegalArgumentException if the supplied value is not resolvable
@@ -146,7 +145,7 @@ public class DefaultTransactionConfig implements TransactionConfig, Serializable
 
   /**
    * Set the propagation behavior. Must be one of the propagation constants
-   * in the TransactionDefinition interface. Default is PROPAGATION_REQUIRED.
+   * in the TransactionConfig interface. Default is PROPAGATION_REQUIRED.
    * <p>Exclusively designed for use with {@link #PROPAGATION_REQUIRED} or
    * {@link #PROPAGATION_REQUIRES_NEW} since it only applies to newly started
    * transactions. Consider switching the "validateExistingTransactions" flag to
@@ -173,7 +172,7 @@ public class DefaultTransactionConfig implements TransactionConfig, Serializable
 
   /**
    * Set the isolation level by the name of the corresponding constant in
-   * {@link TransactionDefinition} &mdash; for example, {@code "ISOLATION_DEFAULT"}.
+   * {@link TransactionConfig} &mdash; for example, {@code "ISOLATION_DEFAULT"}.
    *
    * @param constantName name of the constant
    * @throws IllegalArgumentException if the supplied value is not resolvable
@@ -190,7 +189,7 @@ public class DefaultTransactionConfig implements TransactionConfig, Serializable
 
   /**
    * Set the isolation level. Must be one of the isolation constants
-   * in the TransactionDefinition interface. Default is ISOLATION_DEFAULT.
+   * in the TransactionConfig interface. Default is ISOLATION_DEFAULT.
    * <p>Exclusively designed for use with {@link #PROPAGATION_REQUIRED} or
    * {@link #PROPAGATION_REQUIRES_NEW} since it only applies to newly started
    * transactions. Consider switching the "validateExistingTransactions" flag to
@@ -283,7 +282,7 @@ public class DefaultTransactionConfig implements TransactionConfig, Serializable
    */
   @Override
   public boolean equals(@Nullable Object other) {
-    return (this == other || (other instanceof TransactionDefinition && toString().equals(other.toString())));
+    return (this == other || (other instanceof TransactionConfig && toString().equals(other.toString())));
   }
 
   /**
@@ -298,16 +297,8 @@ public class DefaultTransactionConfig implements TransactionConfig, Serializable
 
   /**
    * Return an identifying description for this transaction definition.
-   * <p>The format matches the one used by
-   * {@link cn.taketoday.transaction.interceptor.TransactionAttributeEditor},
-   * to be able to feed {@code toString} results into bean properties of type
-   * {@link cn.taketoday.transaction.interceptor.TransactionAttribute}.
-   * <p>Has to be overridden in subclasses for correct {@code equals}
-   * and {@code hashCode} behavior. Alternatively, {@link #equals}
-   * and {@link #hashCode} can be overridden themselves.
    *
    * @see #getDefinitionDescription()
-   * @see cn.taketoday.transaction.interceptor.TransactionAttributeEditor
    */
   @Override
   public String toString() {
@@ -336,24 +327,24 @@ public class DefaultTransactionConfig implements TransactionConfig, Serializable
 
   private static String getPropagationBehaviorName(int propagationBehavior) {
     return switch (propagationBehavior) {
-      case TransactionDefinition.PROPAGATION_REQUIRED -> "PROPAGATION_REQUIRED";
-      case TransactionDefinition.PROPAGATION_SUPPORTS -> "PROPAGATION_SUPPORTS";
-      case TransactionDefinition.PROPAGATION_MANDATORY -> "PROPAGATION_MANDATORY";
-      case TransactionDefinition.PROPAGATION_REQUIRES_NEW -> "PROPAGATION_REQUIRES_NEW";
-      case TransactionDefinition.PROPAGATION_NOT_SUPPORTED -> "PROPAGATION_NOT_SUPPORTED";
-      case TransactionDefinition.PROPAGATION_NEVER -> "PROPAGATION_NEVER";
-      case TransactionDefinition.PROPAGATION_NESTED -> "PROPAGATION_NESTED";
+      case TransactionConfig.PROPAGATION_REQUIRED -> "PROPAGATION_REQUIRED";
+      case TransactionConfig.PROPAGATION_SUPPORTS -> "PROPAGATION_SUPPORTS";
+      case TransactionConfig.PROPAGATION_MANDATORY -> "PROPAGATION_MANDATORY";
+      case TransactionConfig.PROPAGATION_REQUIRES_NEW -> "PROPAGATION_REQUIRES_NEW";
+      case TransactionConfig.PROPAGATION_NOT_SUPPORTED -> "PROPAGATION_NOT_SUPPORTED";
+      case TransactionConfig.PROPAGATION_NEVER -> "PROPAGATION_NEVER";
+      case TransactionConfig.PROPAGATION_NESTED -> "PROPAGATION_NESTED";
       default -> throw new IllegalArgumentException("Unsupported propagation behavior: " + propagationBehavior);
     };
   }
 
   static String getIsolationLevelName(int isolationLevel) {
     return switch (isolationLevel) {
-      case TransactionDefinition.ISOLATION_DEFAULT -> "ISOLATION_DEFAULT";
-      case TransactionDefinition.ISOLATION_READ_UNCOMMITTED -> "ISOLATION_READ_UNCOMMITTED";
-      case TransactionDefinition.ISOLATION_READ_COMMITTED -> "ISOLATION_READ_COMMITTED";
-      case TransactionDefinition.ISOLATION_REPEATABLE_READ -> "ISOLATION_REPEATABLE_READ";
-      case TransactionDefinition.ISOLATION_SERIALIZABLE -> "ISOLATION_SERIALIZABLE";
+      case TransactionConfig.ISOLATION_DEFAULT -> "ISOLATION_DEFAULT";
+      case TransactionConfig.ISOLATION_READ_UNCOMMITTED -> "ISOLATION_READ_UNCOMMITTED";
+      case TransactionConfig.ISOLATION_READ_COMMITTED -> "ISOLATION_READ_COMMITTED";
+      case TransactionConfig.ISOLATION_REPEATABLE_READ -> "ISOLATION_REPEATABLE_READ";
+      case TransactionConfig.ISOLATION_SERIALIZABLE -> "ISOLATION_SERIALIZABLE";
       default -> throw new IllegalArgumentException("Unsupported isolation level: " + isolationLevel);
     };
   }

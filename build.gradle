@@ -39,7 +39,6 @@ repositories {
 dependencies {
   api("cn.taketoday:today-beans")
   api("cn.taketoday:today-core")
-  api("cn.taketoday:today-tx")
 
   optional("org.hsqldb:hsqldb")
   optional("com.h2database:h2")

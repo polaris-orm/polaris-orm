@@ -14,25 +14,34 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris.jdbc;
-
-import cn.taketoday.lang.Nullable;
-import cn.taketoday.polaris.DataAccessException;
+package cn.taketoday.polaris;
 
 /**
- * Represents an exception thrown by polaris.
+ * 由于错误使用框架 API 而引发的异常。
  *
+ * @author Rod Johnson
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 1.0
+ * @since 4.0
  */
-public class PersistenceException extends DataAccessException {
+public class InvalidDataAccessApiUsageException extends NonTransientDataAccessException {
 
-  public PersistenceException(@Nullable String message) {
-    super(message);
+  /**
+   * Constructor for InvalidDataAccessApiUsageException.
+   *
+   * @param msg the detail message
+   */
+  public InvalidDataAccessApiUsageException(String msg) {
+    super(msg);
   }
 
-  public PersistenceException(@Nullable String message, @Nullable Throwable cause) {
-    super(message, cause);
+  /**
+   * Constructor for InvalidDataAccessApiUsageException.
+   *
+   * @param msg the detail message
+   * @param cause the root cause from the data access API in use
+   */
+  public InvalidDataAccessApiUsageException(String msg, Throwable cause) {
+    super(msg, cause);
   }
 
 }

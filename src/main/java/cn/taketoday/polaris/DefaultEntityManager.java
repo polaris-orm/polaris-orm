@@ -33,9 +33,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import cn.taketoday.core.Pair;
-import cn.taketoday.dao.DataAccessException;
-import cn.taketoday.dao.DataRetrievalFailureException;
-import cn.taketoday.dao.InvalidDataAccessApiUsageException;
 import cn.taketoday.lang.Assert;
 import cn.taketoday.lang.Descriptive;
 import cn.taketoday.lang.Nullable;

@@ -18,11 +18,11 @@ package cn.taketoday.polaris.jdbc.support;
 
 import java.sql.SQLException;
 
-import cn.taketoday.dao.DataAccessException;
 import cn.taketoday.lang.Assert;
 import cn.taketoday.lang.Nullable;
 import cn.taketoday.logging.Logger;
 import cn.taketoday.logging.LoggerFactory;
+import cn.taketoday.polaris.DataAccessException;
 import cn.taketoday.polaris.format.SqlStatementLogger;
 import cn.taketoday.polaris.jdbc.UncategorizedSQLException;
 import cn.taketoday.polaris.jdbc.datasource.ConnectionSource;
@@ -51,31 +51,10 @@ public abstract class JdbcAccessor {
   }
 
   /**
-   * Specify the database product name for the DataSource that this accessor uses.
-   * This allows to initialize an SQLErrorCodeSQLExceptionTranslator without
-   * obtaining a Connection from the DataSource to get the meta-data.
-   *
-   * @param dbName the database product name that identifies the error codes entry
-   * @see SQLErrorCodeSQLExceptionTranslator#setDatabaseProductName
-   * @see java.sql.DatabaseMetaData#getDatabaseProductName()
-   */
-  public void setDatabaseProductName(String dbName) {
-    if (SQLErrorCodeSQLExceptionTranslator.hasUserProvidedErrorCodesFile()) {
-      this.exceptionTranslator = new SQLErrorCodeSQLExceptionTranslator(dbName);
-    }
-    else {
-      this.exceptionTranslator = new SQLExceptionSubclassTranslator();
-    }
-  }
-
-  /**
    * Set the exception translator for this instance.
    * <p>If no custom translator is provided, a default
    * {@link SQLErrorCodeSQLExceptionTranslator} is used
    * which examines the SQLException's vendor-specific error code.
-   *
-   * @see cn.taketoday.polaris.jdbc.support.SQLErrorCodeSQLExceptionTranslator
-   * @see cn.taketoday.polaris.jdbc.support.SQLStateSQLExceptionTranslator
    */
   public void setExceptionTranslator(@Nullable SQLExceptionTranslator exceptionTranslator) {
     this.exceptionTranslator = exceptionTranslator;
@@ -97,12 +76,7 @@ public abstract class JdbcAccessor {
     synchronized(this) {
       exceptionTranslator = this.exceptionTranslator;
       if (exceptionTranslator == null) {
-        if (SQLErrorCodeSQLExceptionTranslator.hasUserProvidedErrorCodesFile()) {
-          exceptionTranslator = new SQLErrorCodeSQLExceptionTranslator(getConnectionSource());
-        }
-        else {
-          exceptionTranslator = new SQLExceptionSubclassTranslator();
-        }
+        exceptionTranslator = new PolarisSQLExceptionTranslator();
         this.exceptionTranslator = exceptionTranslator;
       }
       return exceptionTranslator;
@@ -123,8 +97,8 @@ public abstract class JdbcAccessor {
    * @return a DataAccessException wrapping the {@code SQLException} (never {@code null})
    * @see #getExceptionTranslator()
    */
-  public DataAccessException translateException(String task, @Nullable String sql, SQLException ex) {
-    DataAccessException dae = getExceptionTranslator().translate(task, sql, ex);
+  public RuntimeException translateException(String task, @Nullable String sql, SQLException ex) {
+    RuntimeException dae = getExceptionTranslator().translate(task, sql, ex);
     return dae != null ? dae : new UncategorizedSQLException(task, sql, ex);
   }
 

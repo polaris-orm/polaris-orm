@@ -25,9 +25,9 @@ import javax.sql.DataSource;
 import cn.taketoday.beans.BeanProperty;
 import cn.taketoday.core.conversion.ConversionService;
 import cn.taketoday.core.conversion.support.DefaultConversionService;
-import cn.taketoday.dao.DataAccessException;
 import cn.taketoday.lang.Assert;
 import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.DataAccessException;
 import cn.taketoday.polaris.DefaultEntityManager;
 import cn.taketoday.polaris.EntityManager;
 import cn.taketoday.polaris.jdbc.datasource.ConnectionSource;
@@ -37,9 +37,9 @@ import cn.taketoday.polaris.jdbc.support.JdbcAccessor;
 import cn.taketoday.polaris.jdbc.support.JdbcTransactionManager;
 import cn.taketoday.polaris.jdbc.type.TypeHandler;
 import cn.taketoday.polaris.jdbc.type.TypeHandlerManager;
+import cn.taketoday.polaris.transaction.Isolation;
 import cn.taketoday.polaris.transaction.TransactionConfig;
 import cn.taketoday.polaris.transaction.TransactionManager;
-import cn.taketoday.transaction.annotation.Isolation;
 
 /**
  * RepositoryManager is the main class for the polaris library.

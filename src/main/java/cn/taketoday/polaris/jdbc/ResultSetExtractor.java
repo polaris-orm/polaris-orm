@@ -19,7 +19,7 @@ package cn.taketoday.polaris.jdbc;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import cn.taketoday.dao.DataAccessException;
+import cn.taketoday.polaris.DataAccessException;
 
 /**
  * 数据提取器
