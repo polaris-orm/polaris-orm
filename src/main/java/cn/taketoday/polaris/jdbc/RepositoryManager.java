@@ -26,7 +26,6 @@ import cn.taketoday.beans.BeanProperty;
 import cn.taketoday.core.conversion.ConversionService;
 import cn.taketoday.core.conversion.support.DefaultConversionService;
 import cn.taketoday.dao.DataAccessException;
-import cn.taketoday.format.support.ApplicationConversionService;
 import cn.taketoday.lang.Assert;
 import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.DefaultEntityManager;
@@ -198,7 +197,7 @@ public class RepositoryManager extends JdbcAccessor implements QueryProducer {
    */
   public void setConversionService(@Nullable ConversionService conversionService) {
     this.conversionService = conversionService == null
-            ? ApplicationConversionService.getSharedInstance() : conversionService;
+            ? DefaultConversionService.getSharedInstance() : conversionService;
   }
 
   public ConversionService getConversionService() {

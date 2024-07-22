@@ -15,8 +15,8 @@ apply plugin: 'cn.taketoday.build.conventions'
 apply plugin: 'cn.taketoday.build.optional-dependencies'
 
 ext.javadocLinks = [
-    "https://docs.oracle.com/en/java/javase/17/docs/api/",
-    "https://jakarta.ee/specifications/platform/9/apidocs/",
+        "https://docs.oracle.com/en/java/javase/17/docs/api/",
+        "https://jakarta.ee/specifications/platform/9/apidocs/",
 
 ] as String[]
 
@@ -40,11 +40,6 @@ dependencies {
   api("cn.taketoday:today-beans")
   api("cn.taketoday:today-core")
   api("cn.taketoday:today-tx")
-  optional("cn.taketoday:today-aop")
-  optional("cn.taketoday:today-context")
-  optional("cn.taketoday:today-framework")
-  optional("cn.taketoday:today-starter")
-
 
   optional("org.hsqldb:hsqldb")
   optional("com.h2database:h2")
@@ -53,6 +48,7 @@ dependencies {
   optional("org.apache.derby:derbytools")
   optional 'com.zaxxer:HikariCP'
 
+  testImplementation("cn.taketoday:today-context")
   testImplementation 'jakarta.transaction:jakarta.transaction-api:2.0.0'
   testImplementation 'com.google.guava:guava:33.1.0-jre'
   testImplementation 'org.zapodot:embedded-db-junit:1.0.0'

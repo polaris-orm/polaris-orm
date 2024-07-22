@@ -33,8 +33,6 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.ResultQuery;
@@ -66,14 +64,9 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
-import cn.taketoday.context.annotation.AnnotationConfigApplicationContext;
-import cn.taketoday.context.annotation.Configuration;
-import cn.taketoday.context.annotation.Primary;
 import cn.taketoday.polaris.jdbc.JdbcConnection;
 import cn.taketoday.polaris.jdbc.NamedQuery;
 import cn.taketoday.polaris.jdbc.RepositoryManager;
-import cn.taketoday.stereotype.Singleton;
-import lombok.SneakyThrows;
 
 /**
  * @author aldenquimby@gmail.com
@@ -87,7 +80,6 @@ public class PojoPerformanceTest {
   private final static String DB_URL = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;MODE=MySQL";
   private final static String DB_USER = "sa";
   private final static String DB_PASSWORD = "";
-  private final static String HIBERNATE_DIALECT = "org.hibernate.dialect.H2Dialect";
   private final static SQLDialect JOOQ_DIALECT = SQLDialect.H2;
   //  private final int ITERATIONS = 50000;
   private final int ITERATIONS = 1000;
@@ -460,11 +452,8 @@ public class PojoPerformanceTest {
     }
   }
 
-  @Configuration
   static class DataSourceConfig {
 
-    @Primary
-    @Singleton(destroyMethod = "close")
     public DataSource h2DataSource() {
       final HikariDataSource hikariDataSource = new HikariDataSource();
       hikariDataSource.setPassword(DB_PASSWORD);
@@ -472,36 +461,6 @@ public class PojoPerformanceTest {
       hikariDataSource.setDriverClassName(DRIVER_CLASS);
       hikariDataSource.setJdbcUrl(DB_URL);
       return hikariDataSource;
-    }
-  }
-
-  static class HibernateTypicalSelect extends PerformanceTestBase {
-    private Session session;
-    private AnnotationConfigApplicationContext context;
-
-    @SneakyThrows
-    @Override
-    public void init() {
-      Logger.getLogger("org.hibernate").setLevel(Level.OFF);
-      context = new AnnotationConfigApplicationContext();
-
-      context.scan("cn.taketoday.jdbc.performance");
-
-      SessionFactory sessionFactory = context.getBean(SessionFactory.class);
-      session = sessionFactory.openSession();
-    }
-
-    @Override
-    public void run(int input) {
-      session.get(Post.class, input);
-    }
-
-    @Override
-    public void close() {
-      session.close();
-      if (context != null) {
-        context.close();
-      }
     }
   }
 
@@ -582,7 +541,7 @@ public class PojoPerformanceTest {
       final DataSource dataSource = new DataSourceConfig().h2DataSource();
 
       Environment environment = new Environment("development", transactionFactory, dataSource);
-      org.apache.ibatis.session.Configuration config = new org.apache.ibatis.session.Configuration(environment);
+      var config = new org.apache.ibatis.session.Configuration(environment);
       config.addMapper(MyBatisPostMapper.class);
       SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(config);
       session = sqlSessionFactory.openSession();
