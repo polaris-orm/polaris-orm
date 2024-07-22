@@ -6,6 +6,7 @@ Polaris 是一个 Java ORM 框架
 [![Apache](https://img.shields.io/badge/License-Apache_v2-blue.svg)](./LICENSE)
 [![Coveralls](https://github.com/polaris-orm/polaris/actions/workflows/coveralls.yaml/badge.svg)](https://github.com/polaris-orm/polaris/actions/workflows/coveralls.yaml)
 [![CI](https://github.com/polaris-orm/polaris/actions/workflows/multi-env.yaml/badge.svg)](https://github.com/polaris-orm/polaris/actions/workflows/multi-env.yaml)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e482b7d1bd0d474da5a0cdcbd42fe135)](https://app.codacy.com/gh/polaris-orm/polaris-orm/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Coverage Status](https://coveralls.io/repos/github/polaris-orm/polaris/badge.svg?branch=main)](https://coveralls.io/github/polaris-orm/polaris?branch=main)
 
 
