@@ -24,8 +24,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.function.Consumer;
 
-import cn.taketoday.beans.BeanMetadata;
-import cn.taketoday.beans.BeanProperty;
+import cn.taketoday.polaris.beans.BeanMetadata;
+import cn.taketoday.polaris.beans.BeanProperty;
 import cn.taketoday.polaris.model.UserModel;
 
 import static org.assertj.core.api.Assertions.assertThat;

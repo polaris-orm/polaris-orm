@@ -16,10 +16,10 @@
 
 package cn.taketoday.polaris.jdbc;
 
-import cn.taketoday.beans.BeanMetadata;
-import cn.taketoday.beans.BeanProperty;
-import cn.taketoday.beans.PropertyAccessorUtils;
 import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.beans.BeanMetadata;
+import cn.taketoday.polaris.beans.BeanProperty;
+import cn.taketoday.polaris.beans.BeanUtils;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -36,7 +36,7 @@ final class PropertyPath {
 
   public PropertyPath(Class<?> objectType, String propertyPath) {
     BeanMetadata metadata = BeanMetadata.from(objectType);
-    int pos = PropertyAccessorUtils.getFirstNestedPropertySeparatorIndex(propertyPath);
+    int pos = BeanUtils.getFirstNestedPropertySeparatorIndex(propertyPath);
     String name = propertyPath.substring(0, pos);
     this.beanProperty = metadata.obtainBeanProperty(name);
 
@@ -45,7 +45,7 @@ final class PropertyPath {
   }
 
   public PropertyPath(String propertyPath, BeanMetadata metadata) {
-    int pos = PropertyAccessorUtils.getFirstNestedPropertySeparatorIndex(propertyPath);
+    int pos = BeanUtils.getFirstNestedPropertySeparatorIndex(propertyPath);
     if (pos > -1) {
       // compute next PropertyPath
       String propertyName = propertyPath.substring(0, pos);

@@ -20,9 +20,9 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Objects;
 
-import cn.taketoday.beans.BeanProperty;
 import cn.taketoday.core.annotation.MergedAnnotations;
 import cn.taketoday.lang.Assert;
+import cn.taketoday.polaris.beans.BeanProperty;
 
 /**
  * Determine ID property

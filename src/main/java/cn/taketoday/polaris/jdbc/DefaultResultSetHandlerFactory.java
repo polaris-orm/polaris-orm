@@ -20,9 +20,9 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Map;
 
-import cn.taketoday.beans.BeanProperty;
-import cn.taketoday.beans.BeanUtils;
 import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.beans.BeanProperty;
+import cn.taketoday.polaris.beans.BeanUtils;
 import cn.taketoday.polaris.jdbc.support.JdbcUtils;
 import cn.taketoday.polaris.jdbc.type.TypeHandler;
 import cn.taketoday.util.ConcurrentReferenceHashMap;

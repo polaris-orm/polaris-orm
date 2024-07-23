@@ -22,12 +22,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-import cn.taketoday.beans.BeanMetadata;
-import cn.taketoday.beans.BeanProperty;
 import cn.taketoday.core.annotation.MergedAnnotation;
 import cn.taketoday.core.annotation.MergedAnnotations;
 import cn.taketoday.core.style.ToStringBuilder;
 import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.beans.BeanMetadata;
+import cn.taketoday.polaris.beans.BeanProperty;
 import cn.taketoday.util.StringUtils;
 
 /**

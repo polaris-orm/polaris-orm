@@ -25,13 +25,12 @@ import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
-import cn.taketoday.beans.BeanMetadata;
-import cn.taketoday.beans.BeanProperty;
-import cn.taketoday.beans.support.BeanInstantiator;
 import cn.taketoday.core.annotation.MergedAnnotation;
 import cn.taketoday.core.annotation.MergedAnnotations;
-import cn.taketoday.polaris.Column;
 import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.Column;
+import cn.taketoday.polaris.beans.BeanMetadata;
+import cn.taketoday.polaris.beans.BeanProperty;
 import cn.taketoday.util.ConcurrentReferenceHashMap;
 import cn.taketoday.util.MapCache;
 import cn.taketoday.util.StringUtils;
@@ -52,6 +51,7 @@ public class JdbcBeanMetadata implements Iterable<BeanProperty> {
   public final BeanMetadata beanMetadata;
   private HashMap<String, BeanProperty> beanProperties;
 
+  @Deprecated
   public JdbcBeanMetadata(Class<?> clazz) {
     this.beanMetadata = BeanMetadata.from(clazz);
     this.caseSensitive = false;
@@ -109,16 +109,20 @@ public class JdbcBeanMetadata implements Iterable<BeanProperty> {
 
   public Class<?> getObjectType() { return beanMetadata.getType(); }
 
-  public BeanInstantiator getInstantiator() { return beanMetadata.getInstantiator(); }
-
   public Object newInstance() { return beanMetadata.newInstance(); }
 
-  public void setProperty(Object root, String propertyName, Object value) { beanMetadata.setProperty(root, propertyName, value); }
+  public void setProperty(Object root, String propertyName, Object value) {
+    beanMetadata.setProperty(root, propertyName, value);
+  }
 
-  public Object getProperty(Object root, String propertyName) { return beanMetadata.getProperty(root, propertyName); }
+  public Object getProperty(Object root, String propertyName) {
+    return beanMetadata.getProperty(root, propertyName);
+  }
 
   @Override
-  public Iterator<BeanProperty> iterator() { return beanMetadata.iterator(); }
+  public Iterator<BeanProperty> iterator() {
+    return beanMetadata.iterator();
+  }
 
   @Override
   public void forEach(Consumer<? super BeanProperty> action) { beanMetadata.forEach(action); }

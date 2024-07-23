@@ -19,12 +19,12 @@ package cn.taketoday.polaris.jdbc;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import cn.taketoday.beans.BeanProperty;
 import cn.taketoday.core.conversion.ConversionException;
 import cn.taketoday.core.conversion.ConversionService;
-import cn.taketoday.polaris.jdbc.type.TypeHandler;
 import cn.taketoday.lang.Assert;
 import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.beans.BeanProperty;
+import cn.taketoday.polaris.jdbc.type.TypeHandler;
 
 /**
  * for any pojo
@@ -33,30 +33,28 @@ import cn.taketoday.lang.Nullable;
  * @see #setTo(Object, ResultSet, int)
  * @since 2021/1/7 22:49
  */
-public class ObjectPropertySetter {
+final class ObjectPropertySetter {
 
   @Nullable
   private final PropertyPath propertyPath;
+
   private final BeanProperty beanProperty; // cache
 
   private final TypeHandler<?> typeHandler;
+
   private final ConversionService conversionService;
 
   @Nullable
   private final PrimitiveTypeNullHandler primitiveTypeNullHandler;
 
-  public ObjectPropertySetter(
-          @Nullable PropertyPath propertyPath, BeanProperty beanProperty, RepositoryManager manager) {
-    this(propertyPath, beanProperty,
-            manager.getConversionService(),
-            manager.getTypeHandler(beanProperty),
-            manager.getPrimitiveTypeNullHandler());
+  public ObjectPropertySetter(@Nullable PropertyPath propertyPath, BeanProperty beanProperty, RepositoryManager manager) {
+    this(propertyPath, beanProperty, manager.getConversionService(),
+            manager.getTypeHandler(beanProperty), manager.getPrimitiveTypeNullHandler());
   }
 
-  public ObjectPropertySetter(
-          @Nullable PropertyPath propertyPath, BeanProperty beanProperty,
-          ConversionService conversionService, TypeHandler<?> typeHandler,
-          @Nullable PrimitiveTypeNullHandler primitiveTypeNullHandler) {
+  public ObjectPropertySetter(@Nullable PropertyPath propertyPath,
+          BeanProperty beanProperty, ConversionService conversionService,
+          TypeHandler<?> typeHandler, @Nullable PrimitiveTypeNullHandler primitiveTypeNullHandler) {
     Assert.notNull(typeHandler, "TypeHandler is required");
     Assert.notNull(beanProperty, "BeanProperty is required");
     Assert.notNull(conversionService, "ConversionService is required");

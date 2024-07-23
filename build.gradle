@@ -37,7 +37,6 @@ repositories {
 }
 
 dependencies {
-  api("cn.taketoday:today-beans")
   api("cn.taketoday:today-core")
 
 

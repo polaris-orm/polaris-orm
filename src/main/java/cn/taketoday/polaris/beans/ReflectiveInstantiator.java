@@ -14,24 +14,30 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris.jdbc;
+package cn.taketoday.polaris.beans;
 
-import java.sql.ResultSet;
-
-import cn.taketoday.polaris.beans.BeanProperty;
+import java.lang.reflect.Constructor;
 
 /**
- * use this handler when {@link ObjectPropertySetter}
- * handle {@link ObjectPropertySetter#setTo(Object, ResultSet, int)}
+ * based on java reflect
  *
- * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 1.0 2022/7/30 09:24
+ * @author TODAY 2020/9/20 21:55
+ * @see Constructor#newInstance(Object...)
  */
-public interface PrimitiveTypeNullHandler {
+final class ReflectiveInstantiator extends ConstructorAccessor {
 
-  /**
-   * handle null when {@link ObjectPropertySetter} {@code property} is {@code null}
-   * and {@code property} is primitive-type
-   */
-  void handleNull(BeanProperty property, Object obj);
+  public ReflectiveInstantiator(Constructor<?> constructor) {
+    super(constructor);
+  }
+
+  @Override
+  public Object doInstantiate(final Object[] args) {
+    return BeanUtils.newInstance(constructor, args);
+  }
+
+  @Override
+  public String toString() {
+    return "BeanInstantiator use reflective constructor: " + constructor;
+  }
+
 }

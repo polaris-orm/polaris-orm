@@ -19,10 +19,10 @@ package cn.taketoday.polaris;
 import java.lang.annotation.Annotation;
 import java.util.Set;
 
-import cn.taketoday.beans.BeanProperty;
 import cn.taketoday.core.annotation.MergedAnnotation;
 import cn.taketoday.core.annotation.MergedAnnotations;
 import cn.taketoday.lang.Assert;
+import cn.taketoday.polaris.beans.BeanProperty;
 
 /**
  * PropertyFilter is to determine witch property not included in

@@ -19,11 +19,11 @@ package cn.taketoday.polaris;
 import java.util.ArrayList;
 import java.util.Set;
 
-import cn.taketoday.beans.BeanMetadata;
-import cn.taketoday.beans.BeanProperty;
+import cn.taketoday.lang.Assert;
+import cn.taketoday.polaris.beans.BeanMetadata;
+import cn.taketoday.polaris.beans.BeanProperty;
 import cn.taketoday.polaris.jdbc.type.TypeHandler;
 import cn.taketoday.polaris.jdbc.type.TypeHandlerManager;
-import cn.taketoday.lang.Assert;
 import cn.taketoday.util.ClassUtils;
 
 /**

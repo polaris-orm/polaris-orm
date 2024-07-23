@@ -21,7 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import cn.taketoday.beans.BeanProperty;
+import cn.taketoday.polaris.beans.BeanProperty;
 import cn.taketoday.polaris.jdbc.ResultSetIterator;
 
 /**

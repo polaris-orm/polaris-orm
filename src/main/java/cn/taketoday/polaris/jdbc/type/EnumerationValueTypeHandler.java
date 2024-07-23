@@ -23,12 +23,12 @@ import java.sql.SQLException;
 import java.util.Objects;
 import java.util.function.Function;
 
-import cn.taketoday.beans.BeanMetadata;
-import cn.taketoday.beans.BeanProperty;
 import cn.taketoday.core.annotation.MergedAnnotations;
 import cn.taketoday.lang.Assert;
 import cn.taketoday.lang.Nullable;
 import cn.taketoday.lang.TodayStrategies;
+import cn.taketoday.polaris.beans.BeanMetadata;
+import cn.taketoday.polaris.beans.BeanProperty;
 
 /**
  * resolve EnumerationValue

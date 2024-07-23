@@ -19,12 +19,11 @@ package cn.taketoday.polaris;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-import cn.taketoday.beans.BeanProperty;
 import cn.taketoday.core.annotation.MergedAnnotation;
 import cn.taketoday.core.annotation.MergedAnnotations;
 import cn.taketoday.lang.Assert;
 import cn.taketoday.lang.Nullable;
-import cn.taketoday.reflect.Property;
+import cn.taketoday.polaris.beans.BeanProperty;
 import cn.taketoday.util.StringUtils;
 
 /**
@@ -86,7 +85,7 @@ public interface ColumnNameDiscover {
    * just use the property-name as the column-name
    */
   static ColumnNameDiscover forPropertyName() {
-    return Property::getName;
+    return BeanProperty::getName;
   }
 
   /**

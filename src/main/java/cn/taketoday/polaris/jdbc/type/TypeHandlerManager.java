@@ -37,8 +37,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
-import cn.taketoday.beans.BeanProperty;
-import cn.taketoday.beans.BeanUtils;
 import cn.taketoday.core.ParameterizedTypeReference;
 import cn.taketoday.core.ResolvableType;
 import cn.taketoday.core.annotation.MergedAnnotation;
@@ -46,6 +44,8 @@ import cn.taketoday.core.annotation.MergedAnnotations;
 import cn.taketoday.lang.Assert;
 import cn.taketoday.lang.Enumerable;
 import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.beans.BeanProperty;
+import cn.taketoday.polaris.beans.BeanUtils;
 
 /**
  * {@link TypeHandler} Manager

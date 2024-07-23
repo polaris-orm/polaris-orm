@@ -22,7 +22,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import cn.taketoday.beans.BeanProperty;
 import cn.taketoday.core.conversion.ConversionService;
 import cn.taketoday.core.conversion.support.DefaultConversionService;
 import cn.taketoday.lang.Assert;
@@ -30,6 +29,7 @@ import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.DataAccessException;
 import cn.taketoday.polaris.DefaultEntityManager;
 import cn.taketoday.polaris.EntityManager;
+import cn.taketoday.polaris.beans.BeanProperty;
 import cn.taketoday.polaris.jdbc.datasource.ConnectionSource;
 import cn.taketoday.polaris.jdbc.parsing.QueryParameter;
 import cn.taketoday.polaris.jdbc.parsing.SqlParameterParser;

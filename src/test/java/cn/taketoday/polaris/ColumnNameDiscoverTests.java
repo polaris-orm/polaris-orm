@@ -28,7 +28,7 @@ import cn.taketoday.core.annotation.AliasFor;
 import cn.taketoday.lang.Constant;
 import cn.taketoday.polaris.model.UserModel;
 
-import static cn.taketoday.beans.BeanProperty.valueOf;
+import static cn.taketoday.polaris.beans.BeanProperty.valueOf;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

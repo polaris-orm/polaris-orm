@@ -23,7 +23,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import cn.taketoday.beans.BeanMetadata;
+import cn.taketoday.polaris.beans.BeanMetadata;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

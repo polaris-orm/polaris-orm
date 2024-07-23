@@ -23,7 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import cn.taketoday.beans.BeanProperty;
+import cn.taketoday.polaris.beans.BeanProperty;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
