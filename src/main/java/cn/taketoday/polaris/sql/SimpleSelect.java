@@ -25,7 +25,7 @@ import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.Order;
 import cn.taketoday.polaris.Pageable;
 import cn.taketoday.polaris.StatementSequence;
-import cn.taketoday.polaris.dialect.Platform;
+import cn.taketoday.polaris.platform.Platform;
 import cn.taketoday.util.CollectionUtils;
 
 /**

@@ -18,7 +18,7 @@ package cn.taketoday.polaris.sql;
 
 import org.junit.jupiter.api.Test;
 
-import cn.taketoday.polaris.dialect.Platform;
+import cn.taketoday.polaris.platform.Platform;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

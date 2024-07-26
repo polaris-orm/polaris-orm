@@ -22,7 +22,7 @@ import java.util.List;
 
 import cn.taketoday.lang.Assert;
 import cn.taketoday.polaris.StatementSequence;
-import cn.taketoday.polaris.dialect.Platform;
+import cn.taketoday.polaris.platform.Platform;
 import cn.taketoday.util.CollectionUtils;
 
 /**

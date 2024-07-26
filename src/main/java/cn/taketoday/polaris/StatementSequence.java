@@ -16,7 +16,7 @@
 
 package cn.taketoday.polaris;
 
-import cn.taketoday.polaris.dialect.Platform;
+import cn.taketoday.polaris.platform.Platform;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>

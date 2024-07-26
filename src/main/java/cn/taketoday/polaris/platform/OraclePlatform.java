@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris.dialect;
+package cn.taketoday.polaris.platform;
 
 /**
- * @author TODAY 2021/10/10 13:13
+ * @author TODAY 2021/10/10 13:12
  * @since 1.0
  */
-public class PostgreSQLPlatform extends Platform {
+public class OraclePlatform extends Platform {
 
 }

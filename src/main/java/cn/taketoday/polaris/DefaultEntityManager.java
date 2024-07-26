@@ -37,7 +37,7 @@ import cn.taketoday.lang.Assert;
 import cn.taketoday.lang.Descriptive;
 import cn.taketoday.lang.Nullable;
 import cn.taketoday.logging.LogMessage;
-import cn.taketoday.polaris.dialect.Platform;
+import cn.taketoday.polaris.platform.Platform;
 import cn.taketoday.polaris.jdbc.CannotGetJdbcConnectionException;
 import cn.taketoday.polaris.jdbc.DefaultResultSetHandlerFactory;
 import cn.taketoday.polaris.jdbc.GeneratedKeysException;

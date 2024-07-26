@@ -18,7 +18,7 @@ package cn.taketoday.polaris.sql;
 
 import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.StatementSequence;
-import cn.taketoday.polaris.dialect.Platform;
+import cn.taketoday.polaris.platform.Platform;
 
 /**
  * A simple SQL <tt>SELECT</tt> statement

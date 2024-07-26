@@ -20,7 +20,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import cn.taketoday.polaris.StatementSequence;
-import cn.taketoday.polaris.dialect.Platform;
+import cn.taketoday.polaris.platform.Platform;
 
 /**
  * A translated HQL query

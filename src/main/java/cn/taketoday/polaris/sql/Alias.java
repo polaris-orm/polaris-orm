@@ -16,7 +16,7 @@
 
 package cn.taketoday.polaris.sql;
 
-import cn.taketoday.polaris.dialect.Platform;
+import cn.taketoday.polaris.platform.Platform;
 
 /**
  * An alias generator for SQL identifiers

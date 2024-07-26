@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.StatementSequence;
-import cn.taketoday.polaris.dialect.Platform;
+import cn.taketoday.polaris.platform.Platform;
 
 /**
  * An SQL {@code DELETE} statement

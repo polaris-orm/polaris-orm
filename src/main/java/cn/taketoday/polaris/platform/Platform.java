@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris.dialect;
+package cn.taketoday.polaris.platform;
 
 import java.util.regex.Pattern;
 

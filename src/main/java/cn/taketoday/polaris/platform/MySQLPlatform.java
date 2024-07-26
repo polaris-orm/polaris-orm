@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris.dialect;
+package cn.taketoday.polaris.platform;
 
 /**
  * @author TODAY 2021/10/10 13:12
