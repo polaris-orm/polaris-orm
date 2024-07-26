@@ -10,54 +10,67 @@ Polaris 是一个 Java ORM 框架
 [![Coverage Status](https://coveralls.io/repos/github/polaris-orm/polaris/badge.svg?branch=main)](https://coveralls.io/github/polaris-orm/polaris?branch=main)
 
 
-本项目是 [TAKETODAY/today-infrastructure/today-jdbc](https://github.com/TAKETODAY/today-infrastructure/tree/master/today-jdbc) 的一个分支。
+本项目是 [TAKETODAY/today-infrastructure/today-jdbc](https://github.com/TAKETODAY/today-infrastructure/tree/master/today-jdbc) 的一个分支。**欢迎大家贡献代码**
 
+## 特点
 
-## 🛠️ 安装
-
-### Gradle
-
-```groovy
-implementation 'cn.taketoday:polaris-orm:0.0.1-SNAPSHOT'
-```
-
+- 轻量，不依赖第三方库。
+- 更好的性能，用字节码技术避免反射调用，JDBC 之上的一层很薄的封装。
+- 自动生成 添加、删除、修改和简单查询数据库的 SQL。
+- 支持多种数据库，通过 Platform 接口灵活扩展。
+- 优雅的 API 设计。代码优雅，易维护。
 
 ## 示例
 
-### RepositoryManager
-
+### Model
 ```java
-public Pagination<ArticleItem> getHomeArticles(Pageable pageable) {
-  try (JdbcConnection connection = repository.open()) {
-    try (Query countQuery = connection.createQuery(
-            "SELECT COUNT(id) FROM article WHERE `status` = ?")) {
-      countQuery.addParameter(PostStatus.PUBLISHED);
-      int count = countQuery.fetchScalar(int.class);
-      if (count < 1) {
-        return Pagination.empty();
-      }
+@Table("article")
+public class Article {
+    
+  @Id
+  public Long id;
 
-      String sql = """
-              SELECT `id`, `uri`, `title`, `cover`, `summary`, `pv`, `create_at`
-              FROM article WHERE `status` = :status
-              order by create_at DESC LIMIT :offset, :pageSize
-              """;
-      try (NamedQuery query = repository.createNamedQuery(sql)) {
-        query.addParameter("offset", pageable.offset());
-        query.addParameter("status", PostStatus.PUBLISHED);
-        query.addParameter("pageSize", pageable.pageSize());
+  public String cover;
 
-        return fetchArticleItems(pageable, count, query);
-      }
-    }
-  }
+  @Column("title")
+  public String title;
+
+  public Instant createAt;
+
+// ...
 }
 ```
 
-### EntityManager
+### 使用 EntityManager 
 
 ### 
 ```java
+
+@POST("/articles")
+@ResponseStatus(HttpStatus.CREATED)
+@Logging(title = "创建文章", content = "标题: [#{#form.title}]")
+public void create(@RequestBody ArticleForm form) { 
+  Article article = Article.forCreation(form);
+  entityManager.persist(article);
+}
+
+@PUT("/articles/{id}")
+@ResponseStatus(HttpStatus.NO_CONTENT)
+@Logging(title = "更新文章", content = "更新文章: [#{#from.title}]")
+public void update(@PathVariable("id") Long id, @RequestBody ArticleForm from) {
+  Article article = Article.forUpdate(from);
+  article.setId(id);
+  article.setUpdateAt(Instant.now());
+//  entityManager.updateById(article);
+  entityManager.updateById(article, PropertyUpdateStrategy.noneNull());
+}
+
+@DELETE("/articles/{id}")
+@ResponseStatus(HttpStatus.NO_CONTENT)
+@Logging(title = "删除文章", content = "删除文章: [#{#id}]")
+public void delete(@PathVariable Long id) {
+  entityManager.deleteById(id);
+}
 
 @GET
 public Pagination<ArticleItem> getArticlesByCategory(String categoryName, Pageable pageable) { 
@@ -66,14 +79,16 @@ public Pagination<ArticleItem> getArticlesByCategory(String categoryName, Pageab
         .map(Pagination::from);
 }
 
+// 复杂查询
+
 @GET
 public Pagination<Article> search(ArticleConditionForm from, Pageable pageable) { 
   return entityManager.page(Article.class, from, pageable)
          .map(page -> Pagination.ok(page.getRows(), page.getTotalRows().intValue(), pageable));
 }
   
-@Getter
-@Setter
+// 复杂表单
+@Data
 public class ArticleConditionForm implements ConditionStatement, DebugDescriptive {
 
   @Nullable
@@ -181,6 +196,63 @@ public class ArticleConditionForm implements ConditionStatement, DebugDescriptiv
 }
 
 ```
+
+
+### 使用 RepositoryManager 
+
+> 这种方式提供了接近原生 JDBC 的性能。
+
+```java
+
+@Nullable
+@Cacheable(key = "'getByURI_'+#uri")
+public Article getByURI(String uri) {
+  Assert.notNull(uri, "文章地址不能为空");
+  try (Query query = repository.createQuery("SELECT * FROM article WHERE uri=? LIMIT 1")) {
+    query.addParameter(uri);
+    
+    Article article = query.fetchFirst(Article.class);
+    applyTags(article);
+    return article; 
+  }
+}
+
+public Pagination<ArticleItem> getHomeArticles(Pageable pageable) {
+  try (JdbcConnection connection = repository.open()) {
+    try (Query countQuery = connection.createQuery(
+            "SELECT COUNT(id) FROM article WHERE `status` = ?")) {
+      countQuery.addParameter(PostStatus.PUBLISHED);
+      int count = countQuery.fetchScalar(int.class);
+      if (count < 1) {
+        return Pagination.empty();
+      }
+
+      String sql = """
+              SELECT `id`, `uri`, `title`, `cover`, `summary`, `pv`, `create_at`
+              FROM article WHERE `status` = :status
+              order by create_at DESC LIMIT :offset, :pageSize
+              """;
+      try (NamedQuery query = repository.createNamedQuery(sql)) {
+        query.addParameter("offset", pageable.offset());
+        query.addParameter("status", PostStatus.PUBLISHED);
+        query.addParameter("pageSize", pageable.pageSize());
+
+        return fetchArticleItems(pageable, count, query);
+      }
+    }
+  }
+}
+```
+
+## 🛠️ 安装
+
+暂时还未发布到 Maven 中央仓库
+
+### Gradle
+```groovy
+implementation 'cn.taketoday:polaris-orm:0.0.1-SNAPSHOT'
+```
+
 
 ## 🙏 鸣谢
 
