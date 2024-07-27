@@ -16,13 +16,32 @@
 
 package cn.taketoday.polaris;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ServiceLoader;
+
+import cn.taketoday.polaris.support.DefaultConditionStrategy;
+import cn.taketoday.polaris.support.FuzzyQueryConditionStrategy;
+import cn.taketoday.polaris.support.WhereAnnotationConditionStrategy;
+
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2024/4/10 16:53
  */
 final class DefaultQueryHandlerFactory implements QueryHandlerFactory {
 
+  static final List<PropertyConditionStrategy> strategies;
+
   private final EntityMetadataFactory factory;
+
+  static {
+    var serviceLoader = ServiceLoader.load(PropertyConditionStrategy.class);
+    var list = new ArrayList<>(serviceLoader.stream().map(ServiceLoader.Provider::get).toList());
+    list.add(new WhereAnnotationConditionStrategy());
+    list.add(new FuzzyQueryConditionStrategy());
+    list.add(new DefaultConditionStrategy());
+    strategies = List.copyOf(list);
+  }
 
   public DefaultQueryHandlerFactory(EntityMetadataFactory factory) {
     this.factory = factory;
@@ -30,12 +49,12 @@ final class DefaultQueryHandlerFactory implements QueryHandlerFactory {
 
   @Override
   public QueryStatement createQuery(Object example) {
-    return new ExampleQuery(factory, example);
+    return new ExampleQuery(factory, example, strategies);
   }
 
   @Override
   public ConditionStatement createCondition(Object example) {
-    return new ExampleQuery(factory, example);
+    return new ExampleQuery(factory, example, strategies);
   }
 
 }

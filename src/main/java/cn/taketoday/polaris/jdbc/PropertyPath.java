@@ -16,7 +16,7 @@
 
 package cn.taketoday.polaris.jdbc;
 
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.util.Nullable;
 import cn.taketoday.polaris.beans.BeanMetadata;
 import cn.taketoday.polaris.beans.BeanProperty;
 import cn.taketoday.polaris.beans.BeanUtils;

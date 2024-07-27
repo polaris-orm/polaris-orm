@@ -27,15 +27,14 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.Spliterator;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-import cn.taketoday.lang.Assert;
-import cn.taketoday.lang.Nullable;
-import cn.taketoday.util.ClassUtils;
-import cn.taketoday.util.ConcurrentReferenceHashMap;
-import cn.taketoday.util.ExceptionUtils;
-import cn.taketoday.util.MapCache;
-import cn.taketoday.util.ReflectionUtils;
+import cn.taketoday.polaris.util.Assert;
+import cn.taketoday.polaris.util.ExceptionUtils;
+import cn.taketoday.polaris.util.MapCache;
+import cn.taketoday.polaris.util.Nullable;
+import cn.taketoday.polaris.util.ReflectionUtils;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
@@ -44,14 +43,14 @@ import cn.taketoday.util.ReflectionUtils;
 public class BeanMetadata implements Iterable<BeanProperty> {
 
   private static final MapCache<Class<?>, BeanMetadata, ?> metadataMappings = new MapCache<>(
-          new ConcurrentReferenceHashMap<>(), BeanMetadata::new);
+          new ConcurrentHashMap<>(), BeanMetadata::new);
 
   private final Class<?> beanClass;
 
   private BeanInstantiator instantiator;
 
   /**
-   * @since 4.0
+   * @since 1.0
    */
   private BeanPropertiesHolder propertyHolder;
 
@@ -162,21 +161,21 @@ public class BeanMetadata implements Iterable<BeanProperty> {
   }
 
   /**
-   * @since 4.0
+   * @since 1.0
    */
   public int getPropertySize() {
     return propertyHolder().beanProperties.size();
   }
 
   /**
-   * @since 4.0
+   * @since 1.0
    */
   public boolean containsProperty(String name) {
     return propertyHolder().mapping.containsKey(name);
   }
 
   /**
-   * @since 4.0
+   * @since 1.0
    */
   private BeanPropertiesHolder propertyHolder() {
     BeanPropertiesHolder propertyHolder = this.propertyHolder;
@@ -263,7 +262,6 @@ public class BeanMetadata implements Iterable<BeanProperty> {
    *
    * @param beanClass target bean class cannot be simple class
    * @return {@link BeanMetadata}
-   * @see ClassUtils#isSimpleType(Class)
    */
   public static BeanMetadata from(Class<?> beanClass) {
     return metadataMappings.get(beanClass);
@@ -274,14 +272,13 @@ public class BeanMetadata implements Iterable<BeanProperty> {
    *
    * @param object target bean cannot be simple object
    * @return {@link BeanMetadata}
-   * @see ClassUtils#isSimpleType(Class)
    */
   public static BeanMetadata from(Object object) {
     return from(object.getClass());
   }
 
   /**
-   * @since 4.0
+   * @since 1.0
    */
   static final class BeanPropertiesHolder {
     public final HashMap<String, BeanProperty> mapping;
@@ -300,7 +297,7 @@ public class BeanMetadata implements Iterable<BeanProperty> {
     private static final BeanPropertiesMapCache beanPropertiesMappings = new BeanPropertiesMapCache();
 
     BeanPropertiesMapCache() {
-      super(new ConcurrentReferenceHashMap<>());
+      super(new ConcurrentHashMap<>());
     }
 
     static BeanPropertiesHolder computeProperties(BeanMetadata metadata) {

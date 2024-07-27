@@ -19,12 +19,12 @@ package cn.taketoday.polaris;
 import java.util.ArrayList;
 import java.util.Set;
 
-import cn.taketoday.lang.Assert;
 import cn.taketoday.polaris.beans.BeanMetadata;
 import cn.taketoday.polaris.beans.BeanProperty;
-import cn.taketoday.polaris.jdbc.type.TypeHandler;
-import cn.taketoday.polaris.jdbc.type.TypeHandlerManager;
-import cn.taketoday.util.ClassUtils;
+import cn.taketoday.polaris.type.TypeHandler;
+import cn.taketoday.polaris.type.TypeHandlerManager;
+import cn.taketoday.polaris.util.Assert;
+import cn.taketoday.polaris.util.ClassUtils;
 
 /**
  * Default EntityHolderFactory

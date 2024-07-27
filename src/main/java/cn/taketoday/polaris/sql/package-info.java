@@ -15,12 +15,11 @@
  */
 
 /**
- * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 1.0 2024/4/8 16:41
+ * SQL Supports
  */
 @NonNullApi
 @NonNullFields
 package cn.taketoday.polaris.sql;
 
-import cn.taketoday.lang.NonNullApi;
-import cn.taketoday.lang.NonNullFields;
+import cn.taketoday.polaris.util.NonNullApi;
+import cn.taketoday.polaris.util.NonNullFields;

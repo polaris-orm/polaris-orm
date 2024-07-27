@@ -20,8 +20,8 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 
-import cn.taketoday.lang.Assert;
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.util.Assert;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * 默认配置

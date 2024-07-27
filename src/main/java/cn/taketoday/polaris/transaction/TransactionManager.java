@@ -16,7 +16,7 @@
 
 package cn.taketoday.polaris.transaction;
 
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * 事务管理器

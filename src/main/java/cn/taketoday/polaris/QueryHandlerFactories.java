@@ -16,10 +16,11 @@
 
 package cn.taketoday.polaris;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.ServiceLoader;
 
-import cn.taketoday.lang.Nullable;
-import cn.taketoday.lang.TodayStrategies;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -27,12 +28,13 @@ import cn.taketoday.lang.TodayStrategies;
  */
 final class QueryHandlerFactories implements QueryHandlerFactory {
 
-  final List<QueryHandlerFactory> factories;
+  private final List<QueryHandlerFactory> factories;
 
-  QueryHandlerFactories(EntityMetadataFactory entityMetadataFactory) {
-    List<QueryHandlerFactory> list = TodayStrategies.find(QueryHandlerFactory.class);
+  QueryHandlerFactories(EntityMetadataFactory metadataFactory) {
+    var serviceLoader = ServiceLoader.load(QueryHandlerFactory.class);
+    var list = new ArrayList<>(serviceLoader.stream().map(ServiceLoader.Provider::get).toList());
     list.add(new MapQueryHandlerFactory());
-    list.add(new DefaultQueryHandlerFactory(entityMetadataFactory));
+    list.add(new DefaultQueryHandlerFactory(metadataFactory));
     this.factories = List.copyOf(list);
   }
 

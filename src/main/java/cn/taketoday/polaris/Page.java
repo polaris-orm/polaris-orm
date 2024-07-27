@@ -22,8 +22,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import cn.taketoday.core.style.ToStringBuilder;
-import cn.taketoday.lang.Unmodifiable;
+import cn.taketoday.polaris.util.Unmodifiable;
 
 /**
  * Page result
@@ -194,19 +193,8 @@ public class Page<T> {
 
   @Override
   public String toString() {
-    return ToStringBuilder.from(this)
-            .append("pageNumber", pageNumber)
-            .append("limit", limit)
-            .append("prevPage", prevPage)
-            .append("nextPage", nextPage)
-            .append("totalPages", totalPages)
-            .append("totalRows", totalRows)
-            .append("isFirstPage", firstPage)
-            .append("isLastPage", lastPage)
-            .append("hasPrevPage", hasPrevPage)
-            .append("hasNextPage", hasNextPage)
-            .append("rows", rows)
-            .toString();
+    return "Page{pageNumber=%d, hasNextPage=%s, hasPrevPage=%s, limit=%d, totalPages=%d, totalRows=%s}"
+            .formatted(pageNumber, hasNextPage, hasPrevPage, limit, totalPages, totalRows);
   }
 
   @Override

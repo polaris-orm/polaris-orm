@@ -21,12 +21,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.Order;
 import cn.taketoday.polaris.Pageable;
 import cn.taketoday.polaris.StatementSequence;
 import cn.taketoday.polaris.platform.Platform;
-import cn.taketoday.util.CollectionUtils;
+import cn.taketoday.polaris.util.CollectionUtils;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * A SQL {@code SELECT} statement with no table joins.

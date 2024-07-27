@@ -16,7 +16,7 @@
 
 package cn.taketoday.polaris;
 
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>

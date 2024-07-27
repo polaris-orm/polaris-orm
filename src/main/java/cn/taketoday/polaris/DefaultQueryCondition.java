@@ -21,12 +21,11 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Objects;
 
-import cn.taketoday.core.style.ToStringBuilder;
-import cn.taketoday.polaris.jdbc.type.ObjectTypeHandler;
-import cn.taketoday.polaris.jdbc.type.TypeHandler;
-import cn.taketoday.lang.Assert;
-import cn.taketoday.lang.Nullable;
-import cn.taketoday.util.CollectionUtils;
+import cn.taketoday.polaris.type.ObjectTypeHandler;
+import cn.taketoday.polaris.type.TypeHandler;
+import cn.taketoday.polaris.util.Assert;
+import cn.taketoday.polaris.util.CollectionUtils;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -151,10 +150,6 @@ public class DefaultQueryCondition extends QueryCondition {
 
   @Override
   public String toString() {
-    return ToStringBuilder.from(this)
-            .append("columnName", columnName)
-            .append("value", parameterValue)
-            .toString();
+    return "DefaultQueryCondition{columnName='%s', parameterValue=%s}".formatted(columnName, parameterValue);
   }
-
 }

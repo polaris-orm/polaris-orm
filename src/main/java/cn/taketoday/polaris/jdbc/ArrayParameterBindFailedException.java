@@ -16,7 +16,7 @@
 
 package cn.taketoday.polaris.jdbc;
 
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * for array parameter bind failed exception

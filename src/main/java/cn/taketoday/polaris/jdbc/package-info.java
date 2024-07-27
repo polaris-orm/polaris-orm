@@ -18,7 +18,9 @@
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2023/1/23 09:14
  */
+@NonNullApi
 @NonNullFields
 package cn.taketoday.polaris.jdbc;
 
-import cn.taketoday.lang.NonNullFields;
+import cn.taketoday.polaris.util.NonNullApi;
+import cn.taketoday.polaris.util.NonNullFields;

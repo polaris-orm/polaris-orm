@@ -16,7 +16,7 @@
 
 package cn.taketoday.polaris;
 
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * 如果无法检索到某些预期的数据，例如在通过已知标识符查找特定数据时，将抛出此异常。

@@ -16,8 +16,8 @@
 
 package cn.taketoday.polaris.jdbc;
 
-import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.DataAccessException;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * Represents an exception thrown by polaris.

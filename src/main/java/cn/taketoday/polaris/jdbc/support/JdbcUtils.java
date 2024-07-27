@@ -23,10 +23,10 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import cn.taketoday.lang.Nullable;
-import cn.taketoday.logging.Logger;
-import cn.taketoday.logging.LoggerFactory;
-import cn.taketoday.util.StringUtils;
+import cn.taketoday.polaris.logging.Logger;
+import cn.taketoday.polaris.logging.LoggerFactory;
+import cn.taketoday.polaris.util.Nullable;
+import cn.taketoday.polaris.util.StringUtils;
 
 /**
  * Generic utility methods for working with JDBC. Mainly for internal use

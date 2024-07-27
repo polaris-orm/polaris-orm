@@ -18,8 +18,8 @@ package cn.taketoday.polaris.sql;
 
 import java.util.Collection;
 
-import cn.taketoday.lang.Nullable;
-import cn.taketoday.util.CollectionUtils;
+import cn.taketoday.polaris.util.CollectionUtils;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * A restriction (predicate) to be applied to a query

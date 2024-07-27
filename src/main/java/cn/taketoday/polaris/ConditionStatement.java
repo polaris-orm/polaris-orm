@@ -20,12 +20,10 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-import cn.taketoday.core.annotation.MergedAnnotation;
-import cn.taketoday.lang.Constant;
-import cn.taketoday.lang.Descriptive;
-import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.sql.OrderByClause;
 import cn.taketoday.polaris.sql.Restriction;
+import cn.taketoday.polaris.util.Descriptive;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * Condition statement
@@ -51,9 +49,9 @@ public interface ConditionStatement {
    */
   @Nullable
   default OrderByClause getOrderByClause(EntityMetadata metadata) {
-    MergedAnnotation<OrderBy> orderBy = metadata.getAnnotation(OrderBy.class);
-    if (orderBy.isPresent()) {
-      String clause = orderBy.getStringValue();
+    OrderBy orderBy = metadata.getAnnotation(OrderBy.class);
+    if (orderBy != null) {
+      String clause = orderBy.value();
       if (!Constant.DEFAULT_NONE.equals(clause)) {
         return OrderByClause.plain(clause);
       }

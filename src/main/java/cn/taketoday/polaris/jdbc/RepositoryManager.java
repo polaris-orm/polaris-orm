@@ -22,10 +22,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import cn.taketoday.core.conversion.ConversionService;
-import cn.taketoday.core.conversion.support.DefaultConversionService;
-import cn.taketoday.lang.Assert;
-import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.DataAccessException;
 import cn.taketoday.polaris.DefaultEntityManager;
 import cn.taketoday.polaris.EntityManager;
@@ -35,11 +31,15 @@ import cn.taketoday.polaris.jdbc.parsing.QueryParameter;
 import cn.taketoday.polaris.jdbc.parsing.SqlParameterParser;
 import cn.taketoday.polaris.jdbc.support.JdbcAccessor;
 import cn.taketoday.polaris.jdbc.support.JdbcTransactionManager;
-import cn.taketoday.polaris.jdbc.type.TypeHandler;
-import cn.taketoday.polaris.jdbc.type.TypeHandlerManager;
 import cn.taketoday.polaris.transaction.Isolation;
 import cn.taketoday.polaris.transaction.TransactionConfig;
 import cn.taketoday.polaris.transaction.TransactionManager;
+import cn.taketoday.polaris.type.ConversionService;
+import cn.taketoday.polaris.type.DefaultConversionService;
+import cn.taketoday.polaris.type.TypeHandler;
+import cn.taketoday.polaris.type.TypeHandlerManager;
+import cn.taketoday.polaris.util.Assert;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * RepositoryManager is the main class for the polaris library.
@@ -75,7 +75,7 @@ public class RepositoryManager extends JdbcAccessor implements QueryProducer {
 
   private SqlParameterParser sqlParameterParser = new SqlParameterParser();
 
-  private ConversionService conversionService = DefaultConversionService.getSharedInstance();
+  private ConversionService conversionService = new DefaultConversionService();
 
   @Nullable
   private PrimitiveTypeNullHandler primitiveTypeNullHandler;
@@ -197,7 +197,7 @@ public class RepositoryManager extends JdbcAccessor implements QueryProducer {
    */
   public void setConversionService(@Nullable ConversionService conversionService) {
     this.conversionService = conversionService == null
-            ? DefaultConversionService.getSharedInstance() : conversionService;
+            ? new DefaultConversionService() : conversionService;
   }
 
   public ConversionService getConversionService() {

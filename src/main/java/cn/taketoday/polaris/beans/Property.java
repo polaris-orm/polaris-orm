@@ -19,6 +19,7 @@ package cn.taketoday.polaris.beans;
 import java.io.Serial;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.invoke.TypeDescriptor;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
@@ -27,16 +28,12 @@ import java.lang.reflect.Modifier;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
-import cn.taketoday.core.MethodParameter;
-import cn.taketoday.core.ResolvableType;
-import cn.taketoday.core.TypeDescriptor;
-import cn.taketoday.lang.Constant;
-import cn.taketoday.lang.NonNull;
-import cn.taketoday.lang.Nullable;
-import cn.taketoday.util.ConcurrentReferenceHashMap;
-import cn.taketoday.util.ReflectionUtils;
-import cn.taketoday.util.StringUtils;
+import cn.taketoday.polaris.Constant;
+import cn.taketoday.polaris.util.Nullable;
+import cn.taketoday.polaris.util.ReflectionUtils;
+import cn.taketoday.polaris.util.StringUtils;
 
 /**
  * A description of a JavaBeans Property that allows us to avoid a dependency on
@@ -48,53 +45,41 @@ import cn.taketoday.util.StringUtils;
  * {@code TypeDescriptor} can then be used to convert from/to the property type.
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/7/23 01:01
+ * @since 1.0
  */
 public class Property implements Member, AnnotatedElement, Serializable {
 
   @Serial
   private static final long serialVersionUID = 1L;
 
-  private static final ConcurrentReferenceHashMap<Property, Annotation[]>
-          annotationCache = new ConcurrentReferenceHashMap<>();
+  private static final ConcurrentHashMap<Property, Annotation[]> annotationCache = new ConcurrentHashMap<>();
 
   // Nullable
   protected transient Field field;
 
-  /** @since 3.0.4 */
   @Nullable
   private transient TypeDescriptor typeDescriptor;
 
   protected final String name;
 
-  /** @since 4.0 */
+  /**  */
   @Nullable
   protected final Method readMethod;
 
-  /** @since 4.0 */
+  /**  */
   @Nullable
   protected final Method writeMethod;
 
-  /** @since 4.0 */
+  @Nullable
   private Class<?> propertyType;
 
-  /** @since 4.0 */
+  @Nullable
   private Class<?> declaringClass;
 
-  /** @since 4.0 */
   private boolean fieldIsNull;
 
   @Nullable
   private transient Annotation[] annotations;
-
-  // @since 4.0
-  private ResolvableType resolvableType;
-
-  // @since 4.0
-  private transient MethodParameter methodParameter;
-
-  // @since 4.0
-  protected transient MethodParameter writeMethodParameter;
 
   public Property(String name, Field field) {
     this.name = name;
@@ -125,44 +110,6 @@ public class Property implements Member, AnnotatedElement, Serializable {
       name = ReflectionUtils.getPropertyName(readMethod, writeMethod);
     }
     this.name = name;
-  }
-
-  /**
-   * Returns {@link TypeDescriptor} for this property
-   */
-  public final TypeDescriptor getTypeDescriptor() {
-    TypeDescriptor typeDescriptor = this.typeDescriptor;
-    if (typeDescriptor == null) {
-      typeDescriptor = createDescriptor();
-      this.typeDescriptor = typeDescriptor;
-    }
-    return typeDescriptor;
-  }
-
-  protected TypeDescriptor createDescriptor() {
-    ResolvableType resolvableType = ResolvableType.forMethodParameter(getMethodParameter());
-    return new TypeDescriptor(resolvableType, resolvableType.resolve(getType()), this);
-  }
-
-  public ResolvableType getResolvableType() {
-    ResolvableType resolvableType = this.resolvableType;
-    if (resolvableType == null) {
-      resolvableType = createResolvableType();
-      this.resolvableType = resolvableType;
-    }
-    return resolvableType;
-  }
-
-  protected ResolvableType createResolvableType() {
-    Method readMethod = getReadMethod();
-    if (readMethod != null) {
-      return ResolvableType.forReturnType(readMethod, getDeclaringClass());
-    }
-    Method writeMethod = getWriteMethod();
-    if (writeMethod != null) {
-      return ResolvableType.forParameter(writeMethod, 0, getDeclaringClass());
-    }
-    throw new IllegalStateException("never get here");
   }
 
   /**
@@ -280,8 +227,6 @@ public class Property implements Member, AnnotatedElement, Serializable {
 
   /**
    * read only
-   *
-   * @since 3.0.2
    */
   public boolean isReadOnly() {
     return writeMethod == null;
@@ -289,8 +234,6 @@ public class Property implements Member, AnnotatedElement, Serializable {
 
   /**
    * can write
-   *
-   * @since 4.0
    */
   public boolean isWriteable() {
     return writeMethod != null;
@@ -298,8 +241,6 @@ public class Property implements Member, AnnotatedElement, Serializable {
 
   /**
    * can read
-   *
-   * @since 4.0
    */
   public boolean isReadable() {
     // todo maybe can access field
@@ -319,7 +260,6 @@ public class Property implements Member, AnnotatedElement, Serializable {
    * @see Double#TYPE
    * @see Void#TYPE
    * @see Class#isPrimitive()
-   * @since 4.0
    */
   public boolean isPrimitive() {
     return getType().isPrimitive();
@@ -330,8 +270,6 @@ public class Property implements Member, AnnotatedElement, Serializable {
    * either in the form of any variant of a parameter-level {@code Nullable}
    * annotation (such as from JSR-305 or the FindBugs set of annotations),
    * or a language-level nullable type declaration
-   *
-   * @since 4.0
    */
   public boolean isNullable() {
     for (Annotation ann : getAnnotations(false)) {
@@ -345,8 +283,6 @@ public class Property implements Member, AnnotatedElement, Serializable {
   /**
    * Returns the {@code Class} object representing the class or interface
    * that declares the field represented by this {@code Field} object.
-   *
-   * @since 4.0
    */
   @Override
   public Class<?> getDeclaringClass() {
@@ -371,60 +307,10 @@ public class Property implements Member, AnnotatedElement, Serializable {
     return writeMethod;
   }
 
-  @Nullable
-  public MethodParameter getWriteMethodParameter() {
-    MethodParameter writeMethodParameter = this.writeMethodParameter;
-    if (writeMethodParameter == null && getWriteMethod() != null) {
-      writeMethodParameter = new MethodParameter(getWriteMethod(), 0).withContainingClass(getDeclaringClass());
-      this.writeMethodParameter = writeMethodParameter;
-    }
-    return writeMethodParameter;
-  }
-
-  /**
-   * If method based bean-property
-   */
-  public MethodParameter getMethodParameter() {
-    MethodParameter methodParameter = this.methodParameter;
-    if (methodParameter == null) {
-      methodParameter = resolveMethodParameter();
-      this.methodParameter = methodParameter;
-    }
-    return methodParameter;
-  }
-
-  private MethodParameter resolveMethodParameter() {
-    MethodParameter read = resolveReadMethodParameter();
-    MethodParameter write = getWriteMethodParameter();
-    if (write == null) {
-      if (read == null) {
-        throw new IllegalStateException("Property '%s' in '%s' is neither readable nor writeable"
-                .formatted(name, declaringClass));
-      }
-      return read;
-    }
-    if (read != null) {
-      Class<?> readType = read.getParameterType();
-      Class<?> writeType = write.getParameterType();
-      if (!writeType.equals(readType) && writeType.isAssignableFrom(readType)) {
-        return read;
-      }
-    }
-    return write;
-  }
-
-  @Nullable
-  private MethodParameter resolveReadMethodParameter() {
-    if (getReadMethod() == null) {
-      return null;
-    }
-    return new MethodParameter(getReadMethod(), -1).withContainingClass(getDeclaringClass());
-  }
-
   // AnnotatedElement
 
   @Override
-  public boolean isAnnotationPresent(@NonNull Class<? extends Annotation> annotationClass) {
+  public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
     for (Annotation annotation : getAnnotations(false)) {
       if (annotation.annotationType() == annotationClass) {
         return true;
@@ -436,7 +322,7 @@ public class Property implements Member, AnnotatedElement, Serializable {
   @Override
   @Nullable
   @SuppressWarnings("unchecked")
-  public <T extends Annotation> T getAnnotation(@NonNull Class<T> annotationClass) {
+  public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
     for (Annotation annotation : getAnnotations(false)) {
       if (annotation.annotationType() == annotationClass) {
         return (T) annotation;

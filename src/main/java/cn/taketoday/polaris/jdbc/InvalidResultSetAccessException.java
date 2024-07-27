@@ -18,7 +18,7 @@ package cn.taketoday.polaris.jdbc;
 
 import java.sql.SQLException;
 
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.util.Nullable;
 import cn.taketoday.polaris.InvalidDataAccessResourceUsageException;
 
 /**

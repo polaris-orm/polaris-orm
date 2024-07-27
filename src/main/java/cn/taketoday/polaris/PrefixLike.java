@@ -21,9 +21,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import cn.taketoday.core.annotation.AliasFor;
-import cn.taketoday.lang.Constant;
-
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2024/2/24 23:53
@@ -36,13 +33,8 @@ public @interface PrefixLike {
   /**
    * The where-clause predicate.
    */
-  @AliasFor(annotation = Like.class, attribute = "value")
   String value() default Constant.DEFAULT_NONE;
 
-  @AliasFor(annotation = Like.class, attribute = "column")
-  String column() default Constant.DEFAULT_NONE;
-
-  @AliasFor(annotation = Like.class, attribute = "trim")
   boolean trim() default true;
 
 }

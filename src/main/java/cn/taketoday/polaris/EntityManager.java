@@ -24,10 +24,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import cn.taketoday.core.Pair;
-import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.sql.Select;
-import cn.taketoday.util.StreamIterable;
+import cn.taketoday.polaris.util.Nullable;
+import cn.taketoday.polaris.util.Pair;
+import cn.taketoday.polaris.util.StreamIterable;
 
 /**
  * Entity manager

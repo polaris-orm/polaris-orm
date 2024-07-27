@@ -16,7 +16,7 @@
 
 package cn.taketoday.polaris.jdbc;
 
-import cn.taketoday.core.NestedRuntimeException;
+import cn.taketoday.polaris.DataAccessException;
 
 /**
  * Fatal exception thrown when we can't connect to an RDBMS using JDBC.
@@ -24,7 +24,7 @@ import cn.taketoday.core.NestedRuntimeException;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 2019-11-09 14:53
  */
-public class CannotGetJdbcConnectionException extends NestedRuntimeException {
+public class CannotGetJdbcConnectionException extends DataAccessException {
 
   public CannotGetJdbcConnectionException(String msg) {
     super(msg);

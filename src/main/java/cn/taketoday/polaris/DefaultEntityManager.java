@@ -32,12 +32,6 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import cn.taketoday.core.Pair;
-import cn.taketoday.lang.Assert;
-import cn.taketoday.lang.Descriptive;
-import cn.taketoday.lang.Nullable;
-import cn.taketoday.logging.LogMessage;
-import cn.taketoday.polaris.platform.Platform;
 import cn.taketoday.polaris.jdbc.CannotGetJdbcConnectionException;
 import cn.taketoday.polaris.jdbc.DefaultResultSetHandlerFactory;
 import cn.taketoday.polaris.jdbc.GeneratedKeysException;
@@ -47,13 +41,19 @@ import cn.taketoday.polaris.jdbc.PersistenceException;
 import cn.taketoday.polaris.jdbc.RepositoryManager;
 import cn.taketoday.polaris.jdbc.ResultSetExtractor;
 import cn.taketoday.polaris.jdbc.support.JdbcAccessor;
+import cn.taketoday.polaris.logging.LogMessage;
+import cn.taketoday.polaris.platform.Platform;
 import cn.taketoday.polaris.sql.Insert;
 import cn.taketoday.polaris.sql.OrderByClause;
 import cn.taketoday.polaris.sql.Restriction;
 import cn.taketoday.polaris.sql.SimpleSelect;
 import cn.taketoday.polaris.sql.Update;
 import cn.taketoday.polaris.transaction.TransactionConfig;
-import cn.taketoday.util.CollectionUtils;
+import cn.taketoday.polaris.util.Assert;
+import cn.taketoday.polaris.util.CollectionUtils;
+import cn.taketoday.polaris.util.Descriptive;
+import cn.taketoday.polaris.util.Nullable;
+import cn.taketoday.polaris.util.Pair;
 
 /**
  * Default EntityManager implementation
@@ -583,7 +583,7 @@ public class DefaultEntityManager extends JdbcAccessor implements EntityManager 
       sql.append("` = ? ");
     }
     else {
-      exampleQuery = new ExampleQuery(entityOrExample, metadata);
+      exampleQuery = new ExampleQuery(entityOrExample, metadata, DefaultQueryHandlerFactory.strategies);
       exampleQuery.renderWhereClause(sql);
     }
 

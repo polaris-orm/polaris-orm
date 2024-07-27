@@ -19,10 +19,8 @@ package cn.taketoday.polaris;
 import java.lang.annotation.Annotation;
 import java.util.Set;
 
-import cn.taketoday.core.annotation.MergedAnnotation;
-import cn.taketoday.core.annotation.MergedAnnotations;
-import cn.taketoday.lang.Assert;
 import cn.taketoday.polaris.beans.BeanProperty;
+import cn.taketoday.polaris.util.Assert;
 
 /**
  * PropertyFilter is to determine witch property not included in
@@ -78,15 +76,10 @@ public interface PropertyFilter {
    *
    * @param annotationType Annotation type
    * @return Annotation based {@link PropertyFilter}
-   * @see MergedAnnotation#getString(String)
    */
   static PropertyFilter forAnnotation(Class<? extends Annotation> annotationType) {
     Assert.notNull(annotationType, "annotationType is required");
-    return property -> {
-      var annotation = MergedAnnotations.from(
-              property, property.getAnnotations()).get(annotationType);
-      return annotation.isPresent();
-    };
+    return property -> property.isAnnotationPresent(annotationType);
   }
 
 }

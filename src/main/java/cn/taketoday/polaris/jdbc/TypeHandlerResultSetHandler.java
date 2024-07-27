@@ -19,7 +19,7 @@ package cn.taketoday.polaris.jdbc;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import cn.taketoday.polaris.jdbc.type.TypeHandler;
+import cn.taketoday.polaris.type.TypeHandler;
 
 /**
  * @author TODAY 2021/1/7 22:52

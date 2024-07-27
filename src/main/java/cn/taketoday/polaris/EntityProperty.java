@@ -22,12 +22,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
 
-import cn.taketoday.core.annotation.MergedAnnotation;
-import cn.taketoday.core.annotation.MergedAnnotations;
-import cn.taketoday.core.style.ToStringBuilder;
-import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.beans.BeanProperty;
-import cn.taketoday.polaris.jdbc.type.TypeHandler;
+import cn.taketoday.polaris.type.TypeHandler;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -41,9 +38,6 @@ public class EntityProperty {
   public final BeanProperty property;
 
   public final TypeHandler<Object> typeHandler;
-
-  @Nullable
-  private MergedAnnotations annotations;
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
   EntityProperty(BeanProperty property, String columnName, TypeHandler typeHandler, boolean isIdProperty) {
@@ -141,29 +135,19 @@ public class EntityProperty {
     property.setDirectly(entity, propertyValue);
   }
 
-  public MergedAnnotations getAnnotations() {
-    MergedAnnotations annotations = this.annotations;
-    if (annotations == null) {
-      annotations = MergedAnnotations.from(property, property.getAnnotations());
-      this.annotations = annotations;
-    }
-    return annotations;
-  }
-
-  public <A extends Annotation> MergedAnnotation<A> getAnnotation(Class<A> annType) {
-    return getAnnotations().get(annType);
+  @Nullable
+  public <A extends Annotation> A getAnnotation(Class<A> annType) {
+    return property.getAnnotation(annType);
   }
 
   public <A extends Annotation> boolean isPresent(Class<A> annType) {
-    return getAnnotations().isPresent(annType);
+    return property.isAnnotationPresent(annType);
   }
 
   @Override
   public String toString() {
-    return ToStringBuilder.from(this)
-            .append("property", property)
-            .append("columnName", columnName)
-            .toString();
+    return "EntityProperty{columnName='%s', isIdProperty=%s, property=%s, typeHandler=%s}"
+            .formatted(columnName, isIdProperty, property, typeHandler);
   }
 
   @Override

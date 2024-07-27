@@ -25,15 +25,12 @@ import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
-import cn.taketoday.core.annotation.MergedAnnotation;
-import cn.taketoday.core.annotation.MergedAnnotations;
-import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.Column;
 import cn.taketoday.polaris.beans.BeanMetadata;
 import cn.taketoday.polaris.beans.BeanProperty;
-import cn.taketoday.util.ConcurrentReferenceHashMap;
-import cn.taketoday.util.MapCache;
-import cn.taketoday.util.StringUtils;
+import cn.taketoday.polaris.util.MapCache;
+import cn.taketoday.polaris.util.Nullable;
+import cn.taketoday.polaris.util.StringUtils;
 
 /**
  * Stores metadata for a POJO
@@ -41,6 +38,7 @@ import cn.taketoday.util.StringUtils;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  */
 public class JdbcBeanMetadata implements Iterable<BeanProperty> {
+
   private static final Cache caseSensitiveFalse = new Cache();
   private static final Cache caseSensitiveTrue = new Cache();
 
@@ -49,6 +47,7 @@ public class JdbcBeanMetadata implements Iterable<BeanProperty> {
   public final boolean autoDeriveColumnNames;
 
   public final BeanMetadata beanMetadata;
+
   private HashMap<String, BeanProperty> beanProperties;
 
   @Deprecated
@@ -163,9 +162,9 @@ public class JdbcBeanMetadata implements Iterable<BeanProperty> {
   @Nullable
   static String getAnnotatedPropertyName(AnnotatedElement propertyElement) {
     // just alias name, cannot override its getter,setter
-    MergedAnnotation<Column> annotation = MergedAnnotations.from(propertyElement).get(Column.class);
-    if (annotation.isPresent()) {
-      String name = annotation.getStringValue();
+    Column annotation = propertyElement.getAnnotation(Column.class);
+    if (annotation != null) {
+      String name = annotation.value();
       if (StringUtils.isNotEmpty(name)) {
         return name;
       }
@@ -174,10 +173,6 @@ public class JdbcBeanMetadata implements Iterable<BeanProperty> {
   }
 
   static class Cache extends MapCache<Class<?>, HashMap<String, BeanProperty>, JdbcBeanMetadata> {
-
-    public Cache() {
-      super(new ConcurrentReferenceHashMap<>());
-    }
 
     @Override
     protected HashMap<String, BeanProperty> createValue(Class<?> key, JdbcBeanMetadata beanMetadata) {

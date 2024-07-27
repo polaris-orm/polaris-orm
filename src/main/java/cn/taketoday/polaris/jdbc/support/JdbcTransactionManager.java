@@ -16,7 +16,7 @@
 
 package cn.taketoday.polaris.jdbc.support;
 
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.util.Nullable;
 import cn.taketoday.polaris.jdbc.datasource.ConnectionSource;
 import cn.taketoday.polaris.transaction.DefaultTransaction;
 import cn.taketoday.polaris.transaction.Transaction;

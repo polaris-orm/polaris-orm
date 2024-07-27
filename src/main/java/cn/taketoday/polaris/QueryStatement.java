@@ -19,7 +19,7 @@ package cn.taketoday.polaris;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import cn.taketoday.lang.Descriptive;
+import cn.taketoday.polaris.util.Descriptive;
 
 /**
  * Query condition builder

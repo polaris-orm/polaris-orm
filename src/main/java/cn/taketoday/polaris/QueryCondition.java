@@ -21,10 +21,10 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
 
-import cn.taketoday.lang.Assert;
-import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.sql.Select;
-import cn.taketoday.util.ObjectUtils;
+import cn.taketoday.polaris.util.Assert;
+import cn.taketoday.polaris.util.Nullable;
+import cn.taketoday.polaris.util.ObjectUtils;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>

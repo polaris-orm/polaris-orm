@@ -21,7 +21,7 @@ package cn.taketoday.polaris;
  *
  * @author Rod Johnson
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0
+ * @since 1.0
  */
 public class InvalidDataAccessApiUsageException extends NonTransientDataAccessException {
 

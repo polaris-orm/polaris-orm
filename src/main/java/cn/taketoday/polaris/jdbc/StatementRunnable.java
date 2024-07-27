@@ -15,7 +15,7 @@
  */
 package cn.taketoday.polaris.jdbc;
 
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * Represents a method with a {@link JdbcConnection} and an optional argument.

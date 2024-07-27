@@ -16,7 +16,7 @@
 
 package cn.taketoday.polaris.jdbc;
 
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * @author TODAY 2021/8/25 22:38

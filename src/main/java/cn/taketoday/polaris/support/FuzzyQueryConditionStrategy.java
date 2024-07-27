@@ -16,15 +16,14 @@
 
 package cn.taketoday.polaris.support;
 
-import cn.taketoday.core.annotation.MergedAnnotation;
-import cn.taketoday.lang.Constant;
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.Constant;
 import cn.taketoday.polaris.EntityProperty;
-import cn.taketoday.polaris.PropertyConditionStrategy;
-import cn.taketoday.polaris.sql.Restriction;
 import cn.taketoday.polaris.Like;
 import cn.taketoday.polaris.PrefixLike;
+import cn.taketoday.polaris.PropertyConditionStrategy;
 import cn.taketoday.polaris.SuffixLike;
+import cn.taketoday.polaris.sql.Restriction;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -35,10 +34,11 @@ public class FuzzyQueryConditionStrategy implements PropertyConditionStrategy {
   @Nullable
   @Override
   public Condition resolve(EntityProperty entityProperty, Object propertyValue) {
-    MergedAnnotation<Like> annotation = entityProperty.getAnnotation(Like.class);
-    if (annotation.isPresent()) {
+    // TODO meta annotation
+    Like annotation = entityProperty.property.getAnnotation(Like.class);
+    if (annotation != null) {
       // get column name
-      String column = annotation.getStringValue();
+      String column = annotation.value();
       if (Constant.DEFAULT_NONE.equals(column)) {
         column = entityProperty.columnName;
       }
@@ -47,7 +47,7 @@ public class FuzzyQueryConditionStrategy implements PropertyConditionStrategy {
 
       if (propertyValue instanceof String string) {
         // trim
-        if (annotation.getBoolean("trim")) {
+        if (annotation.trim()) {
           string = string.trim();
         }
         if (entityProperty.isPresent(PrefixLike.class)) {

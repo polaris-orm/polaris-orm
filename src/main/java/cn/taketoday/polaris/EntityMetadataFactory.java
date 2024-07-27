@@ -16,7 +16,7 @@
 
 package cn.taketoday.polaris;
 
-import cn.taketoday.util.MapCache;
+import cn.taketoday.polaris.util.MapCache;
 
 /**
  * {@link EntityMetadata} Factory

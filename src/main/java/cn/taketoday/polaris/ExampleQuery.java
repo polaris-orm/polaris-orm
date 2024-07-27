@@ -22,20 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import cn.taketoday.core.annotation.MergedAnnotation;
-import cn.taketoday.lang.Constant;
-import cn.taketoday.lang.Nullable;
-import cn.taketoday.lang.TodayStrategies;
-import cn.taketoday.logging.LogMessage;
 import cn.taketoday.polaris.PropertyConditionStrategy.Condition;
+import cn.taketoday.polaris.logging.LogMessage;
 import cn.taketoday.polaris.sql.MutableOrderByClause;
 import cn.taketoday.polaris.sql.OrderByClause;
 import cn.taketoday.polaris.sql.OrderBySource;
 import cn.taketoday.polaris.sql.Restriction;
 import cn.taketoday.polaris.sql.SimpleSelect;
-import cn.taketoday.polaris.support.DefaultConditionStrategy;
-import cn.taketoday.polaris.support.FuzzyQueryConditionStrategy;
-import cn.taketoday.polaris.support.WhereAnnotationConditionStrategy;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -43,19 +37,11 @@ import cn.taketoday.polaris.support.WhereAnnotationConditionStrategy;
  */
 final class ExampleQuery extends SimpleSelectQueryStatement implements ConditionStatement, DebugDescriptive {
 
-  static final List<PropertyConditionStrategy> strategies;
-
-  static {
-    List<PropertyConditionStrategy> list = TodayStrategies.find(PropertyConditionStrategy.class);
-    list.add(new WhereAnnotationConditionStrategy());
-    list.add(new FuzzyQueryConditionStrategy());
-    list.add(new DefaultConditionStrategy());
-    strategies = List.copyOf(list);
-  }
-
   private final Object example;
 
   private final EntityMetadata exampleMetadata;
+
+  private final List<PropertyConditionStrategy> strategies;
 
   @Nullable
   private ArrayList<Condition> conditions;
@@ -63,13 +49,15 @@ final class ExampleQuery extends SimpleSelectQueryStatement implements Condition
   @Nullable
   private OrderByClause orderByClause;
 
-  ExampleQuery(Object example, EntityMetadata exampleMetadata) {
+  ExampleQuery(Object example, EntityMetadata exampleMetadata, List<PropertyConditionStrategy> strategies) {
     this.example = example;
     this.exampleMetadata = exampleMetadata;
+    this.strategies = strategies;
   }
 
-  ExampleQuery(EntityMetadataFactory factory, Object example) {
+  ExampleQuery(EntityMetadataFactory factory, Object example, List<PropertyConditionStrategy> strategies) {
     this.example = example;
+    this.strategies = strategies;
     this.exampleMetadata = factory.getEntityMetadata(example.getClass());
   }
 
@@ -150,9 +138,9 @@ final class ExampleQuery extends SimpleSelectQueryStatement implements Condition
   }
 
   private void applyOrderByClause() {
-    MergedAnnotation<OrderBy> orderBy = exampleMetadata.getAnnotation(OrderBy.class);
-    if (orderBy.isPresent()) {
-      String clause = orderBy.getString("clause");
+    OrderBy orderBy = exampleMetadata.getAnnotation(OrderBy.class);
+    if (orderBy != null) {
+      String clause = orderBy.clause();
       if (!Constant.DEFAULT_NONE.equals(clause)) {
         orderByClause = OrderByClause.plain(clause);
       }
@@ -161,9 +149,9 @@ final class ExampleQuery extends SimpleSelectQueryStatement implements Condition
 
   private void applyOrderByClause(EntityProperty entityProperty) {
     if (!(orderByClause instanceof OrderByClause.Plain)) {
-      MergedAnnotation<OrderBy> annotation = entityProperty.getAnnotation(OrderBy.class);
-      if (annotation.isPresent()) {
-        Order direction = annotation.getEnum("direction", Order.class);
+      OrderBy annotation = entityProperty.getAnnotation(OrderBy.class);
+      if (annotation != null) {
+        Order direction = annotation.direction();
         MutableOrderByClause mutable = (MutableOrderByClause) orderByClause;
         if (mutable == null) {
           mutable = OrderByClause.mutable();

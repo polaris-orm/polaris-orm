@@ -19,12 +19,10 @@ package cn.taketoday.polaris.jdbc;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import cn.taketoday.core.conversion.ConversionException;
-import cn.taketoday.core.conversion.ConversionService;
-import cn.taketoday.lang.Assert;
-import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.beans.BeanProperty;
-import cn.taketoday.polaris.jdbc.type.TypeHandler;
+import cn.taketoday.polaris.type.TypeHandler;
+import cn.taketoday.polaris.util.Assert;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * for any pojo
@@ -42,26 +40,20 @@ final class ObjectPropertySetter {
 
   private final TypeHandler<?> typeHandler;
 
-  private final ConversionService conversionService;
-
   @Nullable
   private final PrimitiveTypeNullHandler primitiveTypeNullHandler;
 
   public ObjectPropertySetter(@Nullable PropertyPath propertyPath, BeanProperty beanProperty, RepositoryManager manager) {
-    this(propertyPath, beanProperty, manager.getConversionService(),
-            manager.getTypeHandler(beanProperty), manager.getPrimitiveTypeNullHandler());
+    this(propertyPath, beanProperty, manager.getTypeHandler(beanProperty), manager.getPrimitiveTypeNullHandler());
   }
 
-  public ObjectPropertySetter(@Nullable PropertyPath propertyPath,
-          BeanProperty beanProperty, ConversionService conversionService,
+  public ObjectPropertySetter(@Nullable PropertyPath propertyPath, BeanProperty beanProperty,
           TypeHandler<?> typeHandler, @Nullable PrimitiveTypeNullHandler primitiveTypeNullHandler) {
     Assert.notNull(typeHandler, "TypeHandler is required");
     Assert.notNull(beanProperty, "BeanProperty is required");
-    Assert.notNull(conversionService, "ConversionService is required");
     this.typeHandler = typeHandler;
     this.propertyPath = propertyPath;
     this.beanProperty = beanProperty;
-    this.conversionService = conversionService;
     this.primitiveTypeNullHandler = primitiveTypeNullHandler;
   }
 
@@ -109,25 +101,8 @@ final class ObjectPropertySetter {
       return typeHandler.getResult(resultSet, columnIndex);
     }
     catch (SQLException e) {
-      // maybe data conversion error
-      Object object = resultSet.getObject(columnIndex);
-      if (object == null || beanProperty.isInstance(object)) {
-        return object;
-      }
-      try {
-        return conversionService.convert(object, beanProperty.getTypeDescriptor());
-      }
-      catch (ConversionException ex) {
-        if (ex.getCause() instanceof IllegalArgumentException cause) {
-          String message = cause.getMessage();
-          if ("A null value cannot be assigned to a primitive type".equals(message)) {
-            // primitive type
-            return null;
-          }
-        }
-        e.addSuppressed(ex);
-        throw e;
-      }
+      // 尝试交给底层驱动
+      return resultSet.getObject(columnIndex, beanProperty.getType());
     }
   }
 

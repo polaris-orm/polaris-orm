@@ -19,7 +19,7 @@ package cn.taketoday.polaris.format;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
-import cn.taketoday.util.StringUtils;
+import cn.taketoday.polaris.util.StringUtils;
 
 /**
  * Performs formatting of DDL SQL statements.

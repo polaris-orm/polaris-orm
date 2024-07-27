@@ -22,7 +22,7 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * JDBC 连接源

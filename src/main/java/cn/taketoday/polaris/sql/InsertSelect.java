@@ -20,10 +20,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import cn.taketoday.lang.Assert;
 import cn.taketoday.polaris.StatementSequence;
 import cn.taketoday.polaris.platform.Platform;
-import cn.taketoday.util.CollectionUtils;
+import cn.taketoday.polaris.util.Assert;
+import cn.taketoday.polaris.util.CollectionUtils;
 
 /**
  * Implementation of InsertSelect.

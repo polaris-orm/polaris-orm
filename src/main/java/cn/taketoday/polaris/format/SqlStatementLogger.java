@@ -19,12 +19,11 @@ package cn.taketoday.polaris.format;
 import java.sql.Statement;
 import java.util.concurrent.TimeUnit;
 
-import cn.taketoday.core.style.ToStringBuilder;
-import cn.taketoday.lang.Nullable;
-import cn.taketoday.lang.TodayStrategies;
-import cn.taketoday.logging.Logger;
-import cn.taketoday.logging.LoggerFactory;
-import cn.taketoday.util.LogFormatUtils;
+import cn.taketoday.polaris.logging.LogFormatUtils;
+import cn.taketoday.polaris.logging.Logger;
+import cn.taketoday.polaris.logging.LoggerFactory;
+import cn.taketoday.polaris.util.Nullable;
+import cn.taketoday.polaris.util.PolarisProperties;
 
 /**
  * Centralize logging for SQL statements.
@@ -40,11 +39,11 @@ public class SqlStatementLogger {
   private static final Logger slowLogger = LoggerFactory.getLogger("polaris.SQL_SLOW");
 
   public static final SqlStatementLogger sharedInstance = new SqlStatementLogger(
-          TodayStrategies.getFlag("sql.logToStdout", false),
-          TodayStrategies.getFlag("sql.format", true),
-          TodayStrategies.getFlag("sql.highlight", true),
-          TodayStrategies.getFlag("sql.stdoutOnly", false),
-          TodayStrategies.getLong("sql.logSlowQuery", 0)
+          PolarisProperties.getFlag("sql.logToStdout", false),
+          PolarisProperties.getFlag("sql.format", true),
+          PolarisProperties.getFlag("sql.highlight", true),
+          PolarisProperties.getFlag("sql.stdoutOnly", false),
+          PolarisProperties.getLong("sql.logSlowQuery", 0)
   );
 
   private final boolean format;
@@ -235,12 +234,8 @@ public class SqlStatementLogger {
 
   @Override
   public String toString() {
-    return ToStringBuilder.from(this)
-            .append("format", format)
-            .append("logToStdout", logToStdout)
-            .append("highlight", highlight)
-            .append("logSlowQuery", logSlowQuery)
-            .toString();
+    return "SqlStatementLogger{format=%s, logToStdout=%s, stdoutOnly=%s, highlight=%s, logSlowQuery=%d}"
+            .formatted(format, logToStdout, stdoutOnly, highlight, logSlowQuery);
   }
 
 }

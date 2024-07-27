@@ -16,7 +16,7 @@
 
 package cn.taketoday.polaris;
 
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * 未分类的数据访问异常
@@ -25,7 +25,7 @@ import cn.taketoday.lang.Nullable;
  *
  * @author Rod Johnson
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0
+ * @since 1.0
  */
 public abstract class UncategorizedDataAccessException extends NonTransientDataAccessException {
 

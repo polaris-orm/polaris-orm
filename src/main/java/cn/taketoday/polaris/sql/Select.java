@@ -16,9 +16,9 @@
 
 package cn.taketoday.polaris.sql;
 
-import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.StatementSequence;
 import cn.taketoday.polaris.platform.Platform;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * A simple SQL <tt>SELECT</tt> statement
@@ -153,11 +153,6 @@ public class Select implements StatementSequence {
   public Select setSelectClause(CharSequence selectClause) {
     this.selectClause = selectClause;
     this.guesstimatedBufferSize += selectClause.length();
-    return this;
-  }
-
-  public Select setSelectClause(SelectFragment selectFragment) {
-    setSelectClause(selectFragment.toFragmentString().substring(2));
     return this;
   }
 

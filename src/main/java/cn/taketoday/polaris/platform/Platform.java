@@ -18,17 +18,13 @@ package cn.taketoday.polaris.platform;
 
 import java.util.regex.Pattern;
 
-import cn.taketoday.polaris.sql.ANSICaseFragment;
-import cn.taketoday.polaris.sql.ANSIJoinFragment;
-import cn.taketoday.polaris.sql.CaseFragment;
-import cn.taketoday.polaris.sql.JoinFragment;
-import cn.taketoday.util.ClassUtils;
-import cn.taketoday.util.StringUtils;
+import cn.taketoday.polaris.util.ClassUtils;
+import cn.taketoday.polaris.util.StringUtils;
 
 /**
  * SQL generate strategy
  *
- * @author TODAY 2021/10/10 13:11
+ * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0
  */
 public abstract class Platform {
@@ -75,27 +71,6 @@ public abstract class Platform {
    */
   public String getNoColumnsInsertString() {
     return "VALUES ( )";
-  }
-
-  /**
-   * Create a {@link JoinFragment} strategy responsible
-   * for handling this dialect's variations in how joins are handled.
-   *
-   * @return This dialect's {@link JoinFragment} strategy.
-   */
-  public JoinFragment createOuterJoinFragment() {
-    return new ANSIJoinFragment();
-  }
-
-  /**
-   * Create a {@link CaseFragment} strategy responsible
-   * for handling this dialect's variations in how CASE statements are
-   * handled.
-   *
-   * @return This dialect's {@link CaseFragment} strategy.
-   */
-  public CaseFragment createCaseFragment() {
-    return new ANSICaseFragment();
   }
 
   public static Platform forClasspath() {

@@ -25,7 +25,6 @@ import java.lang.annotation.Target;
 import java.util.List;
 
 import cn.taketoday.core.annotation.AliasFor;
-import cn.taketoday.lang.Constant;
 import cn.taketoday.polaris.model.UserModel;
 
 import static cn.taketoday.polaris.beans.BeanProperty.valueOf;
@@ -42,10 +41,10 @@ class ColumnNameDiscoverTests {
   public @interface MyColumn {
 
     @AliasFor("name")
-    String value() default Constant.BLANK;
+    String value() default "";
 
     @AliasFor("value")
-    String name() default Constant.BLANK;
+    String name() default "";
 
     String myValue() default "";
 

@@ -19,8 +19,8 @@ package cn.taketoday.polaris;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.sql.Restriction;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>

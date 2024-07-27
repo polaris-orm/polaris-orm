@@ -16,9 +16,9 @@
 
 package cn.taketoday.polaris;
 
-import cn.taketoday.lang.Nullable;
-import cn.taketoday.util.ObjectUtils;
-import cn.taketoday.util.StringUtils;
+import cn.taketoday.polaris.util.Nullable;
+import cn.taketoday.polaris.util.ObjectUtils;
+import cn.taketoday.polaris.util.StringUtils;
 
 /**
  * default {@link TableNameGenerator}

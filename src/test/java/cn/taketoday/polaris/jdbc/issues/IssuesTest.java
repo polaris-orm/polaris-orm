@@ -33,13 +33,12 @@ import java.util.List;
 import cn.taketoday.polaris.jdbc.JdbcConnection;
 import cn.taketoday.polaris.jdbc.PersistenceException;
 import cn.taketoday.polaris.jdbc.RepositoryManager;
-import cn.taketoday.polaris.jdbc.Row;
-import cn.taketoday.polaris.jdbc.Table;
 import cn.taketoday.polaris.jdbc.issues.pojos.Issue1Pojo;
 import cn.taketoday.polaris.jdbc.issues.pojos.KeyValueEntity;
 import lombok.Setter;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by IntelliJ IDEA. User: lars Date: 10/17/11 Time: 9:02 PM This class
@@ -57,9 +56,12 @@ public class IssuesTest {
             });
   }
 
-  private RepositoryManager sql2o;
+  private RepositoryManager manager;
+
   private String url;
+
   private String user;
+
   private String pass;
 
   public IssuesTest(Driver driverToRegister, String url, String user, String pass, String testName) {
@@ -72,28 +74,17 @@ public class IssuesTest {
       }
     }
 
-    this.sql2o = new RepositoryManager(url, user, pass);
+    this.manager = new RepositoryManager(url, user, pass);
 
     this.url = url;
     this.user = user;
     this.pass = pass;
 
     if ("HyperSQL DB test".equals(testName)) {
-      sql2o.createNamedQuery("set database sql syntax MSS true").executeUpdate();
+      manager.createNamedQuery("set database sql syntax MSS true").executeUpdate();
     }
   }
 
-  /**
-   * Tests for issue #1 https://github.com/aaberg/sql2o/issues/1
-   *
-   * Issue: I have a case where I need to override/modify the value loaded from
-   * db. I want to do this in a setter but the current version of sql2o modifies
-   * the property directly.
-   *
-   * Comment: The priority was wrong. Sql2o would try to set the field first, and
-   * afterwards the setter. The priority should be the setter first and the field
-   * after.
-   */
   @Test
   public void testSetterPriority() {
     RepositoryManager sql2o = new RepositoryManager(url, user, pass);
@@ -103,11 +94,6 @@ public class IssuesTest {
     assertEquals(2, pojo.val);
   }
 
-  /**
-   * Tests for issue #2 https://github.com/aaberg/sql2o/issues/2
-   *
-   * Issue: NPE - should instead tell what the problem is
-   */
   @Test
   public void testForFieldDoesNotExistException() {
     RepositoryManager sql2o = new RepositoryManager(url, user, pass);
@@ -117,47 +103,8 @@ public class IssuesTest {
               KeyValueEntity.class);
     }
     catch (PersistenceException ex) {
-      Assert.assertTrue(ex.getMessage().contains("Could not map"));
+      assertTrue(ex.getMessage().contains("Could not map"));
     }
-  }
-
-  /**
-   * Tests for issue #4 https://github.com/aaberg/sql2o/issues/4
-   *
-   * NPE when typing wrong column name in row.get(...) Also, column name should
-   * not be case sensitive, if sql2o not is in casesensitive property is false.
-   */
-  @Test
-  public void testForNpeInRowGet() {
-    sql2o.createNamedQuery("create table issue4table(id integer identity primary key, val varchar(20))").executeUpdate();
-
-    sql2o.createNamedQuery("insert into issue4table (val) values (:val)")
-            .addParameter("val", "something").addToBatch()
-            .addParameter("val", "something else").addToBatch()
-            .addParameter("val", "hello").addToBatch()
-            .executeBatch();
-
-    Table table = sql2o.createNamedQuery("select * from issue4table").fetchTable();
-
-    Row row0 = table.rows().get(0);
-    String row0Val = row0.getString("vAl");
-
-    Assert.assertEquals("something", row0Val);
-
-    Row row1 = table.rows().get(1);
-    boolean failed = false;
-
-    try {
-      String row1Value = row1.getString("ahsHashah"); // Should fail with an sql2o exception
-    }
-    catch (PersistenceException ex) {
-      failed = true;
-
-      Assert.assertTrue(ex.getMessage().startsWith("Column with name 'ahsHashah' does not exist"));
-    }
-
-    Assert.assertTrue("assert that exception occurred", failed);
-
   }
 
   @Setter
@@ -179,56 +126,38 @@ public class IssuesTest {
     }
   }
 
-  /**
-   * Tests for issue #5 https://github.com/aaberg/sql2o/issues/5 crashes if the
-   * POJO has a int field where we try to set a null value
-   */
   @Test
   public void testForNullToSimpeType() {
-    sql2o.createNamedQuery("create table issue5table(id int identity primary key, val integer)").executeUpdate();
+    manager.createNamedQuery("create table issue5table(id int identity primary key, val integer)").executeUpdate();
 
-    sql2o.createNamedQuery("insert into issue5table(val) values (:val)")
+    manager.createNamedQuery("insert into issue5table(val) values (:val)")
             .addParameter("val", (Object) null).executeUpdate();
 
-    List<Issue5POJO> list1 = sql2o.createNamedQuery("select * from issue5table")
+    List<Issue5POJO> list1 = manager.createNamedQuery("select * from issue5table")
             .fetch(Issue5POJO.class);
 
-    List<Issue5POJO2> list2 = sql2o.createNamedQuery("select * from issue5table")
+    List<Issue5POJO2> list2 = manager.createNamedQuery("select * from issue5table")
             .fetch(Issue5POJO2.class);
 
-    Assert.assertEquals(1, list1.size());
-    Assert.assertEquals(1, list2.size());
-    Assert.assertEquals(0, list1.get(0).val);
-    Assert.assertEquals(0, list2.get(0).getVal());
+    assertEquals(1, list1.size());
+    assertEquals(1, list2.size());
+    assertEquals(0, list1.get(0).val);
+    assertEquals(0, list2.get(0).getVal());
   }
 
-  /**
-   * Tests for issue #9 https://github.com/aaberg/sql2o/issues/9 When running a
-   * select query with column labels (aliases) in HSQLDB, sql2o is still trying to
-   * use column names wheWhen running a select query with column labels (aliases)
-   * in HSQLDB, sql2o is still trying to use column names when mapping to java
-   * classes. This is caused by a behavior in HSQLDB, that is different from most
-   * other databases. the ResultSet.getColumnName() method will still return the
-   * real column name, even though a label was used. To get the label with HSQLDB,
-   * ResultSet.getColumnLabel().n mapping to java classes. This is caused by a
-   * behavior in HSQLDB, that is different from most other databases. the
-   * ResultSet.getColumnName() method will still return the real column name, even
-   * though a label was used. To get the label with HSQLDB,
-   * ResultSet.getColumnLabel().
-   */
   @Test
   public void testForLabelErrorInHsqlDb() {
-    sql2o.createNamedQuery("create table issue9test (id integer identity primary key, val varchar(50))").executeUpdate();
+    manager.createNamedQuery("create table issue9test (id integer identity primary key, val varchar(50))").executeUpdate();
 
     String insertSql = "insert into issue9test(val) values (:val)";
-    sql2o.createNamedQuery(insertSql).addParameter("val", "something").executeUpdate();
-    sql2o.createNamedQuery(insertSql).addParameter("val", "something else").executeUpdate();
-    sql2o.createNamedQuery(insertSql).addParameter("val", "something third").executeUpdate();
+    manager.createNamedQuery(insertSql).addParameter("val", "something").executeUpdate();
+    manager.createNamedQuery(insertSql).addParameter("val", "something else").executeUpdate();
+    manager.createNamedQuery(insertSql).addParameter("val", "something third").executeUpdate();
 
-    List<Issue9Pojo> pojos = sql2o.createNamedQuery("select id, val theVal from issue9Test").fetch(Issue9Pojo.class);
+    List<Issue9Pojo> pojos = manager.createNamedQuery("select id, val theVal from issue9Test").fetch(Issue9Pojo.class);
 
-    Assert.assertEquals(3, pojos.size());
-    Assert.assertEquals("something", pojos.get(0).theVal);
+    assertEquals(3, pojos.size());
+    assertEquals("something", pojos.get(0).theVal);
 
   }
 
@@ -238,29 +167,21 @@ public class IssuesTest {
 
   @Test
   public void testForNullPointerExceptionInAddParameterMethod() {
-    sql2o.createNamedQuery("create table issue11test (id integer identity primary key, val varchar(50), adate datetime)")
+    manager.createNamedQuery("create table issue11test (id integer identity primary key, val varchar(50), adate datetime)")
             .executeUpdate();
 
     String insertSql = "insert into issue11test (val, adate) values (:val, :date)";
-    sql2o.createNamedQuery(insertSql)
+    manager.createNamedQuery(insertSql)
             .addParameter("val", WhatEverEnum.VAL)
             .addParameter("date", new Date())
             .executeUpdate();
     Date dtNull = null;
     WhatEverEnum enumNull = null;
 
-    sql2o.createNamedQuery(insertSql).addParameter("val", enumNull)
+    manager.createNamedQuery(insertSql).addParameter("val", enumNull)
             .addParameter("date", dtNull).executeUpdate();
   }
 
-  /**
-   * Test for issue #132 ( https://github.com/aaberg/sql2o/issues/132 ) Ref change
-   * done in pull request #75 Also see comment on google groups
-   * https://groups.google.com/forum/#!topic/sql2o/3H4XJIv-i04
-   *
-   * If a column cannot be mapped to a property, an exception should be thrown.
-   * Today it is silently ignored.
-   */
   @Test
   public void testErrorWhenFieldDoesntExist() {
 
@@ -279,7 +200,7 @@ public class IssuesTest {
 
     String createQuery = "create table testErrorWhenFieldDoesntExist(id_val integer primary key, str_val varchar(100))";
 
-    try (JdbcConnection connection = sql2o.open()) {
+    try (JdbcConnection connection = manager.open()) {
       connection.createNamedQuery(createQuery).executeUpdate();
 
       String insertSql = "insert into testErrorWhenFieldDoesntExist(id_val, str_val) values (:val1, :val2)";
@@ -312,30 +233,16 @@ public class IssuesTest {
     public String name;
   }
 
-  /**
-   * Test for issue #148 (https://github.com/aaberg/sql2o/issues/148) ##
-   * IndexOutOfRange exception When a resultset has multiple columns with the same
-   * name, sql2o 1.5.1 will throw an IndexOutOfRange exception when calling
-   * executeAndFetchTable() method.
-   */
   @Test
   public void testIndexOutOfRangeExceptionWithMultipleColumnsWithSameName() {
-
     String sql = "select 11 id, 'something' name, 'something else' name from (values(0))";
 
-    ThePojo p;
-    Table t;
-    try (JdbcConnection connection = sql2o.open()) {
-      p = connection.createNamedQuery(sql).fetchFirst(ThePojo.class);
+    try (JdbcConnection connection = manager.open()) {
+      ThePojo p = connection.createNamedQuery(sql).fetchFirst(ThePojo.class);
 
-      t = connection.createNamedQuery(sql).fetchTable();
+      assertEquals(11, p.id);
+      assertEquals("something else", p.name);
     }
-
-    Assert.assertEquals(11, p.id);
-    Assert.assertEquals("something else", p.name);
-
-    Assert.assertEquals(11, (int) t.rows().get(0).getInteger("id"));
-    assertEquals("something else", t.rows().get(0).getString("name"));
   }
 
   static class TheIgnoreSqlCommentPojo {
@@ -344,9 +251,6 @@ public class IssuesTest {
     public String strval;
   }
 
-  /**
-   * Reproduce issue #142 (https://github.com/aaberg/sql2o/issues/142)
-   */
   @Test
   public void testIgnoreSqlComments() {
 
@@ -362,7 +266,7 @@ public class IssuesTest {
             "/* and, it's another type of comment!*/" +
             "where intval = :param";
 
-    try (JdbcConnection connection = sql2o.open()) {
+    try (JdbcConnection connection = manager.open()) {
       connection.createNamedQuery(createSql).executeUpdate();
 
       for (int idx = 0; idx < 100; idx++) {
@@ -378,7 +282,7 @@ public class IssuesTest {
               .addParameter("param", 5)
               .fetch(TheIgnoreSqlCommentPojo.class);
 
-      Assert.assertEquals(10, resultList.size());
+      assertEquals(10, resultList.size());
     }
   }
 
@@ -389,7 +293,7 @@ public class IssuesTest {
 
   @Test
   public void testIssue166OneCharacterParameterFail() {
-    try (JdbcConnection connection = sql2o.open()) {
+    try (JdbcConnection connection = manager.open()) {
       connection.createNamedQuery("create table testIssue166OneCharacterParameterFail(id integer, val varchar(10))")
               .executeUpdate();
 
@@ -403,14 +307,14 @@ public class IssuesTest {
               .addParameter("p", 1)
               .fetchScalar(Integer.class);
 
-      Assert.assertEquals(1, cnt);
+      assertEquals(1, cnt);
     }
   }
 
   @Test
   public void testIssue149NullPointerWhenUsingWrongParameterName() {
 
-    try (JdbcConnection connection = sql2o.open()) {
+    try (JdbcConnection connection = manager.open()) {
       connection.createNamedQuery("create table issue149 (id integer primary key, val varchar(20))").executeUpdate();
       connection.createNamedQuery("insert into issue149(id, val) values (:id, :val)")
               .addParameter("id", 1)

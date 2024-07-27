@@ -16,7 +16,7 @@
 
 package cn.taketoday.polaris.support;
 
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.util.Nullable;
 import cn.taketoday.polaris.EntityProperty;
 import cn.taketoday.polaris.PropertyConditionStrategy;
 import cn.taketoday.polaris.sql.Restriction;

@@ -16,8 +16,7 @@
 
 package cn.taketoday.polaris;
 
-import cn.taketoday.core.NestedRuntimeException;
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * 数据访问异常
@@ -25,7 +24,7 @@ import cn.taketoday.lang.Nullable;
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0 2024/7/22 11:00
  */
-public abstract class DataAccessException extends NestedRuntimeException {
+public abstract class DataAccessException extends RuntimeException {
 
   /**
    * Constructor for DataAccessException.

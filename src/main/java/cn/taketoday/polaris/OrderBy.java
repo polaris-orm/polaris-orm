@@ -21,9 +21,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import cn.taketoday.core.annotation.AliasFor;
-import cn.taketoday.lang.Constant;
-
 /**
  * clause and direction cannot present same time
  *
@@ -37,13 +34,11 @@ public @interface OrderBy {
   /**
    * Class level
    */
-  @AliasFor(attribute = "clause")
   String value() default Constant.DEFAULT_NONE;
 
   /**
    * Class level
    */
-  @AliasFor(attribute = "value")
   String clause() default Constant.DEFAULT_NONE;
 
   /**

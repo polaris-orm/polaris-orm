@@ -18,10 +18,9 @@ package cn.taketoday.polaris.beans;
 
 import java.lang.reflect.Constructor;
 
-import cn.taketoday.lang.Assert;
-import cn.taketoday.lang.Nullable;
-import cn.taketoday.reflect.ReflectionException;
-import cn.taketoday.util.ReflectionUtils;
+import cn.taketoday.polaris.util.Assert;
+import cn.taketoday.polaris.util.Nullable;
+import cn.taketoday.polaris.util.ReflectionUtils;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
@@ -57,7 +56,7 @@ public abstract class BeanInstantiator {
     }
   }
 
-  // internal new-instance impl @since 4.0
+  // internal new-instance impl @since 1.0
   protected abstract Object doInstantiate(@Nullable Object[] args)
           throws Throwable;
 
@@ -76,15 +75,8 @@ public abstract class BeanInstantiator {
    * @param target target class
    */
   public static <T> BeanInstantiator forConstructor(final Class<T> target) {
-    Assert.notNull(target, "target class is required");
-    try {
-      final Constructor<T> constructor = target.getDeclaredConstructor();
-      return forConstructor(constructor);
-    }
-    catch (NoSuchMethodException e) {
-      throw new ReflectionException(
-              "Target class: '%s' has no default constructor".formatted(target), e);
-    }
+    Constructor<?> suitableConstructor = BeanUtils.obtainConstructor(target);
+    return forConstructor(suitableConstructor);
   }
 
   /**
@@ -95,7 +87,7 @@ public abstract class BeanInstantiator {
    * @return BeanInstantiator to construct target T
    */
   public static BeanInstantiator forConstructor(Constructor<?> constructor) {
-    return new BeanInstantiatorGenerator(constructor).create();
+    return forReflective(constructor);// fixme use bytecode
   }
 
   /**

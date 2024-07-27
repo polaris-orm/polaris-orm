@@ -16,8 +16,6 @@
 
 package cn.taketoday.polaris;
 
-import cn.taketoday.core.style.ToStringBuilder;
-
 /**
  * Simple Pageable
  *
@@ -28,10 +26,7 @@ record SimplePageable(int pageNumber, int pageSize) implements Pageable {
 
   @Override
   public String toString() {
-    return ToStringBuilder.from(this)
-            .append("pageNumber", pageNumber)
-            .append("pageSize", pageSize)
-            .toString();
+    return "Pageable[pageNumber = %d, pageSize = %d]".formatted(pageNumber, pageSize);
   }
 
 }

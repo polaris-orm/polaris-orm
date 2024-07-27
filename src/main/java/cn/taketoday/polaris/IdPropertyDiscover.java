@@ -20,9 +20,8 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Objects;
 
-import cn.taketoday.core.annotation.MergedAnnotations;
-import cn.taketoday.lang.Assert;
 import cn.taketoday.polaris.beans.BeanProperty;
+import cn.taketoday.polaris.util.Assert;
 
 /**
  * Determine ID property
@@ -45,7 +44,8 @@ public interface IdPropertyDiscover {
   // static
 
   /**
-   * returns a new resolving chain
+   * 将两个策略合并到一起，尝试了第一个策略之后如果不是 ID 则会尝试第二个策略
+   * 也就是 {@code next} 变量
    *
    * @param next next resolver
    * @return returns a new resolving chain
@@ -88,25 +88,21 @@ public interface IdPropertyDiscover {
   }
 
   /**
-   * use {@link Id}
-   * <p>
-   * Can be meta present
+   * use {@link Id} or {@link GeneratedId}
    */
   static IdPropertyDiscover forIdAnnotation() {
-    return forAnnotation(Id.class);
+    return forAnnotation(Id.class).and(forAnnotation(GeneratedId.class));
   }
 
   /**
    * Use input {@code annotationType} to determine id column
-   * <p>
-   * Can be meta present
    *
    * @param annotationType Annotation type
    * @return Annotation based {@link IdPropertyDiscover}
    */
   static IdPropertyDiscover forAnnotation(Class<? extends Annotation> annotationType) {
     Assert.notNull(annotationType, "annotationType is required");
-    return property -> MergedAnnotations.from(property, property.getAnnotations()).isPresent(annotationType);
+    return property -> property.isAnnotationPresent(annotationType);
   }
 
 }

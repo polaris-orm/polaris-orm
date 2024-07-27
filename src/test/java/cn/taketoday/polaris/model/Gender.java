@@ -16,7 +16,7 @@
 
 package cn.taketoday.polaris.model;
 
-import cn.taketoday.lang.Enumerable;
+import cn.taketoday.polaris.type.Enumerable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>

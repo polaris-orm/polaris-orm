@@ -16,7 +16,7 @@
 
 package cn.taketoday.polaris;
 
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * for page query

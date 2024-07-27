@@ -23,7 +23,7 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 
-import cn.taketoday.polaris.jdbc.type.TypeHandler;
+import cn.taketoday.polaris.type.TypeHandler;
 
 /**
  * Parameter Setter

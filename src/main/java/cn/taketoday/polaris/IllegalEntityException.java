@@ -17,7 +17,7 @@
 package cn.taketoday.polaris;
 
 import cn.taketoday.polaris.jdbc.PersistenceException;
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * Entity definition is not legal

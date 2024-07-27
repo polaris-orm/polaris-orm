@@ -18,11 +18,10 @@ package cn.taketoday.polaris;
 
 import java.lang.annotation.Annotation;
 
-import cn.taketoday.core.annotation.MergedAnnotation;
-import cn.taketoday.core.annotation.MergedAnnotations;
-import cn.taketoday.lang.Assert;
-import cn.taketoday.lang.Nullable;
-import cn.taketoday.util.StringUtils;
+import cn.taketoday.polaris.util.AnnotationUtils;
+import cn.taketoday.polaris.util.Assert;
+import cn.taketoday.polaris.util.Nullable;
+import cn.taketoday.polaris.util.StringUtils;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -66,7 +65,7 @@ public interface TableNameGenerator {
   }
 
   /**
-   * use {@link Table#name()}
+   * use {@link Table#value()}
    */
   static TableNameGenerator forTableAnnotation() {
     return forAnnotation(Table.class);
@@ -77,10 +76,9 @@ public interface TableNameGenerator {
    *
    * @param annotationType Annotation type
    * @return Annotation based {@link TableNameGenerator}
-   * @see MergedAnnotation#getString(String)
    */
   static TableNameGenerator forAnnotation(Class<? extends Annotation> annotationType) {
-    return forAnnotation(annotationType, MergedAnnotation.VALUE);
+    return forAnnotation(annotationType, "value");
   }
 
   /**
@@ -89,7 +87,6 @@ public interface TableNameGenerator {
    * @param annotationType Annotation type
    * @param attributeName the attribute name
    * @return Annotation based {@link TableNameGenerator}
-   * @see MergedAnnotation#getString(String)
    */
   static TableNameGenerator forAnnotation(Class<? extends Annotation> annotationType, String attributeName) {
     Assert.notNull(attributeName, "attributeName is required");
@@ -99,18 +96,17 @@ public interface TableNameGenerator {
 
       @Override
       public String generateTableName(Class<?> entityClass) {
-        MergedAnnotations annotations = MergedAnnotations.from(entityClass);
-        var annotation = annotations.get(annotationType);
-        if (annotation.isPresent()) {
-          String name = annotation.getString(attributeName);
+        Annotation annotation = entityClass.getAnnotation(annotationType);
+        if (annotation != null) {
+          String name = (String) AnnotationUtils.getValue(annotation, attributeName);
           if (StringUtils.hasText(name)) {
             return name;
           }
         }
 
-        var ref = annotations.get(EntityRef.class);
-        if (ref.isPresent()) {
-          Class<?> classValue = ref.getClassValue();
+        var ref = entityClass.getAnnotation(EntityRef.class);
+        if (ref != null) {
+          Class<?> classValue = ref.value();
           return generateTableName(classValue);
         }
         return null;

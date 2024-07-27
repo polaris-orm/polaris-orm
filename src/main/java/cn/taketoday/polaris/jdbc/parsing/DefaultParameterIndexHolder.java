@@ -19,16 +19,18 @@ package cn.taketoday.polaris.jdbc.parsing;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import cn.taketoday.polaris.jdbc.ParameterBinder;
-import cn.taketoday.util.CollectionUtils;
 
 /**
- * @author TODAY 2021/6/8 23:52
+ * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0
  */
 final class DefaultParameterIndexHolder extends ParameterIndexHolder {
+
   final int index;
 
   DefaultParameterIndexHolder(int index) {
@@ -73,7 +75,37 @@ final class DefaultParameterIndexHolder extends ParameterIndexHolder {
 
   @Override
   public Iterator<Integer> iterator() {
-    return CollectionUtils.singletonIterator(index);
+    return new Iterator<>() {
+      private boolean hasNext = true;
+
+      @Override
+      public boolean hasNext() {
+        return hasNext;
+      }
+
+      @Override
+      public Integer next() {
+        if (hasNext) {
+          hasNext = false;
+          return index;
+        }
+        throw new NoSuchElementException();
+      }
+
+      @Override
+      public void remove() {
+        throw new UnsupportedOperationException();
+      }
+
+      @Override
+      public void forEachRemaining(Consumer<? super Integer> action) {
+        Objects.requireNonNull(action);
+        if (hasNext) {
+          action.accept(index);
+          hasNext = false;
+        }
+      }
+    };
   }
 
 }

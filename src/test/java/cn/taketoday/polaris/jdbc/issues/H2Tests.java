@@ -20,6 +20,7 @@ import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.sql.DataSource;
@@ -27,7 +28,6 @@ import javax.sql.DataSource;
 import cn.taketoday.polaris.jdbc.JdbcConnection;
 import cn.taketoday.polaris.jdbc.NamedQuery;
 import cn.taketoday.polaris.jdbc.RepositoryManager;
-import cn.taketoday.polaris.jdbc.Table;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -87,15 +87,23 @@ class H2Tests {
       insQuery.addParameter("id", uuid1).addParameter("val", uuid2).executeUpdate();
       insQuery.addParameter("id", uuid3).addParameter("val", uuid4).executeUpdate();
 
-      Table table = connection.createNamedQuery("select * from uuidtest").fetchTable();
+      List<UUIDModel> uuidModel = connection.createNamedQuery("select * from uuidtest").fetch(UUIDModel.class);
 
-      assertThat((UUID) table.rows().get(0).getObject("id")).isEqualTo(uuid1);
-      assertThat((UUID) table.rows().get(0).getObject("val")).isEqualTo(uuid2);
-      assertThat((UUID) table.rows().get(1).getObject("id")).isEqualTo(uuid3);
-      assertThat(table.rows().get(1).getObject("val")).isNull();
+      assertThat(uuidModel.get(0).id).isEqualTo(uuid1);
+      assertThat(uuidModel.get(0).val).isEqualTo(uuid2);
+
+      assertThat(uuidModel.get(1).id).isEqualTo(uuid3);
+      assertThat(uuidModel.get(1).val).isNull();
 
       connection.rollback();
     }
 
   }
+
+  static class UUIDModel {
+    public UUID id;
+
+    public UUID val;
+  }
+
 }

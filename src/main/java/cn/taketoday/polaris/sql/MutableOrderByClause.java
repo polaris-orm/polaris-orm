@@ -19,9 +19,9 @@ package cn.taketoday.polaris.sql;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import cn.taketoday.core.Pair;
-import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.Order;
+import cn.taketoday.polaris.util.Nullable;
+import cn.taketoday.polaris.util.Pair;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>

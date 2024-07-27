@@ -21,7 +21,7 @@ import java.util.LinkedList;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
-import cn.taketoday.lang.TodayStrategies;
+import cn.taketoday.polaris.util.PolarisProperties;
 
 /**
  * Performs formatting of basic SQL statements (DML + query).
@@ -32,7 +32,7 @@ import cn.taketoday.lang.TodayStrategies;
  * @since 1.0 2022/9/12 19:20
  */
 public class BasicSQLFormatter implements SQLFormatter {
-  private static final boolean SKIP_DDL = TodayStrategies.getFlag("sql.BasicSQLFormatter.skip-ddl", true);
+  private static final boolean SKIP_DDL = PolarisProperties.getFlag("sql.BasicSQLFormatter.skip-ddl", true);
 
   private static final HashSet<String> BEGIN_CLAUSES = new HashSet<>();
   private static final HashSet<String> END_CLAUSES = new HashSet<>();

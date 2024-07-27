@@ -47,10 +47,10 @@ import cn.taketoday.polaris.jdbc.pojos.ComplexEntity;
 import cn.taketoday.polaris.jdbc.pojos.EntityWithPrivateFields;
 import cn.taketoday.polaris.jdbc.pojos.StringConversionPojo;
 import cn.taketoday.polaris.jdbc.pojos.SuperPojo;
-import cn.taketoday.polaris.jdbc.type.BytesInputStreamTypeHandler;
-import cn.taketoday.polaris.jdbc.type.Enumerated;
-import cn.taketoday.polaris.jdbc.type.TypeHandlerManager;
 import cn.taketoday.polaris.jdbc.utils.IOUtils;
+import cn.taketoday.polaris.type.BytesInputStreamTypeHandler;
+import cn.taketoday.polaris.type.Enumerated;
+import cn.taketoday.polaris.type.TypeHandlerManager;
 import cn.taketoday.util.StreamUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -629,60 +629,6 @@ public class RepositoryManagerTests extends BaseMemDbTest {
   }
 
   @Test
-  public void testFetchTable() {
-    repositoryManager.createNamedQuery(
-                    "create table tabletest(id integer identity primary key, value varchar(20), value2 decimal(5,1))")
-            .executeUpdate();
-    repositoryManager.createNamedQuery("insert into tabletest(value,value2) values (:value, :value2)")
-            .addParameter("value", "something").addParameter("value2", new BigDecimal("3.4")).addToBatch()
-            .addParameter("value", "bla").addParameter("value2", new BigDecimal("5.5")).addToBatch().executeBatch();
-
-    Table table = repositoryManager.createNamedQuery("select * from tabletest order by id").fetchTable();
-
-    assertEquals(3, table.columns().size());
-    assertEquals("ID", table.columns().get(0).getName());
-    assertEquals("VALUE", table.columns().get(1).getName());
-    assertEquals("VALUE2", table.columns().get(2).getName());
-
-    assertEquals(2, table.rows().size());
-
-    Row row0 = table.rows().get(0);
-    Row row1 = table.rows().get(1);
-
-    assertTrue(0 <= row0.getInteger("ID"));
-    assertEquals("something", row0.getString(1));
-    assertEquals(new BigDecimal("3.4"), row0.getBigDecimal("VALUE2"));
-
-    assertTrue(1 <= row1.getInteger(0));
-    assertEquals("bla", row1.getString("VALUE"));
-    assertEquals(5.5D, row1.getDouble(2), 0.00001);
-  }
-
-  @Test
-  public void testTable_asList() {
-    createAndFillUserTable();
-
-    List<Map<String, Object>> rows;
-    try (JdbcConnection con = repositoryManager.open()) {
-      Table table = con.createNamedQuery("select * from user").fetchTable();
-
-      rows = table.asList();
-    }
-
-    assertEquals(insertIntoUsers, rows.size());
-
-    for (Map<String, Object> row : rows) {
-      assertEquals(4, row.size());
-      assertTrue(row.containsKey("id"));
-      assertTrue(row.containsKey("name"));
-      assertTrue(row.containsKey("email"));
-      assertTrue(row.containsKey("text"));
-    }
-
-    deleteUserTable();
-  }
-
-  @Test
   public void testStringConversion() {
     StringConversionPojo pojo = repositoryManager.createNamedQuery(
                     "select '1' val1, '2  ' val2, '' val3, '' val4, null val5 from (values(0))")
@@ -1101,29 +1047,6 @@ public class RepositoryManagerTests extends BaseMemDbTest {
   }
 
   @Test
-  public void testRowGetObjectWithConverters() {
-    String sql = "select 1 col1, '23' col2 from (values(0))";
-    Table t = repositoryManager.createNamedQuery(sql).fetchTable();
-    Row r = t.rows().get(0);
-
-    String col1AsString = r.getObject("col1", String.class);
-    Integer col1AsInteger = r.getObject("col1", Integer.class);
-    Long col1AsLong = r.getObject("col1", Long.class);
-
-    assertThat(col1AsString).isEqualTo("1");
-    assertThat(col1AsInteger).isEqualTo(1);
-    assertThat(col1AsLong).isEqualTo(1L);
-
-    String col2AsString = r.getObject("col2", String.class);
-    Integer col2AsInteger = r.getObject("col2", Integer.class);
-    Long col2AsLong = r.getObject("col2", Long.class);
-
-    assertThat(col2AsString).isEqualTo("23");
-    assertThat(col2AsInteger).isEqualTo(23);
-    assertThat(col2AsLong).isEqualTo(23L);
-  }
-
-  @Test
   public void testExecuteAndFetchLazy() {
     createAndFillUserTable();
 
@@ -1213,26 +1136,6 @@ public class RepositoryManagerTests extends BaseMemDbTest {
 
     assertTrue(con.getJdbcConnection().isClosed());
 
-  }
-
-  @Test
-  public void testLazyTable() throws SQLException {
-    createAndFillUserTable();
-
-    NamedQuery q = repositoryManager.createNamedQuery("select * from User");
-    try (LazyTable lt = q.fetchLazyTable()) {
-      for (Row r : lt.rows()) {
-        String name = r.getString("name");
-
-        assertThat(name).isNotNull();
-      }
-
-      // still in autoClosable scope. Expecting connection to be open.
-      assertThat(q.getConnection().getJdbcConnection().isClosed()).isFalse();
-    }
-    // simulate autoClose.
-    // simulated autoClosable scope exited. Expecting connection to be closed.
-    assertThat(q.getConnection().getJdbcConnection().isClosed()).isTrue();
   }
 
   @Test

@@ -19,12 +19,11 @@ package cn.taketoday.polaris;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-import cn.taketoday.core.annotation.MergedAnnotation;
-import cn.taketoday.core.annotation.MergedAnnotations;
-import cn.taketoday.lang.Assert;
-import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.beans.BeanProperty;
-import cn.taketoday.util.StringUtils;
+import cn.taketoday.polaris.util.AnnotationUtils;
+import cn.taketoday.polaris.util.Assert;
+import cn.taketoday.polaris.util.Nullable;
+import cn.taketoday.polaris.util.StringUtils;
 
 /**
  * Column name discover
@@ -101,7 +100,7 @@ public interface ColumnNameDiscover {
   }
 
   /**
-   * use {@link Column#name()}
+   * use {@link Column#value()}
    */
   static ColumnNameDiscover forColumnAnnotation() {
     return forAnnotation(Column.class);
@@ -112,10 +111,9 @@ public interface ColumnNameDiscover {
    *
    * @param annotationType Annotation type
    * @return Annotation based {@link ColumnNameDiscover}
-   * @see MergedAnnotation#getString(String)
    */
   static ColumnNameDiscover forAnnotation(Class<? extends Annotation> annotationType) {
-    return forAnnotation(annotationType, MergedAnnotation.VALUE);
+    return forAnnotation(annotationType, "value");
   }
 
   /**
@@ -124,16 +122,15 @@ public interface ColumnNameDiscover {
    * @param annotationType Annotation type
    * @param attributeName the attribute name
    * @return Annotation based {@link ColumnNameDiscover}
-   * @see MergedAnnotation#getString(String)
    */
   static ColumnNameDiscover forAnnotation(Class<? extends Annotation> annotationType, String attributeName) {
     Assert.notNull(attributeName, "attributeName is required");
     Assert.notNull(annotationType, "annotationType is required");
 
     return property -> {
-      var annotation = MergedAnnotations.from(property, property.getAnnotations()).get(annotationType);
-      if (annotation.isPresent()) {
-        String columnName = annotation.getString(attributeName);
+      Annotation annotation = property.getAnnotation(annotationType);
+      if (annotation != null) {
+        String columnName = (String) AnnotationUtils.getValue(annotation, attributeName);
         if (StringUtils.hasText(columnName)) {
           return columnName;
         }

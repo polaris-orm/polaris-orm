@@ -18,7 +18,7 @@ package cn.taketoday.polaris.sql;
 
 import java.util.ArrayList;
 
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.util.Nullable;
 import cn.taketoday.polaris.StatementSequence;
 import cn.taketoday.polaris.platform.Platform;
 

@@ -19,30 +19,24 @@ package cn.taketoday.polaris.jdbc;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Spliterator;
 
-import cn.taketoday.core.conversion.ConversionService;
-import cn.taketoday.core.conversion.support.DefaultConversionService;
-import cn.taketoday.lang.Nullable;
-import cn.taketoday.logging.Logger;
-import cn.taketoday.logging.LoggerFactory;
 import cn.taketoday.polaris.format.SqlStatementLogger;
-import cn.taketoday.polaris.jdbc.support.JdbcUtils;
-import cn.taketoday.polaris.jdbc.type.ObjectTypeHandler;
-import cn.taketoday.polaris.jdbc.type.TypeHandler;
-import cn.taketoday.polaris.jdbc.type.TypeHandlerManager;
-import cn.taketoday.util.CollectionUtils;
-import cn.taketoday.util.ObjectUtils;
+import cn.taketoday.polaris.logging.Logger;
+import cn.taketoday.polaris.logging.LoggerFactory;
+import cn.taketoday.polaris.type.ObjectTypeHandler;
+import cn.taketoday.polaris.type.TypeHandler;
+import cn.taketoday.polaris.type.TypeHandlerManager;
+import cn.taketoday.polaris.util.CollectionUtils;
+import cn.taketoday.polaris.util.Nullable;
+import cn.taketoday.polaris.util.ObjectUtils;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -341,29 +335,6 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
     return new DefaultResultSetHandlerFactory<>(
             new JdbcBeanMetadata(returnType, caseSensitive, autoDerivingColumns, throwOnMappingFailure),
             connection.getManager(), getColumnMappings());
-  }
-
-  public LazyTable fetchLazyTable() {
-    return fetchLazyTable(connection.getManager().getConversionService());
-  }
-
-  public LazyTable fetchLazyTable(@Nullable ConversionService conversionService) {
-    return new TableResultSetIterator(executeQuery(), isCaseSensitive(), conversionService).createLazyTable();
-  }
-
-  public Table fetchTable() {
-    return fetchTable(connection.getManager().getConversionService());
-  }
-
-  public Table fetchTable(ConversionService conversionService) {
-    ArrayList<Row> rows = new ArrayList<>();
-    try (LazyTable lt = fetchLazyTable(conversionService)) {
-      for (Row item : lt.rows()) {
-        rows.add(item);
-      }
-      // lt==null is always false
-      return new Table(lt.getName(), rows, lt.columns());
-    }
   }
 
   /**
@@ -807,7 +778,7 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
   /**
    * @since 1.0
    */
-  final class ResultSetHandlerIterator<T> extends CloseResultSetIterator<T> {
+  final class ResultSetHandlerIterator<T> extends ResultSetIterator<T> {
     private final ResultSetExtractor<T> handler;
 
     public ResultSetHandlerIterator(ResultSetExtractor<T> handler) {
@@ -826,66 +797,31 @@ public sealed abstract class AbstractQuery implements AutoCloseable permits Name
     }
 
     @Override
-    protected T readNext(ResultSet resultSet) throws SQLException {
-      return handler.extractData(resultSet);
-    }
-
-  }
-
-  /**
-   * @since 1.0
-   */
-  final class TableResultSetIterator extends CloseResultSetIterator<Row> {
-
-    private final String tableName;
-
-    private final List<Column> columns;
-
-    private final boolean isCaseSensitive;
-
-    private final ConversionService conversionService;
-
-    private final Map<String, Integer> columnNameToIdxMap;
-
-    private TableResultSetIterator(ResultSet rs, boolean isCaseSensitive, @Nullable ConversionService conversionService) {
-      super(rs);
-      this.isCaseSensitive = isCaseSensitive;
-      this.conversionService = conversionService == null ? DefaultConversionService.getSharedInstance() : conversionService;
-      try {
-        ResultSetMetaData meta = rs.getMetaData();
-        ArrayList<Column> columns = new ArrayList<>();
-        var columnNameToIdxMap = new LinkedHashMap<String, Integer>();
-
-        int columnCount = meta.getColumnCount();
-        for (int colIdx = 1; colIdx <= columnCount; colIdx++) {
-          String colName = JdbcUtils.lookupColumnName(meta, colIdx);
-          String colType = meta.getColumnTypeName(colIdx);
-          columns.add(new Column(colName, colIdx - 1, colType));
-
-          String colMapName = isCaseSensitive ? colName : colName.toLowerCase();
-          columnNameToIdxMap.put(colMapName, colIdx - 1);
-        }
-        this.columns = columns;
-        this.tableName = meta.getTableName(1);
-        this.columnNameToIdxMap = columnNameToIdxMap;
-      }
-      catch (SQLException e) {
-        throw new PersistenceException("Error while reading metadata from database", e);
-      }
-    }
-
-    private LazyTable createLazyTable() {
-      return new LazyTable(tableName, asIterable(), columns);
+    public ResultSetIterable<T> asIterable() {
+      return new ResultIterable<>(this);
     }
 
     @Override
-    protected Row readNext(ResultSet resultSet) throws SQLException {
-      final Row row = new Row(columnNameToIdxMap, columns.size(), isCaseSensitive, conversionService);
-      for (Column column : columns) {
-        final int index = column.getIndex();
-        row.addValue(index, resultSet.getObject(index + 1));
+    public void close() {
+      try {
+        resultSet.close();
       }
-      return row;
+      catch (SQLException ex) {
+        if (connection.getManager().isCatchResourceCloseErrors()) {
+          throw translateException("Closing ResultSet", ex);
+        }
+        else {
+          log.debug("ResultSet close failed", ex);
+        }
+      }
+      finally {
+        closeConnectionIfNecessary();
+      }
+    }
+
+    @Override
+    protected T readNext(ResultSet resultSet) throws SQLException {
+      return handler.extractData(resultSet);
     }
 
   }

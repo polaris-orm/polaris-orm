@@ -19,14 +19,14 @@ package cn.taketoday.polaris.jdbc;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import cn.taketoday.lang.Nullable;
 import cn.taketoday.polaris.beans.BeanProperty;
 import cn.taketoday.polaris.beans.BeanUtils;
 import cn.taketoday.polaris.jdbc.support.JdbcUtils;
-import cn.taketoday.polaris.jdbc.type.TypeHandler;
-import cn.taketoday.util.ConcurrentReferenceHashMap;
-import cn.taketoday.util.MapCache;
+import cn.taketoday.polaris.type.TypeHandler;
+import cn.taketoday.polaris.util.MapCache;
+import cn.taketoday.polaris.util.Nullable;
 
 @SuppressWarnings("rawtypes")
 public class DefaultResultSetHandlerFactory<T> implements ResultSetHandlerFactory<T> {
@@ -140,8 +140,7 @@ public class DefaultResultSetHandlerFactory<T> implements ResultSetHandlerFactor
 
   }
 
-  static final MapCache<HandlerKey, ResultSetExtractor, ResultSetMetaData> CACHE
-          = new MapCache<>(new ConcurrentReferenceHashMap<>()) {
+  static final MapCache<HandlerKey, ResultSetExtractor, ResultSetMetaData> CACHE = new MapCache<>(new ConcurrentHashMap<>()) {
 
     @Override
     protected ResultSetExtractor createValue(HandlerKey key, ResultSetMetaData param) {

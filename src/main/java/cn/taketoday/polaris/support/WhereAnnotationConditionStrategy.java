@@ -16,16 +16,17 @@
 
 package cn.taketoday.polaris.support;
 
-import cn.taketoday.core.annotation.MergedAnnotation;
-import cn.taketoday.lang.Constant;
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.Constant;
 import cn.taketoday.polaris.EntityProperty;
 import cn.taketoday.polaris.PropertyConditionStrategy;
-import cn.taketoday.polaris.TrimWhere;
+import cn.taketoday.polaris.Trim;
 import cn.taketoday.polaris.Where;
 import cn.taketoday.polaris.sql.Restriction;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
+ * 处理 {@link cn.taketoday.polaris.Where} 注解
+ *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2024/2/25 00:02
  */
@@ -34,19 +35,19 @@ public class WhereAnnotationConditionStrategy implements PropertyConditionStrate
   @Nullable
   @Override
   public Condition resolve(EntityProperty entityProperty, Object propertyValue) {
-    if (propertyValue instanceof String string && entityProperty.isPresent(TrimWhere.class)) {
+    if (propertyValue instanceof String string && entityProperty.isPresent(Trim.class)) {
       propertyValue = string.trim();
     }
 
     // render where clause
-    MergedAnnotation<Where> annotation = entityProperty.getAnnotation(Where.class);
-    if (annotation.isPresent()) {
-      String value = annotation.getStringValue();
+    Where annotation = entityProperty.getAnnotation(Where.class);
+    if (annotation != null) {
+      String value = annotation.value();
       if (!Constant.DEFAULT_NONE.equals(value)) {
         return new Condition(propertyValue, Restriction.plain(value), entityProperty);
       }
       else {
-        String condition = annotation.getString("condition");
+        String condition = annotation.condition();
         if (Constant.DEFAULT_NONE.equals(condition)) {
           return new Condition(propertyValue, Restriction.equal(entityProperty.columnName), entityProperty);
         }

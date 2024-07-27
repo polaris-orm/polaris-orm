@@ -22,16 +22,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import cn.taketoday.core.annotation.AliasFor;
-import cn.taketoday.lang.Constant;
-
 /**
  * Specifies the mapped column for a persistent property or field.
  * If no <code>Column</code> annotation is specified, the default values apply.
  * <pre> {@code
  *    // Example
  *
- *    @Column(name = "DESC")
+ *    @Column("DESC")
  *    public String getDescription() {
  *      return description;
  *    }
@@ -46,14 +43,10 @@ import cn.taketoday.lang.Constant;
 @Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })
 public @interface Column {
 
-  @AliasFor("name")
-  String value() default Constant.BLANK;
-
   /**
    * (Optional) The name of the column. Defaults to
    * the property or field name.
    */
-  @AliasFor("value")
-  String name() default Constant.BLANK;
+  String value() default "";
 
 }

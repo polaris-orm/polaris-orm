@@ -21,15 +21,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Objects;
 
-import cn.taketoday.core.ResolvableType;
-import cn.taketoday.core.TypeDescriptor;
-import cn.taketoday.reflect.PropertyAccessor;
-
 /**
  * Field based BeanProperty
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 4.0 2022/2/24 15:16
+ * @since 1.0 2022/2/24 15:16
  */
 public final class FieldBeanProperty extends BeanProperty {
 
@@ -43,16 +39,6 @@ public final class FieldBeanProperty extends BeanProperty {
   @Override
   protected PropertyAccessor createAccessor() {
     return PropertyAccessor.forField(field);
-  }
-
-  protected TypeDescriptor createDescriptor() {
-    ResolvableType resolvableType = ResolvableType.forField(field);
-    return new TypeDescriptor(resolvableType, resolvableType.resolve(getType()), this);
-  }
-
-  @Override
-  protected ResolvableType createResolvableType() {
-    return ResolvableType.forField(field);
   }
 
   @Override

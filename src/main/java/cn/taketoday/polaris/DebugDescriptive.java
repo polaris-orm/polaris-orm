@@ -16,8 +16,8 @@
 
 package cn.taketoday.polaris;
 
-import cn.taketoday.lang.Descriptive;
-import cn.taketoday.logging.LogMessage;
+import cn.taketoday.polaris.logging.LogMessage;
+import cn.taketoday.polaris.util.Descriptive;
 
 /**
  * Debug descriptive message provider

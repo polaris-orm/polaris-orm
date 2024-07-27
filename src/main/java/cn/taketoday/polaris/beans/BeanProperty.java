@@ -25,11 +25,9 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
-import cn.taketoday.lang.Assert;
-import cn.taketoday.lang.Nullable;
-import cn.taketoday.reflect.PropertyAccessor;
-import cn.taketoday.reflect.SetterMethod;
-import cn.taketoday.util.ReflectionUtils;
+import cn.taketoday.polaris.util.Assert;
+import cn.taketoday.polaris.util.Nullable;
+import cn.taketoday.polaris.util.ReflectionUtils;
 
 /**
  * Field is first considered then readMethod
@@ -39,7 +37,7 @@ import cn.taketoday.util.ReflectionUtils;
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @see #isWriteable()
  * @see #isReadable()
- * @since 3.0 2021/1/27 22:28
+ * @since 1.0
  */
 public sealed class BeanProperty extends Property implements Member, AnnotatedElement, Serializable permits FieldBeanProperty {
 
@@ -102,14 +100,14 @@ public sealed class BeanProperty extends Property implements Member, AnnotatedEl
   }
 
   /**
-   * @see cn.taketoday.reflect.SetterMethod#set(Object, Object)
+   *
    */
   public final void setValue(Object obj, Object value) {
     value = handleOptional(value, getType());
     setDirectly(obj, value);
   }
 
-  // @since 4.0
+  // @since 1.0
   @Nullable
   static Object handleOptional(Object value, Class<?> propertyType) {
     // convertedValue == null
@@ -120,8 +118,7 @@ public sealed class BeanProperty extends Property implements Member, AnnotatedEl
   }
 
   /**
-   * @see SetterMethod#set(Object, Object)
-   * @since 3.0.2
+   *
    */
   public final void setDirectly(Object obj, Object value) {
     obtainAccessor().set(obj, value);
@@ -138,15 +135,12 @@ public sealed class BeanProperty extends Property implements Member, AnnotatedEl
     return accessor;
   }
 
-  /**
-   * @since 3.0.2
-   */
   protected PropertyAccessor createAccessor() {
     Field field = getField();
     if (field == null) {
-      return PropertyAccessor.forMethod(readMethod, writeMethod);
+      return PropertyAccessor.forReflective(null, readMethod, writeMethod);
     }
-    return PropertyAccessor.forField(field, readMethod, writeMethod);
+    return PropertyAccessor.forField(field);
   }
 
   //---------------------------------------------------------------------
@@ -156,7 +150,7 @@ public sealed class BeanProperty extends Property implements Member, AnnotatedEl
   // static
 
   /**
-   * @since 4.0
+   * @since 1.0
    */
   public static BeanProperty valueOf(Field field) {
     Assert.notNull(field, "field is required");

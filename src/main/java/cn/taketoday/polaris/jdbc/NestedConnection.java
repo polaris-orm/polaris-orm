@@ -19,8 +19,8 @@ package cn.taketoday.polaris.jdbc;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import cn.taketoday.logging.Logger;
-import cn.taketoday.logging.LoggerFactory;
+import cn.taketoday.polaris.logging.Logger;
+import cn.taketoday.polaris.logging.LoggerFactory;
 import cn.taketoday.polaris.jdbc.datasource.WrappedConnection;
 
 /**

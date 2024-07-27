@@ -18,13 +18,12 @@ package cn.taketoday.polaris.beans;
 
 import java.lang.reflect.Constructor;
 
-import cn.taketoday.lang.Nullable;
-import cn.taketoday.reflect.Accessor;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * @author TODAY 2021/8/27 21:41
  */
-public abstract class ConstructorAccessor extends BeanInstantiator implements Accessor {
+public abstract class ConstructorAccessor extends BeanInstantiator {
 
   protected final Constructor<?> constructor;
 
@@ -41,8 +40,8 @@ public abstract class ConstructorAccessor extends BeanInstantiator implements Ac
    * Invoke {@link java.lang.reflect.Constructor} with given args
    *
    * @return returns Object
-   * @since 4.0
    */
   @Override
   public abstract Object doInstantiate(@Nullable Object[] args);
+
 }

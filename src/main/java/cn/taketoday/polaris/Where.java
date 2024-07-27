@@ -21,11 +21,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import cn.taketoday.lang.Constant;
-
 /**
  * Where clause to add to the element Entity or target entity of a collection.
- * The clause is written in SQL. A common use case here is for soft-deletes.
+ * The clause is written in SQL.
  *
  * @author Emmanuel Bernard
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>

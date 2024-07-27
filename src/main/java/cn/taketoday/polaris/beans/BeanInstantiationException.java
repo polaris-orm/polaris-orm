@@ -19,14 +19,13 @@ package cn.taketoday.polaris.beans;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-import cn.taketoday.core.NestedRuntimeException;
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0 2024/7/23 14:23
  */
-public class BeanInstantiationException extends NestedRuntimeException {
+public class BeanInstantiationException extends RuntimeException {
 
   private final Class<?> beanClass;
 

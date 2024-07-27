@@ -22,8 +22,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import cn.taketoday.core.annotation.AliasFor;
-
 /**
  * Specifies the primary table for the annotated entity
  *
@@ -33,7 +31,7 @@ import cn.taketoday.core.annotation.AliasFor;
  * <pre> {@code
  *    Example:
  *
- *    @Table(name="t_user")
+ *    @Table(t_user")
  *    public class User {
  *      ...
  *    }
@@ -47,14 +45,10 @@ import cn.taketoday.core.annotation.AliasFor;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Table {
 
-  @AliasFor("name")
-  String value() default "";
-
   /**
    * (Optional) The name of the table.
    * <p> Defaults to the entity name.
    */
-  @AliasFor("value")
-  String name() default "";
+  String value() default "";
 
 }

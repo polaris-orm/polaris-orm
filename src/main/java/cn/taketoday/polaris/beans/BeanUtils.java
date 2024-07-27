@@ -20,12 +20,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
-import cn.taketoday.core.ConstructorNotFoundException;
-import cn.taketoday.lang.Assert;
-import cn.taketoday.lang.Nullable;
-import cn.taketoday.util.ClassUtils;
-import cn.taketoday.util.ObjectUtils;
-import cn.taketoday.util.ReflectionUtils;
+import cn.taketoday.polaris.util.Assert;
+import cn.taketoday.polaris.util.ClassUtils;
+import cn.taketoday.polaris.util.Nullable;
+import cn.taketoday.polaris.util.ObjectUtils;
+import cn.taketoday.polaris.util.ReflectionUtils;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
@@ -125,13 +124,11 @@ public abstract class BeanUtils {
    * @param <T> Target type
    * @param beanClass target bean class
    * @return Suitable constructor
-   * @throws ConstructorNotFoundException If there is no suitable constructor
-   * @since 2.1.7
    */
   public static <T> Constructor<T> obtainConstructor(Class<T> beanClass) {
     final Constructor<T> ret = getConstructor(beanClass);
     if (ret == null) {
-      throw new ConstructorNotFoundException(beanClass);
+      throw new ReflectionException("no suitable constructor for class " + beanClass.getName());
     }
     return ret;
   }
@@ -149,7 +146,6 @@ public abstract class BeanUtils {
    * @param beanClass target bean class
    * @return Suitable constructor If there isn't a suitable {@link Constructor}
    * returns null
-   * @since 2.1.7
    */
   @Nullable
   @SuppressWarnings("unchecked")
@@ -177,7 +173,6 @@ public abstract class BeanUtils {
    * @param <T> Target type
    * @return Suitable constructor If there isn't a suitable {@link Constructor}
    * returns null
-   * @since 4.0
    */
   @Nullable
   @SuppressWarnings("unchecked")
@@ -210,7 +205,6 @@ public abstract class BeanUtils {
    * @param type the type to check
    * @return whether the given type represents a "simple" value type
    * @see ClassUtils#isSimpleValueType(Class)
-   * @since 4.0
    */
   public static boolean isSimpleValueType(Class<?> type) {
     return ClassUtils.isSimpleValueType(type);
