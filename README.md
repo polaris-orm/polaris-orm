@@ -4,10 +4,10 @@ Polaris 是一个 Java ORM 框架
 
 ![Java17](https://img.shields.io/badge/JDK-17+-success.svg)
 [![Apache](https://img.shields.io/badge/License-Apache_v2-blue.svg)](./LICENSE)
-[![Coveralls](https://github.com/polaris-orm/polaris/actions/workflows/coveralls.yaml/badge.svg)](https://github.com/polaris-orm/polaris/actions/workflows/coveralls.yaml)
-[![CI](https://github.com/polaris-orm/polaris/actions/workflows/multi-env.yaml/badge.svg)](https://github.com/polaris-orm/polaris/actions/workflows/multi-env.yaml)
+[![Coveralls](https://github.com/polaris-orm/polaris-orm/actions/workflows/coveralls.yaml/badge.svg)](https://github.com/polaris-orm/polaris-orm/actions/workflows/coveralls.yaml)
+[![CI](https://github.com/polaris-orm/polaris-orm/actions/workflows/multi-env.yaml/badge.svg)](https://github.com/polaris-orm/polaris-orm/actions/workflows/multi-env.yaml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/e482b7d1bd0d474da5a0cdcbd42fe135)](https://app.codacy.com/gh/polaris-orm/polaris-orm/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-[![Coverage Status](https://coveralls.io/repos/github/polaris-orm/polaris/badge.svg?branch=main)](https://coveralls.io/github/polaris-orm/polaris?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/polaris-orm/polaris-orm/badge.svg?branch=main)](https://coveralls.io/github/polaris-orm/polaris-orm?branch=main)
 
 
 本项目是 [TAKETODAY/today-infrastructure/today-jdbc](https://github.com/TAKETODAY/today-infrastructure/tree/master/today-jdbc) 的一个分支。**欢迎大家贡献代码**
