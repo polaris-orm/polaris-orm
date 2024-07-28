@@ -24,6 +24,7 @@ import cn.taketoday.polaris.util.Assert;
 import cn.taketoday.polaris.util.ClassUtils;
 import cn.taketoday.polaris.util.Nullable;
 import cn.taketoday.polaris.util.ObjectUtils;
+import cn.taketoday.polaris.util.ReflectionException;
 import cn.taketoday.polaris.util.ReflectionUtils;
 
 /**

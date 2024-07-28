@@ -16,7 +16,6 @@
 
 package cn.taketoday.polaris.jdbc;
 
-import com.google.common.collect.ImmutableList;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -51,7 +50,6 @@ import cn.taketoday.polaris.jdbc.utils.IOUtils;
 import cn.taketoday.polaris.type.BytesInputStreamTypeHandler;
 import cn.taketoday.polaris.type.Enumerated;
 import cn.taketoday.polaris.type.TypeHandlerManager;
-import cn.taketoday.util.StreamUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -938,7 +936,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
 
     InputStream inputStream = pojo2.data;
 
-    String pojo2DataString = StreamUtils.copyToString(inputStream);
+    String pojo2DataString = new String(inputStream.readAllBytes());
 //    byte[] pojo2Data = IOUtils.toByteArray(pojo2.data);
 //    String pojo2DataString = new String(pojo2Data);
     assertThat(dataString).isEqualTo(pojo2DataString);
@@ -1458,7 +1456,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
                       " and id in(:ids)" +
                       " and text = :text")
               .addParameter("email", "%email.com")
-              .addParameter("ids", ImmutableList.of())
+              .addParameter("ids", List.of())
               .addParameter("text", "some text")
               .fetch(User.class);
 
@@ -1472,7 +1470,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
                       " and id in(:ids)" +
                       " and text = :text")
               .addParameter("email", "%email.com")
-              .addParameter("ids", ImmutableList.of(1))
+              .addParameter("ids", List.of(1))
               .addParameter("text", "some text")
               .fetch(User.class);
 
@@ -1517,7 +1515,7 @@ public class RepositoryManagerTests extends BaseMemDbTest {
     try (JdbcConnection connection = repositoryManager.open()) {
       List<User> result = connection
               .createNamedQuery("select * from user where id in(:ids)")
-              .addParameter("ids", (Object) ImmutableList.of(1, 2, 3))
+              .addParameter("ids", (Object) List.of(1, 2, 3))
               .fetch(User.class);
 
       assertEquals(3, result.size());

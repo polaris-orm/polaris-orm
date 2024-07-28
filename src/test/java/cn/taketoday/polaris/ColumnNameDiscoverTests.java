@@ -24,7 +24,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.List;
 
-import cn.taketoday.core.annotation.AliasFor;
 import cn.taketoday.polaris.model.UserModel;
 
 import static cn.taketoday.polaris.beans.BeanProperty.valueOf;
@@ -40,10 +39,8 @@ class ColumnNameDiscoverTests {
   @Target({ ElementType.METHOD, ElementType.FIELD })
   public @interface MyColumn {
 
-    @AliasFor("name")
     String value() default "";
 
-    @AliasFor("value")
     String name() default "";
 
     String myValue() default "";

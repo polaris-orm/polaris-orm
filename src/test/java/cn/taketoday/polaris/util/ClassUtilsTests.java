@@ -26,11 +26,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.function.Supplier;
 
-import cn.taketoday.bytecode.proxy.Enhancer;
-import cn.taketoday.bytecode.proxy.MethodInterceptor;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
@@ -69,27 +65,6 @@ class ClassUtilsTests {
     assert ClassUtils.isPresent("java.lang.Float");
     assert !ClassUtils.isPresent("Float");
   }
-
-  // v2.1.7 test code
-  // ----------------------------------------
-
-  @Test
-  void testGetUserClass() {
-    assertEquals(ClassUtilsTests.class, ClassUtils.getUserClass(getClass()));
-
-    Enhancer enhancer = new Enhancer();
-
-    enhancer.setCallback((MethodInterceptor) (obj, method, args, proxy) -> null);
-
-    enhancer.setSuperclass(ClassUtilsTests.class);
-
-    final Object create = enhancer.create();
-
-    assertEquals(ClassUtilsTests.class, ClassUtils.getUserClass(create.getClass()));
-  }
-
-  // ------
-
 
   @ParameterizedTest
   @WrapperTypes

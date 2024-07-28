@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris.beans;
-
-import cn.taketoday.polaris.util.Nullable;
+package cn.taketoday.polaris.util;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>

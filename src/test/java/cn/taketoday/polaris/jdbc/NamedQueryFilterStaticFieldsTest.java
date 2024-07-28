@@ -16,7 +16,6 @@
 
 package cn.taketoday.polaris.jdbc;
 
-import com.google.common.primitives.Longs;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,7 +38,7 @@ public class NamedQueryFilterStaticFieldsTest {
     public static final Comparator<Entity> VER = new Comparator<Entity>() {
       @Override
       public int compare(final Entity o1, final Entity o2) {
-        return Longs.compare(o1.ver, o2.ver);
+        return Long.compare(o1.ver, o2.ver);
       }
     };
   }

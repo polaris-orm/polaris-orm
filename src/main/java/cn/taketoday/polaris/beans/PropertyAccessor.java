@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import cn.taketoday.polaris.util.Nullable;
+import cn.taketoday.polaris.util.ReflectionException;
 import cn.taketoday.polaris.util.ReflectionUtils;
 
 /**

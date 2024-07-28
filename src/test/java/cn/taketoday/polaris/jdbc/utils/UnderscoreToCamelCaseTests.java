@@ -18,7 +18,7 @@ package cn.taketoday.polaris.jdbc.utils;
 
 import org.junit.jupiter.api.Test;
 
-import cn.taketoday.util.StringUtils;
+import cn.taketoday.polaris.util.StringUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;

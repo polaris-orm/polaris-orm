@@ -33,6 +33,7 @@ final class ReflectivePropertyAccessor extends PropertyAccessor {
   private final Field field;
 
   private final Method readMethod;
+
   private final Method writeMethod;
 
   ReflectivePropertyAccessor(@Nullable Field field, @Nullable Method readMethod, @Nullable Method writeMethod) {

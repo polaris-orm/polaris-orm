@@ -185,25 +185,6 @@ public abstract class ClassUtils {
     return isPresent(className, loaderSource.getClassLoader());
   }
 
-  /**
-   * If the class is dynamically generated then the user class will be extracted
-   * in a specific format.
-   *
-   * @param syntheticClass input test class
-   * @return The user class
-   */
-  @SuppressWarnings("unchecked")
-  public static <T> Class<T> getUserClass(Class<T> syntheticClass) {
-    Assert.notNull(syntheticClass, "syntheticClass is required");
-    if (syntheticClass.getName().lastIndexOf(CGLIB_CLASS_SEPARATOR) > -1) {
-      Class<?> superclass = syntheticClass.getSuperclass();
-      if (superclass != null && superclass != Object.class) {
-        return (Class<T>) superclass;
-      }
-    }
-    return syntheticClass;
-  }
-
   //
 
   /**

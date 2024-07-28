@@ -18,7 +18,6 @@ package cn.taketoday.polaris.model;
 
 import java.util.Objects;
 
-import cn.taketoday.core.style.ToStringBuilder;
 import cn.taketoday.polaris.Id;
 import cn.taketoday.polaris.Table;
 import lombok.Data;
@@ -87,21 +86,6 @@ public class UserModel {
   @Override
   public int hashCode() {
     return Objects.hash(id, age, name, avatar, password, introduce, mobilePhone, email, gender);
-  }
-
-  @Override
-  public String toString() {
-    return ToStringBuilder.from(this)
-            .append("id", id)
-            .append("age", age)
-            .append("name", name)
-            .append("avatar", avatar)
-            .append("password", password)
-            .append("introduce", introduce)
-            .append("mobilePhone", mobilePhone)
-            .append("email", email)
-            .append("gender", gender)
-            .toString();
   }
 
 }

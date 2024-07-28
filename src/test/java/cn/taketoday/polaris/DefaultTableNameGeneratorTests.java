@@ -18,10 +18,11 @@ package cn.taketoday.polaris;
 
 import org.junit.jupiter.api.Test;
 
-import javax.annotation.Nullable;
+import java.lang.reflect.Field;
 
 import cn.taketoday.polaris.model.UserModel;
-import cn.taketoday.test.util.ReflectionTestUtils;
+import cn.taketoday.polaris.util.Nullable;
+import cn.taketoday.polaris.util.ReflectionUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,7 +35,10 @@ class DefaultTableNameGeneratorTests {
 
   @Test
   void generateTableName() {
-    ReflectionTestUtils.setField(generator, "annotationGenerator", new TableNameGenerator() {
+    Field annotationGenerator = ReflectionUtils.findField(DefaultTableNameGenerator.class, "annotationGenerator");
+    assert annotationGenerator != null;
+    ReflectionUtils.makeAccessible(annotationGenerator);
+    ReflectionUtils.setField(annotationGenerator, generator, new TableNameGenerator() {
       @Nullable
       @Override
       public String generateTableName(Class<?> entityClass) {

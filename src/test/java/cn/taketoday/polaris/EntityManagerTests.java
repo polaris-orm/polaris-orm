@@ -22,19 +22,20 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import cn.taketoday.polaris.util.Nullable;
 import cn.taketoday.polaris.jdbc.NamedQuery;
 import cn.taketoday.polaris.jdbc.RepositoryManager;
 import cn.taketoday.polaris.model.Gender;
 import cn.taketoday.polaris.model.NoIdModel;
 import cn.taketoday.polaris.model.UserModel;
-import cn.taketoday.test.util.ReflectionTestUtils;
-import cn.taketoday.util.CollectionUtils;
+import cn.taketoday.polaris.util.CollectionUtils;
+import cn.taketoday.polaris.util.Nullable;
+import cn.taketoday.polaris.util.ReflectionUtils;
 
 import static cn.taketoday.polaris.PropertyUpdateStrategy.always;
 import static cn.taketoday.polaris.PropertyUpdateStrategy.noneNull;
@@ -442,7 +443,9 @@ class EntityManagerTests extends AbstractRepositoryManagerTests {
   void batchPersistListener(RepositoryManager repositoryManager) {
     DefaultEntityManager entityManager = new DefaultEntityManager(repositoryManager);
     entityManager.setMaxBatchRecords(120);
-    EntityMetadataFactory entityMetadataFactory = ReflectionTestUtils.getField(entityManager, "entityMetadataFactory");
+    Field entityMetadataFactory1 = ReflectionUtils.findField(entityManager.getClass(), "entityMetadataFactory");
+    ReflectionUtils.makeAccessible(entityMetadataFactory1);
+    EntityMetadataFactory entityMetadataFactory = (EntityMetadataFactory) ReflectionUtils.getField(entityMetadataFactory1, entityManager);
     assertThat(entityMetadataFactory).isNotNull();
 
     entityManager.addBatchPersistListeners((execution, implicitExecution, e) -> {

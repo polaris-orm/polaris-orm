@@ -47,7 +47,6 @@ import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 import cn.taketoday.polaris.util.Nullable;
-import cn.taketoday.util.function.ThrowingBiFunction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;

@@ -16,10 +16,10 @@
 
 package cn.taketoday.polaris.jdbc.performance;
 
-import com.google.common.base.Function;
 import com.google.common.base.Stopwatch;
 
 import java.sql.SQLException;
+import java.util.function.Function;
 
 /**
  * Basically a {@link Runnable} with an Integer input.

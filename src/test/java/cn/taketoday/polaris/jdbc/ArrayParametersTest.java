@@ -16,14 +16,12 @@
 
 package cn.taketoday.polaris.jdbc;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import cn.taketoday.polaris.jdbc.parsing.ParameterIndexHolder;
@@ -35,27 +33,25 @@ public class ArrayParametersTest {
 
   @Test
   public void testUpdateParameterNamesToIndexes() {
-    final ImmutableList<Integer> of = ImmutableList.of(3, 5);
+    final List<Integer> of = List.of(3, 5);
     ArrayList<ArrayParameters.ArrayParameter> arrayParametersSortedAsc =
             listOf(new ArrayParameters.ArrayParameter(6, 3));
 
     QueryParameter parameter = new QueryParameter("paramName", ParameterIndexHolder.valueOf(of));
 
-    ImmutableMap<String, QueryParameter> paramName2 = ImmutableMap.of("paramName", parameter);
+    Map<String, QueryParameter> paramName2 = Map.of("paramName", parameter);
     Map<String, QueryParameter> paramName =
-            ArrayParameters.updateMap(Maps.newHashMap(paramName2), arrayParametersSortedAsc);
+            ArrayParameters.updateMap(new HashMap<>(paramName2), arrayParametersSortedAsc);
 
-    assertEquals(ImmutableMap.of("paramName", new QueryParameter("paramName", ParameterIndexHolder.valueOf(ImmutableList.of(3, 5)))),
+    assertEquals(Map.of("paramName", new QueryParameter("paramName", ParameterIndexHolder.valueOf(List.of(3, 5)))),
             paramName);
 
-    parameter = new QueryParameter("paramName", ParameterIndexHolder.valueOf(ImmutableList.of(3, 7)));
+    parameter = new QueryParameter("paramName", ParameterIndexHolder.valueOf(List.of(3, 7)));
 
-    ImmutableMap<String, QueryParameter> paramName1 = ImmutableMap.of("paramName", parameter);
+    Map<String, QueryParameter> paramName1 = Map.of("paramName", parameter);
 
-    assertEquals(
-            ImmutableMap.of("paramName", new QueryParameter("paramName", ParameterIndexHolder.valueOf(ImmutableList.of(3, 9)))),
-            ArrayParameters.updateMap(
-                    Maps.newHashMap(paramName1),
+    assertEquals(Map.of("paramName", new QueryParameter("paramName", ParameterIndexHolder.valueOf(List.of(3, 9)))),
+            ArrayParameters.updateMap(new HashMap<>(paramName1),
                     listOf(new ArrayParameters.ArrayParameter(6, 3))));
   }
 

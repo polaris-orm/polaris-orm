@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-import cn.taketoday.lang.Nullable;
+import cn.taketoday.polaris.util.Nullable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
