@@ -56,13 +56,6 @@ public abstract class ClassUtils {
    */
   private static final IdentityHashMap<Class<?>, Class<?>> primitiveWrapperTypeMap = new IdentityHashMap<>(9);
 
-  /**
-   * Map with primitive type as key and corresponding wrapper
-   * type as value, for example: int.class -> Integer.class.
-   */
-  @Deprecated
-  private static final IdentityHashMap<Class<?>, Class<?>> primitiveTypeToWrapperMap = new IdentityHashMap<>(9);
-
   static {
     primitiveWrapperTypeMap.put(Boolean.class, boolean.class);
     primitiveWrapperTypeMap.put(Byte.class, byte.class);

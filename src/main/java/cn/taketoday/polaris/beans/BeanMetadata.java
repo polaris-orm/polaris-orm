@@ -31,7 +31,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import cn.taketoday.polaris.util.Assert;
-import cn.taketoday.polaris.util.ExceptionUtils;
 import cn.taketoday.polaris.util.MapCache;
 import cn.taketoday.polaris.util.Nullable;
 import cn.taketoday.polaris.util.ReflectionUtils;
@@ -211,7 +210,7 @@ public class BeanMetadata implements Iterable<BeanProperty> {
       return beanPropertyMap;
     }
     catch (IntrospectionException e) {
-      throw ExceptionUtils.sneakyThrow(e);
+      throw new IllegalStateException("introspection error", e);
     }
   }
 
