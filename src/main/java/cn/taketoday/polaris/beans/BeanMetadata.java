@@ -16,13 +16,12 @@
 
 package cn.taketoday.polaris.beans;
 
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Objects;
@@ -46,11 +45,10 @@ public class BeanMetadata implements Iterable<BeanProperty> {
 
   private final Class<?> beanClass;
 
+  @Nullable
   private BeanInstantiator instantiator;
 
-  /**
-   * @since 1.0
-   */
+  @Nullable
   private BeanPropertiesHolder propertyHolder;
 
   public BeanMetadata(Class<?> beanClass) {
@@ -159,23 +157,14 @@ public class BeanMetadata implements Iterable<BeanProperty> {
     return propertyHolder().beanProperties;
   }
 
-  /**
-   * @since 1.0
-   */
   public int getPropertySize() {
     return propertyHolder().beanProperties.size();
   }
 
-  /**
-   * @since 1.0
-   */
   public boolean containsProperty(String name) {
     return propertyHolder().mapping.containsKey(name);
   }
 
-  /**
-   * @since 1.0
-   */
   private BeanPropertiesHolder propertyHolder() {
     BeanPropertiesHolder propertyHolder = this.propertyHolder;
     if (propertyHolder == null) {
@@ -186,36 +175,37 @@ public class BeanMetadata implements Iterable<BeanProperty> {
   }
 
   public HashMap<String, BeanProperty> createBeanProperties() {
-    HashMap<String, BeanProperty> beanPropertyMap = new LinkedHashMap<>();
+    var names = new HashSet<String>();
+    var properties = new ArrayList<BeanProperty>();
 
-    try {
-      PropertyDescriptor[] propertyDescriptors = Introspector.getBeanInfo(beanClass).getPropertyDescriptors();
-      for (PropertyDescriptor descriptor : propertyDescriptors) {
-        if (descriptor.getReadMethod() != null || descriptor.getWriteMethod() != null) {
-          BeanProperty property = new BeanProperty(descriptor, beanClass);
-          beanPropertyMap.put(descriptor.getName(), property);
-        }
-      }
-
-      ReflectionUtils.doWithFields(beanClass, field -> {
-        if (!Modifier.isStatic(field.getModifiers())) {
+    var targetClass = beanClass;
+    do {
+      var declaredFields = getDeclaredFields(targetClass);
+      var curProperties = new ArrayList<BeanProperty>(declaredFields.length);
+      for (Field field : declaredFields) {
+        if (!Modifier.isStatic(field.getModifiers()) && !field.isSynthetic()) {
           String propertyName = getPropertyName(field);
-          if (!beanPropertyMap.containsKey(propertyName)) {
-            BeanProperty property = new FieldBeanProperty(field);
-            beanPropertyMap.put(propertyName, property);
+          if (names.add(propertyName)) {
+            Method readMethod = ReflectionUtils.getReadMethod(beanClass, field.getType(), propertyName);
+            Method writeMethod = ReflectionUtils.getWriteMethod(beanClass, field.getType(), propertyName);
+            BeanProperty property = new BeanProperty(beanClass, propertyName, field, readMethod, writeMethod);
+            curProperties.add(property);
           }
         }
-      });
+      }
+      properties.addAll(0, curProperties);
+      targetClass = targetClass.getSuperclass();
+    }
+    while (targetClass != null && targetClass != Object.class);
 
-      return beanPropertyMap;
+    HashMap<String, BeanProperty> beanPropertyMap = new LinkedHashMap<>();
+    for (BeanProperty property : properties) {
+      beanPropertyMap.put(property.getName(), property);
     }
-    catch (IntrospectionException e) {
-      throw new IllegalStateException("introspection error", e);
-    }
+    return beanPropertyMap;
   }
 
-  private String getPropertyName(Field field) {
-    // todo maybe start with 'm,_'
+  static String getPropertyName(Field field) {
     return field.getName();
   }
 
@@ -252,6 +242,16 @@ public class BeanMetadata implements Iterable<BeanProperty> {
     return propertyHolder().beanProperties.spliterator();
   }
 
+  static Field[] getDeclaredFields(Class<?> clazz) {
+    try {
+      return clazz.getDeclaredFields();
+    }
+    catch (Throwable ex) {
+      throw new IllegalStateException("Failed to introspect Class [%s] from ClassLoader [%s]"
+              .formatted(clazz.getName(), clazz.getClassLoader()), ex);
+    }
+  }
+
   //---------------------------------------------------------------------
   // static factory method
   //---------------------------------------------------------------------
@@ -276,9 +276,6 @@ public class BeanMetadata implements Iterable<BeanProperty> {
     return forClass(object.getClass());
   }
 
-  /**
-   * @since 1.0
-   */
   static final class BeanPropertiesHolder {
     public final HashMap<String, BeanProperty> mapping;
     public final ArrayList<BeanProperty> beanProperties;

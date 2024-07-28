@@ -17,7 +17,6 @@
 package cn.taketoday.polaris;
 
 import java.util.ArrayList;
-import java.util.Set;
 
 import cn.taketoday.polaris.beans.BeanMetadata;
 import cn.taketoday.polaris.beans.BeanProperty;
@@ -44,8 +43,7 @@ import cn.taketoday.polaris.util.ClassUtils;
  */
 public class DefaultEntityMetadataFactory extends EntityMetadataFactory {
 
-  private PropertyFilter propertyFilter = PropertyFilter.filteredNames(Set.of("class"))
-          .and(PropertyFilter.forTransientAnnotation());
+  private PropertyFilter propertyFilter = PropertyFilter.forTransientAnnotation();
 
   private TableNameGenerator tableNameGenerator = TableNameGenerator.defaultStrategy();
 

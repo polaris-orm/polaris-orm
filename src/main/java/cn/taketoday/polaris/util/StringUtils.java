@@ -22,11 +22,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.Random;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.StringTokenizer;
-import java.util.UUID;
 
 import cn.taketoday.polaris.Constant;
 
@@ -53,8 +51,6 @@ public abstract class StringUtils {
   private static final int DEFAULT_TRUNCATION_THRESHOLD = 100;
 
   private static final String TRUNCATION_SUFFIX = " (truncated)...";
-
-  private static final Random random = new Random();
 
   //---------------------------------------------------------------------
   // General convenience methods for working with Strings
@@ -145,26 +141,6 @@ public abstract class StringUtils {
       return Constant.EMPTY_STRING_ARRAY;
     }
     return collection.toArray(new String[collection.size()]);
-  }
-
-  /**
-   * Trim the elements of the given {@code String} array, calling
-   * {@code String.trim()} on each non-null element.
-   *
-   * @param array the original {@code String} array (potentially empty)
-   * @return the resulting array (of the same size) with trimmed elements
-   */
-  public static String[] trimArrayElements(String[] array) {
-    if (ObjectUtils.isEmpty(array)) {
-      return array;
-    }
-
-    String[] result = new String[array.length];
-    for (int i = 0; i < array.length; i++) {
-      String element = array[i];
-      result[i] = (element != null ? element.trim() : null);
-    }
-    return result;
   }
 
   /**
@@ -286,15 +262,6 @@ public abstract class StringUtils {
   public static Set<String> commaDelimitedListToSet(@Nullable String str) {
     String[] tokens = commaDelimitedListToStringArray(str);
     return new LinkedHashSet<>(Arrays.asList(tokens));
-  }
-
-  /**
-   * Use {@link UUID} to get random uuid string
-   *
-   * @return Random uuid string
-   */
-  public static String getUUIDString() {
-    return UUID.randomUUID().toString();
   }
 
   /**

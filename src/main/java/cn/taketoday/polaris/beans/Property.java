@@ -16,10 +16,7 @@
 
 package cn.taketoday.polaris.beans;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.lang.annotation.Annotation;
-import java.lang.invoke.TypeDescriptor;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
@@ -36,29 +33,15 @@ import cn.taketoday.polaris.util.ReflectionUtils;
 import cn.taketoday.polaris.util.StringUtils;
 
 /**
- * A description of a JavaBeans Property that allows us to avoid a dependency on
- * {@code java.beans.PropertyDescriptor}. The {@code java.beans} package
- * is not available in a number of environments (e.g. Android, Java ME), so this is
- * desirable for portability of core conversion facility.
- *
- * <p>Used to build a {@link TypeDescriptor} from a property location. The built
- * {@code TypeDescriptor} can then be used to convert from/to the property type.
- *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0
  */
-public class Property implements Member, AnnotatedElement, Serializable {
-
-  @Serial
-  private static final long serialVersionUID = 1L;
+public abstract class Property implements Member, AnnotatedElement {
 
   private static final ConcurrentHashMap<Property, Annotation[]> annotationCache = new ConcurrentHashMap<>();
 
   // Nullable
-  protected transient Field field;
-
-  @Nullable
-  private transient TypeDescriptor typeDescriptor;
+  protected Field field;
 
   protected final String name;
 
@@ -89,14 +72,6 @@ public class Property implements Member, AnnotatedElement, Serializable {
     this.writeMethod = null;
   }
 
-  public Property(Field field) {
-    this(field.getName(), field);
-  }
-
-  public Property(Class<?> objectType, @Nullable Method readMethod, @Nullable Method writeMethod) {
-    this(null, readMethod, writeMethod, objectType);
-  }
-
   public Property(@Nullable String name, @Nullable Method readMethod,
           @Nullable Method writeMethod, @Nullable Class<?> declaringClass) {
     if (readMethod == null && writeMethod == null) {
@@ -110,6 +85,15 @@ public class Property implements Member, AnnotatedElement, Serializable {
       name = ReflectionUtils.getPropertyName(readMethod, writeMethod);
     }
     this.name = name;
+  }
+
+  Property(Class<?> declaringClass, String name, Field field,
+          @Nullable Method readMethod, @Nullable Method writeMethod) {
+    this.name = name;
+    this.field = field;
+    this.readMethod = readMethod;
+    this.writeMethod = writeMethod;
+    this.declaringClass = declaringClass;
   }
 
   /**
@@ -160,6 +144,9 @@ public class Property implements Member, AnnotatedElement, Serializable {
       }
       else if (writeMethod != null) {
         propertyType = writeMethod.getParameterTypes()[0];
+      }
+      else if (field != null) {
+        propertyType = field.getType();
       }
       else {
         throw new IllegalStateException("should never get here");
@@ -222,7 +209,7 @@ public class Property implements Member, AnnotatedElement, Serializable {
     else if (writeMethod != null) {
       return writeMethod.isSynthetic();
     }
-    return true;
+    return false;
   }
 
   /**

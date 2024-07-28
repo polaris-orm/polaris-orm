@@ -31,14 +31,7 @@ public abstract class PropertyAccessor {
 
   public abstract Object get(Object obj) throws ReflectionException;
 
-  public abstract void set(Object obj, Object value) throws ReflectionException;
-
-  /**
-   * read-only ?
-   */
-  public boolean isReadOnly() {
-    return false;
-  }
+  public abstract void set(Object obj, @Nullable Object value) throws ReflectionException;
 
   // static
 

@@ -16,9 +16,6 @@
 
 package cn.taketoday.polaris.beans;
 
-import java.beans.PropertyDescriptor;
-import java.io.Serial;
-import java.io.Serializable;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
@@ -39,31 +36,22 @@ import cn.taketoday.polaris.util.ReflectionUtils;
  * @see #isReadable()
  * @since 1.0
  */
-public sealed class BeanProperty extends Property implements Member, AnnotatedElement, Serializable permits FieldBeanProperty {
+public class BeanProperty extends Property implements Member, AnnotatedElement {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
+  @Nullable
+  private PropertyAccessor propertyAccessor;
 
-  private transient PropertyAccessor propertyAccessor;
+  @Nullable
+  private BeanInstantiator instantiator;
 
-  private transient BeanInstantiator instantiator;
-
-  BeanProperty(String name, Field field) {
-    super(name, field);
+  BeanProperty(Field field) {
+    super(field.getName(), field);
     this.field = field;
   }
 
-  BeanProperty(Field field) {
-    this(field.getName(), field);
-  }
-
-  BeanProperty(@Nullable String name, @Nullable Method readMethod,
-          @Nullable Method writeMethod, @Nullable Class<?> declaringClass) {
-    super(name, readMethod, writeMethod, declaringClass);
-  }
-
-  BeanProperty(PropertyDescriptor descriptor, Class<?> declaringClass) {
-    super(descriptor.getName(), descriptor.getReadMethod(), descriptor.getWriteMethod(), declaringClass);
+  BeanProperty(Class<?> declaringClass, String name, Field field,
+          @Nullable Method readMethod, @Nullable Method writeMethod) {
+    super(declaringClass, name, field, readMethod, writeMethod);
   }
 
   /**
@@ -99,17 +87,12 @@ public sealed class BeanProperty extends Property implements Member, AnnotatedEl
     return obtainAccessor().get(object);
   }
 
-  /**
-   *
-   */
   public final void setValue(Object obj, Object value) {
-    value = handleOptional(value, getType());
-    setDirectly(obj, value);
+    setDirectly(obj, handleOptional(value, getType()));
   }
 
-  // @since 1.0
   @Nullable
-  static Object handleOptional(Object value, Class<?> propertyType) {
+  static Object handleOptional(@Nullable Object value, Class<?> propertyType) {
     // convertedValue == null
     if (value == null && propertyType == Optional.class) {
       value = Optional.empty();
@@ -120,7 +103,7 @@ public sealed class BeanProperty extends Property implements Member, AnnotatedEl
   /**
    *
    */
-  public final void setDirectly(Object obj, Object value) {
+  public final void setDirectly(Object obj, @Nullable Object value) {
     obtainAccessor().set(obj, value);
   }
 
@@ -149,9 +132,6 @@ public sealed class BeanProperty extends Property implements Member, AnnotatedEl
 
   // static
 
-  /**
-   * @since 1.0
-   */
   public static BeanProperty valueOf(Field field) {
     Assert.notNull(field, "field is required");
     return new FieldBeanProperty(field);
@@ -161,41 +141,6 @@ public sealed class BeanProperty extends Property implements Member, AnnotatedEl
     Field field = ReflectionUtils.findField(targetClass, name);
     Assert.state(field != null, () -> "bean property not found: " + name);
     return new FieldBeanProperty(field);
-  }
-
-  /**
-   * @param writeMethod can be null (read only)
-   */
-  public static BeanProperty valueOf(Method readMethod, @Nullable Method writeMethod) {
-    return valueOf(readMethod, writeMethod, null);
-  }
-
-  /**
-   * construct with read-method and write-method
-   *
-   * @param writeMethod can be null (read only)
-   * @param declaringClass the implementation class
-   */
-  public static BeanProperty valueOf(@Nullable Method readMethod, @Nullable Method writeMethod, @Nullable Class<?> declaringClass) {
-    return valueOf(null, readMethod, writeMethod, declaringClass);
-  }
-
-  /**
-   * construct with read-method and write-method and property-name
-   * <p>
-   * <b>NOTE:</b> read-write method cannot be null at the same time
-   * </p>
-   *
-   * @param propertyName user specified property name
-   * @param writeMethod can be null (read only)
-   * @param declaringClass the implementation class
-   */
-  public static BeanProperty valueOf(@Nullable String propertyName, @Nullable Method readMethod,
-          @Nullable Method writeMethod, @Nullable Class<?> declaringClass) {
-    if (readMethod == null && writeMethod == null) {
-      throw new IllegalStateException("Property is neither readable nor writeable");
-    }
-    return new BeanProperty(propertyName, readMethod, writeMethod, declaringClass);
   }
 
 }

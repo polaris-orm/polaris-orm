@@ -66,12 +66,14 @@ public abstract class ReflectionUtils {
   /**
    * Cache for {@link Class#getDeclaredFields()}, allowing for fast iteration.
    */
+  @Deprecated
   private static final ConcurrentHashMap<Class<?>, Field[]>
           DECLARED_FIELDS_CACHE = new ConcurrentHashMap<>(256);
   /**
    * Cache for {@link Class#getDeclaredMethods()} plus equivalent default methods
    * from Java 8 based interfaces, allowing for fast iteration.
    */
+  @Deprecated
   private static final ConcurrentHashMap<Class<?>, Method[]>
           DECLARED_METHODS_CACHE = new ConcurrentHashMap<>(256);
 
@@ -135,29 +137,6 @@ public abstract class ReflectionUtils {
   public static void rethrowRuntimeException(Throwable ex) {
     if (ex instanceof RuntimeException) {
       throw (RuntimeException) ex;
-    }
-    if (ex instanceof Error) {
-      throw (Error) ex;
-    }
-    throw new UndeclaredThrowableException(ex);
-  }
-
-  /**
-   * Rethrow the given {@link Throwable exception}, which is presumably the
-   * <em>target exception</em> of an {@link InvocationTargetException}. Should
-   * only be called if no checked exception is expected to be thrown by the target
-   * method.
-   * <p>
-   * Rethrows the underlying exception cast to an {@link Exception} or
-   * {@link Error} if appropriate; otherwise, throws an
-   * {@link UndeclaredThrowableException}.
-   *
-   * @param ex the exception to rethrow
-   * @throws Exception the rethrown exception (in case of a checked exception)
-   */
-  public static void rethrowException(Throwable ex) throws Exception {
-    if (ex instanceof Exception) {
-      throw (Exception) ex;
     }
     if (ex instanceof Error) {
       throw (Error) ex;
@@ -397,28 +376,6 @@ public abstract class ReflectionUtils {
 
   /**
    * Perform the given callback operation on all matching methods of the given
-   * class, as locally declared or equivalent thereof (such as default methods on
-   * Java 8 based interfaces that the given class implements).
-   *
-   * @param clazz the class to introspect
-   * @param mc the callback to invoke for each method
-   * @throws IllegalStateException if introspection fails
-   * @see #doWithMethods
-   */
-  public static void doWithLocalMethods(Class<?> clazz, MethodCallback mc) {
-    Method[] methods = getDeclaredMethods(clazz, false);
-    for (Method method : methods) {
-      try {
-        mc.doWith(method);
-      }
-      catch (IllegalAccessException ex) {
-        throw new IllegalStateException("Not allowed to access method '%s': %s".formatted(method.getName(), ex));
-      }
-    }
-  }
-
-  /**
-   * Perform the given callback operation on all matching methods of the given
    * class and superclasses.
    * <p>
    * The same named method occurring on subclass and superclass will appear twice,
@@ -602,64 +559,6 @@ public abstract class ReflectionUtils {
   }
 
   /**
-   * Determine whether the given method is an "equals" method.
-   *
-   * @see java.lang.Object#equals(Object)
-   */
-  public static boolean isEqualsMethod(@Nullable Method method) {
-    if (method == null || !method.getName().equals("equals")) {
-      return false;
-    }
-    if (method.getParameterCount() != 1) {
-      return false;
-    }
-    return method.getParameterTypes()[0] == Object.class;
-  }
-
-  /**
-   * Determine whether the given method is a "hashCode" method.
-   *
-   * @see java.lang.Object#hashCode()
-   */
-  public static boolean isHashCodeMethod(@Nullable Method method) {
-    return (method != null && method.getName().equals("hashCode") && method.getParameterCount() == 0);
-  }
-
-  /**
-   * Determine whether the given method is a "toString" method.
-   *
-   * @see java.lang.Object#toString()
-   */
-  public static boolean isToStringMethod(@Nullable Method method) {
-    return (method != null && method.getName().equals("toString") && method.getParameterCount() == 0);
-  }
-
-  /**
-   * Determine whether the given method is originally declared by
-   * {@link java.lang.Object}.
-   */
-  public static boolean isObjectMethod(@Nullable Method method) {
-    return (method != null
-            && (
-            method.getDeclaringClass() == Object.class
-                    || isEqualsMethod(method)
-                    || isHashCodeMethod(method)
-                    || isToStringMethod(method))
-    );
-  }
-
-  /**
-   * Determine whether the given method is a "finalize" method.
-   *
-   * @see java.lang.Object#finalize()
-   */
-  public static boolean isFinalizeMethod(@Nullable Method method) {
-    return method != null
-            && method.getName().equals("finalize")
-            && method.getParameterCount() == 0;
-  }
-
-  /**
    * Determine whether the given method is a CGLIB 'renamed' method, following the
    * pattern "CGLIB$methodName$0".
    *
@@ -686,7 +585,7 @@ public abstract class ReflectionUtils {
    * @param method the method to make accessible
    * @see java.lang.reflect.Method#setAccessible
    */
-  @SuppressWarnings("deprecation") // on JDK 9
+  @SuppressWarnings("deprecation")
   public static Method makeAccessible(Method method) {
     Assert.notNull(method, "method is required");
     if ((!Modifier.isPublic(method.getModifiers()) ||
@@ -754,31 +653,6 @@ public abstract class ReflectionUtils {
   }
 
   /**
-   * Attempt to find a {@link Field field} on the supplied {@link Class} with the
-   * supplied {@code name}. Searches all superclasses up to {@link Object}.
-   *
-   * @param clazz the class to introspect
-   * @param name the name of the field (with upper/lower case to be ignored)
-   * @return the corresponding Field object, or {@code null} if not found
-   */
-  @Nullable
-  public static Field findFieldIgnoreCase(Class<?> clazz, String name) {
-    Assert.notNull(clazz, "Class is required");
-    Assert.notNull(name, "Name is required");
-    Class<?> searchType = clazz;
-    while (Object.class != searchType && searchType != null) {
-      Field[] fields = getDeclaredFields(searchType);
-      for (Field field : fields) {
-        if (name.equalsIgnoreCase(field.getName())) {
-          return field;
-        }
-      }
-      searchType = searchType.getSuperclass();
-    }
-    return null;
-  }
-
-  /**
    * Set the field represented by the supplied {@linkplain Field field object} on
    * the specified {@linkplain Object target object} to the specified
    * {@code value}.
@@ -826,25 +700,6 @@ public abstract class ReflectionUtils {
       handleReflectionException(ex);
     }
     throw new IllegalStateException("Should never get here");
-  }
-
-  /**
-   * Invoke the given callback on all locally declared fields in the given class.
-   *
-   * @param clazz the target class to analyze
-   * @param fc the callback to invoke for each field
-   * @throws IllegalStateException if introspection fails
-   * @see #doWithFields
-   */
-  public static void doWithLocalFields(Class<?> clazz, FieldCallback fc) {
-    for (Field field : getDeclaredFields(clazz)) {
-      try {
-        fc.doWith(field);
-      }
-      catch (IllegalAccessException ex) {
-        throw new IllegalStateException("Not allowed to access field '%s': %s".formatted(field.getName(), ex));
-      }
-    }
   }
 
   /**
@@ -952,7 +807,7 @@ public abstract class ReflectionUtils {
    * @param field the field to make accessible
    * @see java.lang.reflect.Field#setAccessible
    */
-  @SuppressWarnings("deprecation") // on JDK 9
+  @SuppressWarnings("deprecation")
   public static Field makeAccessible(Field field) {
     Assert.notNull(field, "field is required");
 
@@ -977,40 +832,6 @@ public abstract class ReflectionUtils {
       constructor.setAccessible(true);
     }
     return constructor;
-  }
-
-  /**
-   * Determine whether the given class has a declared constructor with the given signature.
-   * <p>Essentially translates {@code NoSuchMethodException} to "false".
-   *
-   * @param clazz the clazz to analyze
-   * @param paramTypes the parameter types of the method
-   * @return whether the class has a corresponding constructor
-   * @see Class#getDeclaredConstructor
-   */
-  public static boolean hasConstructor(Class<?> clazz, Class<?>... paramTypes) {
-    return getConstructorIfAvailable(clazz, paramTypes) != null;
-  }
-
-  /**
-   * Determine whether the given class has a declared constructor with the given signature,
-   * and return it if available (else return {@code null}).
-   * <p>Essentially translates {@code NoSuchMethodException} to {@code null}.
-   *
-   * @param clazz the clazz to analyze
-   * @param paramTypes the parameter types of the method
-   * @return the constructor, or {@code null} if not found
-   * @see Class#getDeclaredConstructor
-   */
-  @Nullable
-  public static <T> Constructor<T> getConstructorIfAvailable(Class<T> clazz, Class<?>... paramTypes) {
-    Assert.notNull(clazz, "Class is required");
-    try {
-      return clazz.getDeclaredConstructor(paramTypes);
-    }
-    catch (NoSuchMethodException ex) {
-      return null;
-    }
   }
 
   // Cache handling

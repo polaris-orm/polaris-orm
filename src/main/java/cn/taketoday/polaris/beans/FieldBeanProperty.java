@@ -16,7 +16,6 @@
 
 package cn.taketoday.polaris.beans;
 
-import java.io.Serial;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Objects;
@@ -28,9 +27,6 @@ import java.util.Objects;
  * @since 1.0 2022/2/24 15:16
  */
 public final class FieldBeanProperty extends BeanProperty {
-
-  @Serial
-  private static final long serialVersionUID = 1L;
 
   FieldBeanProperty(Field field) {
     super(field);

@@ -18,6 +18,8 @@ package cn.taketoday.polaris.beans;
 
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0 2024/7/28 16:46
@@ -25,12 +27,25 @@ import org.junit.jupiter.api.Test;
 class BeanMetadataTests {
 
   @Test
-  void beanMetadata() {
-    BeanMetadata beanMetadata = BeanMetadata.forClass(BeanModel.class);
-
+  void beanProperties() {
+    BeanMetadata properties = BeanMetadata.forClass(BeanModel.class);
+    assertThat(properties.beanProperties()).hasSize(2);
   }
 
   static class BeanModel {
 
+    public int id;
+
+    public String name;
   }
+
+  static class PrefixModel {
+
+    public int mId;
+
+    public String mName;
+
+    public int _age;
+  }
+
 }
