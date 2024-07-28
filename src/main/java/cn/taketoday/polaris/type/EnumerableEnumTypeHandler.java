@@ -17,6 +17,8 @@
 package cn.taketoday.polaris.type;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,8 +26,6 @@ import java.sql.SQLException;
 
 import cn.taketoday.polaris.util.Assert;
 import cn.taketoday.polaris.util.Nullable;
-import cn.taketoday.polaris.util.ReflectionUtils;
-import cn.taketoday.polaris.util.ResolvableType;
 
 /**
  * TypeHandler for Enumerable
@@ -48,10 +48,9 @@ public class EnumerableEnumTypeHandler<V> implements TypeHandler<Enumerable<V>> 
 
   @SuppressWarnings("unchecked")
   static <V> Class<V> getValueType(Class<?> type) {
-    ResolvableType resolvableType = ResolvableType.forClass(Enumerable.class, type);
-    Class<?> valueType = resolvableType.resolveGeneric();
+    Class<?> valueType = resolveGeneric(type);
     if (valueType == null || valueType == Object.class) {
-      Method getValue = ReflectionUtils.getMethod(type, "getValue");
+      Method getValue = findValueMethod(type);
       if (getValue != null) {
         valueType = getValue.getReturnType();
       }
@@ -60,6 +59,32 @@ public class EnumerableEnumTypeHandler<V> implements TypeHandler<Enumerable<V>> 
       }
     }
     return (Class<V>) valueType;
+  }
+
+  @Nullable
+  static Method findValueMethod(Class<?> type) {
+    for (Method declaredMethod : type.getDeclaredMethods()) {
+      if (declaredMethod.getName().equals("getValue")
+              && declaredMethod.getParameterCount() == 0
+              && declaredMethod.getReturnType() != Object.class) {
+        return declaredMethod;
+      }
+    }
+    return null;
+  }
+
+  @Nullable
+  static Class<?> resolveGeneric(Class<?> type) {
+    Type[] genericInterfaces = type.getGenericInterfaces();
+    for (Type genericInterface : genericInterfaces) {
+      if (genericInterface instanceof ParameterizedType pType) {
+        Type[] typeArguments = pType.getActualTypeArguments();
+        if (typeArguments.length == 1 && typeArguments[0] instanceof Class<?> valueType) {
+          return valueType;
+        }
+      }
+    }
+    return null;
   }
 
   @Override

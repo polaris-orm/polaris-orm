@@ -39,11 +39,11 @@ public class SqlStatementLogger {
   private static final Logger slowLogger = LoggerFactory.getLogger("polaris.SQL_SLOW");
 
   public static final SqlStatementLogger sharedInstance = new SqlStatementLogger(
-          PolarisProperties.getFlag("sql.logToStdout", false),
-          PolarisProperties.getFlag("sql.format", true),
-          PolarisProperties.getFlag("sql.highlight", true),
-          PolarisProperties.getFlag("sql.stdoutOnly", false),
-          PolarisProperties.getLong("sql.logSlowQuery", 0)
+          PolarisProperties.getFlag("polaris.sql.logToStdout", false),
+          PolarisProperties.getFlag("polaris.sql.format", true),
+          PolarisProperties.getFlag("polaris.sql.highlight", true),
+          PolarisProperties.getFlag("polaris.sql.stdoutOnly", false),
+          PolarisProperties.getLong("polaris.sql.logSlowQuery", 0)
   );
 
   private final boolean format;

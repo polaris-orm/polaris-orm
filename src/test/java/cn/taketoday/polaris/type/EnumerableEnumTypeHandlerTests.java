@@ -61,12 +61,6 @@ class EnumerableEnumTypeHandlerTests {
 
   }
 
-  enum StringValue implements Enumerable {
-
-    TEST1,
-    TEST2;
-  }
-
   @Data
   static class UserModel {
 
@@ -79,9 +73,19 @@ class EnumerableEnumTypeHandlerTests {
   void test() {
     Class<?> valueType = EnumerableEnumTypeHandler.getValueType(Gender.class);
     assertThat(valueType).isNotNull().isEqualTo(Integer.class);
-
     assertThat(EnumerableEnumTypeHandler.getValueType(StringValue.class))
             .isEqualTo(String.class);
+
+    assertThat(EnumerableEnumTypeHandler.getValueType(ByGetValue.class))
+            .isEqualTo(Integer.class);
+
+  }
+
+  @Test
+  void resolveGeneric() {
+    Class<?> generic = EnumerableEnumTypeHandler.resolveGeneric(Gender.class);
+    assertThat(generic).isNotNull().isEqualTo(Integer.class);
+    assertThat(EnumerableEnumTypeHandler.resolveGeneric(StringValue.class)).isNull();
 
   }
 
@@ -126,4 +130,23 @@ class EnumerableEnumTypeHandlerTests {
     verify(delegate).getResult(callableStatement, 1);
 
   }
+
+  enum StringValue implements Enumerable {
+
+    TEST1,
+    TEST2;
+  }
+
+  enum ByGetValue implements Enumerable {
+
+    TEST1,
+    TEST2;
+
+    @Override
+    public Integer getValue() {
+      return ordinal();
+    }
+
+  }
+
 }

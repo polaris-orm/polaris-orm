@@ -20,20 +20,13 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.StringTokenizer;
-import java.util.TimeZone;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import cn.taketoday.polaris.Constant;
 
@@ -75,132 +68,9 @@ public abstract class StringUtils {
     return !isEmpty(str);
   }
 
-  public static String[] split(@Nullable String source) {
-    if (source == null) {
-      return Constant.EMPTY_STRING_ARRAY;
-    }
-    return toStringArray(splitAsList(source));
-  }
-
-  /**
-   * @param source source string
-   * @return if source is null this will returns
-   * {@link Collections#emptyList()}
-   * @see Collections#emptyList()
-   */
-  public static List<String> splitAsList(@Nullable String source) {
-    if (source == null) {
-      return Collections.emptyList();
-    }
-    if (source.isEmpty()) {
-      return Collections.singletonList(source);
-    }
-    final ArrayList<String> splitList = new ArrayList<>();
-
-    int idx = 0;
-    int start = 0;
-    final char[] chars = source.toCharArray();
-    for (final char c : chars) {
-      if (isSplitable(c)) {
-        splitList.add(new String(chars, start, idx - start));
-        start = idx + 1;
-      }
-      idx++;
-    }
-    if (idx != start && idx == source.length()) { // 最后一次分割
-      splitList.add(new String(chars, start, idx - start));
-    }
-    else if (splitList.isEmpty()) {
-      return Collections.singletonList(source);
-    }
-    return splitList;
-  }
-
-  private static boolean isSplitable(final char c) {
-    return c == ',' || c == ';';
-  }
-
-  /**
-   * Split a {@code String} at the first occurrence of the delimiter.
-   * Does not include the delimiter in the result.
-   *
-   * @param toSplit the string to split (potentially {@code null} or empty)
-   * @param delimiter to split the string up with (potentially {@code null} or empty)
-   * @return a two element array with index 0 being before the delimiter, and
-   * index 1 being after the delimiter (neither element includes the delimiter);
-   * or {@code null} if the delimiter wasn't found in the given input {@code String}
-   */
-  @Nullable
-  public static String[] split(@Nullable String toSplit, @Nullable String delimiter) {
-    if (isEmpty(toSplit) || isEmpty(delimiter)) {
-      return null;
-    }
-    int offset = toSplit.indexOf(delimiter);
-    if (offset < 0) {
-      return null;
-    }
-
-    String beforeDelimiter = toSplit.substring(0, offset);
-    String afterDelimiter = toSplit.substring(offset + delimiter.length());
-    return new String[] { beforeDelimiter, afterDelimiter };
-  }
-
   //---------------------------------------------------------------------
   // Convenience methods for working with String arrays
   //---------------------------------------------------------------------
-
-  /**
-   * Take an array of strings and split each element based on the given delimiter.
-   * A {@code Properties} instance is then generated, with the left of the delimiter
-   * providing the key, and the right of the delimiter providing the value.
-   * <p>Will trim both the key and value before adding them to the {@code Properties}.
-   *
-   * @param array the array to process
-   * @param delimiter to split each element using (typically the equals symbol)
-   * @return a {@code Properties} instance representing the array contents,
-   * or {@code null} if the array to process was {@code null} or empty
-   */
-  @Nullable
-  public static Properties splitArrayElementsIntoProperties(String[] array, String delimiter) {
-    return splitArrayElementsIntoProperties(array, delimiter, null);
-  }
-
-  /**
-   * Take an array of strings and split each element based on the given delimiter.
-   * A {@code Properties} instance is then generated, with the left of the
-   * delimiter providing the key, and the right of the delimiter providing the value.
-   * <p>Will trim both the key and value before adding them to the
-   * {@code Properties} instance.
-   *
-   * @param array the array to process
-   * @param delimiter to split each element using (typically the equals symbol)
-   * @param charsToDelete one or more characters to remove from each element
-   * prior to attempting the split operation (typically the quotation mark
-   * symbol), or {@code null} if no removal should occur
-   * @return a {@code Properties} instance representing the array contents,
-   * or {@code null} if the array to process was {@code null} or empty
-   */
-  @Nullable
-  public static Properties splitArrayElementsIntoProperties(
-          String[] array, String delimiter, @Nullable String charsToDelete) {
-
-    if (ObjectUtils.isEmpty(array)) {
-      return null;
-    }
-
-    Properties result = new Properties();
-    for (String element : array) {
-      if (charsToDelete != null) {
-        element = deleteAny(element, charsToDelete);
-      }
-      String[] splittedElement = split(element, delimiter);
-      if (splittedElement == null) {
-        continue;
-      }
-      result.setProperty(splittedElement[0].trim(), splittedElement[1].trim());
-    }
-    return result;
-  }
 
   /**
    * Tokenize the given {@code String} into a {@code String} array via a
@@ -275,54 +145,6 @@ public abstract class StringUtils {
       return Constant.EMPTY_STRING_ARRAY;
     }
     return collection.toArray(new String[collection.size()]);
-  }
-
-  /**
-   * Copy the given {@link Enumeration} into a {@code String} array.
-   * <p>The {@code Enumeration} must contain {@code String} elements only.
-   *
-   * @param enumeration the {@code Enumeration} to copy
-   * (potentially {@code null} or empty)
-   * @return the resulting {@code String} array
-   */
-  public static String[] toStringArray(@Nullable Enumeration<String> enumeration) {
-    return enumeration == null ? Constant.EMPTY_STRING_ARRAY
-            : toStringArray(Collections.list(enumeration));
-  }
-
-  /**
-   * Append the given {@code String} to the given {@code String} array,
-   * returning a new array consisting of the input array contents plus
-   * the given {@code String}.
-   *
-   * @param array the array to append to (can be {@code null})
-   * @param str the {@code String} to append
-   * @return the new array (never {@code null})
-   */
-  public static String[] addStringToArray(@Nullable String[] array, String str) {
-    if (ObjectUtils.isEmpty(array)) {
-      return new String[] { str };
-    }
-
-    String[] newArr = new String[array.length + 1];
-    System.arraycopy(array, 0, newArr, 0, array.length);
-    newArr[array.length] = str;
-    return newArr;
-  }
-
-  /**
-   * Sort the given {@code String} array if necessary.
-   *
-   * @param array the original array (potentially empty)
-   * @return the array in sorted form (never {@code null})
-   */
-  public static String[] sortArray(String[] array) {
-    if (ObjectUtils.isEmpty(array)) {
-      return array;
-    }
-
-    Arrays.sort(array);
-    return array;
   }
 
   /**
@@ -690,19 +512,6 @@ public abstract class StringUtils {
   }
 
   /**
-   * Turn the given Object into a {@code String} with single quotes
-   * if it is a {@code String}; keeping the Object as-is else.
-   *
-   * @param obj the input Object (e.g. "myString")
-   * @return the quoted {@code String} (e.g. "'myString'"),
-   * or the input object as-is if not a {@code String}
-   */
-  @Nullable
-  public static Object quoteIfString(@Nullable Object obj) {
-    return obj instanceof String ? quote((String) obj) : obj;
-  }
-
-  /**
    * Unqualify a string qualified by a '.' dot character. For example,
    * "this.name.is.qualified", returns "qualified".
    *
@@ -883,30 +692,6 @@ public abstract class StringUtils {
   }
 
   /**
-   * Concatenate the given {@code String} arrays into one, with overlapping array
-   * elements included twice.
-   * <p>
-   * The order of elements in the original arrays is preserved.
-   *
-   * @param array1 the first array (can be {@code null})
-   * @param array2 the second array (can be {@code null})
-   * @return the new array ({@code null} if both given arrays were {@code null})
-   */
-  public static String[] concatenateStringArrays(String[] array1, String[] array2) {
-    if (ObjectUtils.isEmpty(array1)) {
-      return array2;
-    }
-    if (ObjectUtils.isEmpty(array2)) {
-      return array1;
-    }
-
-    String[] newArr = new String[array1.length + array2.length];
-    System.arraycopy(array1, 0, newArr, 0, array1.length);
-    System.arraycopy(array2, 0, newArr, array1.length, array2.length);
-    return newArr;
-  }
-
-  /**
    * Check whether the given {@code CharSequence} contains actual <em>text</em>.
    * <p>
    * More specifically, this method returns {@code true} if the
@@ -1073,29 +858,6 @@ public abstract class StringUtils {
     return path.substring(0, extIndex);
   }
 
-  /**
-   * Apply the given relative path to the given Java resource path,
-   * assuming standard Java folder separation (i.e. "/" separators).
-   *
-   * @param path the path to start from (usually a full file path)
-   * @param relativePath the relative path to apply
-   * (relative to the full file path above)
-   * @return the full file path that results from applying the relative path
-   */
-  public static String applyRelativePath(String path, String relativePath) {
-    int separatorIndex = path.lastIndexOf(FOLDER_SEPARATOR_CHAR);
-    if (separatorIndex != -1) {
-      String newPath = path.substring(0, separatorIndex);
-      if (!relativePath.startsWith(FOLDER_SEPARATOR)) {
-        newPath += FOLDER_SEPARATOR_CHAR;
-      }
-      return newPath + relativePath;
-    }
-    else {
-      return relativePath;
-    }
-  }
-
   //
 
   /**
@@ -1163,37 +925,6 @@ public abstract class StringUtils {
     }
     return false;
   }
-
-  public static String generateRandomString(int length) {
-    final char[] ret = new char[length];
-    final Random random = StringUtils.random;
-    for (int i = 0; i < length; i++) {
-      ret[i] = generateRandomCharacter(random.nextInt(3));
-    }
-    return String.valueOf(ret);
-  }
-
-  private static char generateRandomCharacter(int type) {
-    int rand;
-    switch (type) {
-      case 0 -> {//随机小写字母
-        rand = random.nextInt(26);
-        rand += 97;
-        return (char) rand;
-      }
-      case 1 -> {//随机大写字母
-        rand = random.nextInt(26);
-        rand += 65;
-        return (char) rand;
-      }//随机数字
-      default -> {
-        rand = random.nextInt(10);
-        rand += 48;
-        return (char) rand;
-      }
-    }
-  }
-  // 3.0
 
   /**
    * Check whether the given {@code CharSequence} contains any whitespace characters.
@@ -1385,177 +1116,6 @@ public abstract class StringUtils {
             && suffix != null
             && str.length() >= suffix.length()
             && str.regionMatches(true, str.length() - suffix.length(), suffix, 0, suffix.length());
-  }
-
-  /**
-   * Test whether the given string matches the given substring
-   * at the given index.
-   *
-   * @param str the original string (or StringBuilder)
-   * @param index the index in the original string to start matching against
-   * @param substring the substring to match at the given index
-   */
-  public static boolean substringMatch(CharSequence str, int index, CharSequence substring) {
-    int substringLength = substring.length();
-    if (index + substringLength > str.length()) {
-      return false;
-    }
-    for (int i = 0; i < substringLength; i++) {
-      if (str.charAt(index + i) != substring.charAt(i)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
-   * Test if the given {@code String} matches the given single character.
-   *
-   * @param str the {@code String} to check
-   * @param singleCharacter the character to compare to
-   */
-  public static boolean matchesCharacter(@Nullable String str, char singleCharacter) {
-    return (str != null && str.length() == 1 && str.charAt(0) == singleCharacter);
-  }
-
-  /**
-   * Test if the given {@code String} matches the given index to single character.
-   *
-   * @param str given string
-   * @param idx str's index to match
-   * @param charToMatch char To Match
-   */
-  public static boolean matchesCharacter(@Nullable String str, int idx, char charToMatch) {
-    if (str == null || (idx < 0) || (idx >= str.length())) {
-      return false;
-    }
-    return str.charAt(idx) == charToMatch;
-  }
-
-  /**
-   * Test if the first given {@code String} matches the given single character.
-   * <p>
-   * Suitable for comparing the first character
-   * </p>
-   *
-   * @param str given string
-   * @param charToMatch char To Match
-   */
-  public static boolean matchesFirst(@Nullable String str, char charToMatch) {
-    return str != null && !str.isEmpty() && str.charAt(0) == charToMatch;
-  }
-
-  /**
-   * Test if the last given {@code String} matches the given single character.
-   *
-   * @param str given string
-   * @param charToMatch char To Match
-   */
-  public static boolean matchesLast(@Nullable String str, char charToMatch) {
-    return isNotEmpty(str) && str.charAt(str.length() - 1) == charToMatch;
-  }
-
-  //
-
-  /**
-   * Parse the given {@code String} value into a {@link Locale}, accepting
-   * the {@link Locale#toString} format as well as BCP 47 language tags.
-   *
-   * @param localeValue the locale value: following either {@code Locale's}
-   * {@code toString()} format ("en", "en_UK", etc), also accepting spaces as
-   * separators (as an alternative to underscores), or BCP 47 (e.g. "en-UK")
-   * as specified by {@link Locale#forLanguageTag} on Java 7+
-   * @return a corresponding {@code Locale} instance, or {@code null} if none
-   * @throws IllegalArgumentException in case of an invalid locale specification
-   * @see #parseLocaleString
-   * @see Locale#forLanguageTag
-   */
-  @Nullable
-  public static Locale parseLocale(String localeValue) {
-    if (!localeValue.contains("_") && !localeValue.contains(" ")) {
-      validateLocalePart(localeValue);
-      Locale resolved = Locale.forLanguageTag(localeValue);
-      if (!resolved.getLanguage().isEmpty()) {
-        return resolved;
-      }
-    }
-    return parseLocaleString(localeValue);
-  }
-
-  /**
-   * Parse the given {@code String} representation into a {@link Locale}.
-   * <p>For many parsing scenarios, this is an inverse operation of
-   * {@link Locale#toString Locale's toString}, in a lenient sense.
-   * This method does not aim for strict {@code Locale} design compliance;
-   * it is rather specifically tailored for typical parsing needs.
-   * <p><b>Note: This delegate does not accept the BCP 47 language tag format.
-   * Please use {@link #parseLocale} for lenient parsing of both formats.</b>
-   *
-   * @param localeString the locale {@code String}: following {@code Locale's}
-   * {@code toString()} format ("en", "en_UK", etc), also accepting spaces as
-   * separators (as an alternative to underscores)
-   * @return a corresponding {@code Locale} instance, or {@code null} if none
-   * @throws IllegalArgumentException in case of an invalid locale specification
-   */
-  @Nullable
-  public static Locale parseLocaleString(@Nullable String localeString) {
-    if (localeString == null || localeString.isEmpty()) {
-      return null;
-    }
-    String delimiter = "_";
-    if (!localeString.contains("_") && localeString.contains(" ")) {
-      delimiter = " ";
-    }
-    final String[] tokens = localeString.split(delimiter, -1);
-    if (tokens.length == 1) {
-      final String language = tokens[0];
-      validateLocalePart(language);
-      return new Locale(language);
-    }
-    else if (tokens.length == 2) {
-      final String language = tokens[0];
-      validateLocalePart(language);
-      final String country = tokens[1];
-      validateLocalePart(country);
-      return new Locale(language, country);
-    }
-    else if (tokens.length > 2) {
-      final String language = tokens[0];
-      validateLocalePart(language);
-      final String country = tokens[1];
-      validateLocalePart(country);
-      final String variant = Arrays.stream(tokens).skip(2).collect(Collectors.joining(delimiter));
-      return new Locale(language, country, variant);
-    }
-    throw new IllegalArgumentException("Invalid locale format: '%s'".formatted(localeString));
-  }
-
-  private static void validateLocalePart(String localePart) {
-    int length = localePart.length();
-    for (int i = 0; i < length; i++) {
-      char ch = localePart.charAt(i);
-      if (ch != ' ' && ch != '_' && ch != '-' && ch != '#' && !Character.isLetterOrDigit(ch)) {
-        throw new IllegalArgumentException(
-                "Locale part \"%s\" contains invalid characters".formatted(localePart));
-      }
-    }
-  }
-
-  /**
-   * Parse the given {@code timeZoneString} value into a {@link TimeZone}.
-   *
-   * @param timeZoneString the time zone {@code String}, following {@link TimeZone#getTimeZone(String)}
-   * but throwing {@link IllegalArgumentException} in case of an invalid time zone specification
-   * @return a corresponding {@link TimeZone} instance
-   * @throws IllegalArgumentException in case of an invalid time zone specification
-   */
-  public static TimeZone parseTimeZoneString(String timeZoneString) {
-    TimeZone timeZone = TimeZone.getTimeZone(timeZoneString);
-    if ("GMT".equals(timeZone.getID()) && !timeZoneString.startsWith("GMT")) {
-      // We don't want that GMT fallback...
-      throw new IllegalArgumentException("Invalid time zone specification '%s'".formatted(timeZoneString));
-    }
-    return timeZone;
   }
 
   /**

@@ -21,7 +21,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-import cn.taketoday.polaris.logging.Logger;
 import cn.taketoday.polaris.logging.LoggerFactory;
 
 /**
@@ -29,15 +28,16 @@ import cn.taketoday.polaris.logging.LoggerFactory;
  * @since 1.0 2024/7/26 22:40
  */
 public abstract class AnnotationUtils {
-  private static final Logger logger = LoggerFactory.getLogger(AnnotationUtils.class);
+
+  public static final String VALUE = "value";
 
   /**
    * Retrieve the <em>value</em> of the {@code value} attribute of a
    * single-element Annotation, given an annotation instance.
    */
   @Nullable
-  public static Object getValue(Annotation annotation) {
-    return getValue(annotation, "value");
+  public static Object getValue(@Nullable Annotation annotation) {
+    return getValue(annotation, VALUE);
   }
 
   /**
@@ -47,7 +47,7 @@ public abstract class AnnotationUtils {
    */
   @Nullable
   public static Object getValue(@Nullable Annotation annotation, @Nullable String attributeName) {
-    if (annotation == null || !StringUtils.hasText(attributeName)) {
+    if (annotation == null || StringUtils.isBlank(attributeName)) {
       return null;
     }
     try {
@@ -58,7 +58,8 @@ public abstract class AnnotationUtils {
       }
     }
     catch (Throwable ex) {
-      logger.error("Failed to retrieve value from {}: {}", annotation, ex);
+      LoggerFactory.getLogger(AnnotationUtils.class)
+              .error("Failed to retrieve value from {}: {}", annotation, ex);
     }
     return null;
   }

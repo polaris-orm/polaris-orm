@@ -52,7 +52,7 @@ public class JdbcBeanMetadata implements Iterable<BeanProperty> {
 
   @Deprecated
   public JdbcBeanMetadata(Class<?> clazz) {
-    this.beanMetadata = BeanMetadata.from(clazz);
+    this.beanMetadata = BeanMetadata.forClass(clazz);
     this.caseSensitive = false;
     this.throwOnMappingFailure = false;
     this.autoDeriveColumnNames = false;
@@ -60,7 +60,7 @@ public class JdbcBeanMetadata implements Iterable<BeanProperty> {
 
   public JdbcBeanMetadata(Class<?> clazz, boolean caseSensitive, boolean autoDeriveColumnNames, boolean throwOnMappingError) {
     this.caseSensitive = caseSensitive;
-    this.beanMetadata = BeanMetadata.from(clazz);
+    this.beanMetadata = BeanMetadata.forClass(clazz);
     this.throwOnMappingFailure = throwOnMappingError;
     this.autoDeriveColumnNames = autoDeriveColumnNames;
   }

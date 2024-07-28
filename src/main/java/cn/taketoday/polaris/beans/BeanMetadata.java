@@ -263,7 +263,7 @@ public class BeanMetadata implements Iterable<BeanProperty> {
    * @param beanClass target bean class cannot be simple class
    * @return {@link BeanMetadata}
    */
-  public static BeanMetadata from(Class<?> beanClass) {
+  public static BeanMetadata forClass(Class<?> beanClass) {
     return metadataMappings.get(beanClass);
   }
 
@@ -273,8 +273,8 @@ public class BeanMetadata implements Iterable<BeanProperty> {
    * @param object target bean cannot be simple object
    * @return {@link BeanMetadata}
    */
-  public static BeanMetadata from(Object object) {
-    return from(object.getClass());
+  public static BeanMetadata forInstance(Object object) {
+    return forClass(object.getClass());
   }
 
   /**

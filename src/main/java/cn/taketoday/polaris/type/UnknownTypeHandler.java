@@ -22,7 +22,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-import cn.taketoday.polaris.util.ClassUtils;
 import cn.taketoday.polaris.util.Nullable;
 
 /**
@@ -108,7 +107,7 @@ public class UnknownTypeHandler extends BaseTypeHandler<Object> {
   }
 
   @Nullable
-  protected TypeHandler<?> resolveTypeHandler(ResultSetMetaData rsmd, Integer columnIndex) {
+  protected TypeHandler<?> resolveTypeHandler(ResultSetMetaData rsmd, Integer columnIndex) throws SQLException {
     Class<?> javaType = safeGetClassForColumn(rsmd, columnIndex);
     if (javaType != null) {
       return registry.getTypeHandler(javaType);
@@ -117,11 +116,12 @@ public class UnknownTypeHandler extends BaseTypeHandler<Object> {
   }
 
   @Nullable
-  private Class<?> safeGetClassForColumn(ResultSetMetaData rsmd, Integer columnIndex) {
+  private Class<?> safeGetClassForColumn(ResultSetMetaData rsmd, Integer columnIndex) throws SQLException {
     try {
-      return ClassUtils.load(rsmd.getColumnClassName(columnIndex));
+      String columnClassName = rsmd.getColumnClassName(columnIndex);
+      return Class.forName(columnClassName);
     }
-    catch (Exception e) {
+    catch (ClassNotFoundException e) {
       return null;
     }
   }

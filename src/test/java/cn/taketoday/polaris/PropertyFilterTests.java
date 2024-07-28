@@ -51,7 +51,7 @@ class PropertyFilterTests {
   void filteredNames() {
     PropertyFilter propertyFilter = PropertyFilter.filteredNames(Set.of("class"));
 
-    BeanMetadata metadata = BeanMetadata.from(UserModel.class);
+    BeanMetadata metadata = BeanMetadata.forClass(UserModel.class);
     assertThat(propertyFilter.isFiltered(metadata.getBeanProperty("id"))).isFalse();
     assertThat(propertyFilter.isFiltered(metadata.getBeanProperty("class"))).isTrue();
 
@@ -60,7 +60,7 @@ class PropertyFilterTests {
   @Test
   void forTransientAnnotation() {
     PropertyFilter propertyFilter = PropertyFilter.forTransientAnnotation();
-    BeanMetadata metadata = BeanMetadata.from(NestedUserModel.class);
+    BeanMetadata metadata = BeanMetadata.forClass(NestedUserModel.class);
     assertThat(propertyFilter.isFiltered(metadata.getBeanProperty("class"))).isFalse();
     assertThat(propertyFilter.isFiltered(metadata.getBeanProperty("id"))).isFalse();
     assertThat(propertyFilter.isFiltered(metadata.getBeanProperty("my"))).isFalse();
@@ -71,7 +71,7 @@ class PropertyFilterTests {
   @Test
   void forAnnotation() {
     PropertyFilter propertyFilter = PropertyFilter.forAnnotation(MyTransient.class);
-    BeanMetadata metadata = BeanMetadata.from(NestedUserModel.class);
+    BeanMetadata metadata = BeanMetadata.forClass(NestedUserModel.class);
     assertThat(propertyFilter.isFiltered(metadata.getBeanProperty("class"))).isFalse();
     assertThat(propertyFilter.isFiltered(metadata.getBeanProperty("id"))).isFalse();
     assertThat(propertyFilter.isFiltered(metadata.getBeanProperty("my"))).isTrue();
@@ -85,7 +85,7 @@ class PropertyFilterTests {
             .and(PropertyFilter.filteredNames(Set.of("class")))
             .and(PropertyFilter.forTransientAnnotation());
 
-    BeanMetadata metadata = BeanMetadata.from(NestedUserModel.class);
+    BeanMetadata metadata = BeanMetadata.forClass(NestedUserModel.class);
     assertThat(propertyFilter.isFiltered(metadata.getBeanProperty("class"))).isTrue();
     assertThat(propertyFilter.isFiltered(metadata.getBeanProperty("id"))).isFalse();
     assertThat(propertyFilter.isFiltered(metadata.getBeanProperty("my"))).isTrue();
