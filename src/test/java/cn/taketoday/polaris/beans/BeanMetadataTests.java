@@ -30,6 +30,25 @@ class BeanMetadataTests {
   void beanProperties() {
     BeanMetadata properties = BeanMetadata.forClass(BeanModel.class);
     assertThat(properties.beanProperties()).hasSize(2);
+    assertThat(properties.getPropertySize()).isEqualTo(2);
+
+    assertThat(properties.containsProperty("id")).isTrue();
+    assertThat(properties.containsProperty("name")).isTrue();
+    assertThat(properties.containsProperty("name1")).isFalse();
+  }
+
+  @Test
+  void getBeanProperty() {
+    BeanMetadata properties = BeanMetadata.forClass(BeanModel.class);
+    assertThat(properties.getBeanProperty("id")).isNotNull().extracting("name").isEqualTo("id");
+    assertThat(properties.getBeanProperty("name")).isNotNull().extracting("name").isEqualTo("name");
+  }
+
+  @Test
+  void newInstance(){
+    BeanMetadata metadata = BeanMetadata.forClass(BeanModel.class);
+    assertThat(metadata.newInstance()).isNotNull().isInstanceOf(BeanModel.class);
+    assertThat(metadata.newInstance()).isNotEqualTo(metadata.newInstance());
   }
 
   static class BeanModel {
