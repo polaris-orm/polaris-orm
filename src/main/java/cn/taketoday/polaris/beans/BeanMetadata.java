@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.concurrent.ConcurrentHashMap;
@@ -174,7 +175,7 @@ public class BeanMetadata implements Iterable<BeanProperty> {
     return propertyHolder;
   }
 
-  public HashMap<String, BeanProperty> createBeanProperties() {
+  private List<BeanProperty> createBeanProperties() {
     var names = new HashSet<String>();
     var properties = new ArrayList<BeanProperty>();
 
@@ -184,7 +185,7 @@ public class BeanMetadata implements Iterable<BeanProperty> {
       var curProperties = new ArrayList<BeanProperty>(declaredFields.length);
       for (Field field : declaredFields) {
         if (!Modifier.isStatic(field.getModifiers()) && !field.isSynthetic()) {
-          String propertyName = getPropertyName(field);
+          String propertyName = field.getName();
           if (names.add(propertyName)) {
             Method readMethod = ReflectionUtils.getReadMethod(beanClass, field.getType(), propertyName);
             Method writeMethod = ReflectionUtils.getWriteMethod(beanClass, field.getType(), propertyName);
@@ -198,15 +199,7 @@ public class BeanMetadata implements Iterable<BeanProperty> {
     }
     while (targetClass != null && targetClass != Object.class);
 
-    HashMap<String, BeanProperty> beanPropertyMap = new LinkedHashMap<>();
-    for (BeanProperty property : properties) {
-      beanPropertyMap.put(property.getName(), property);
-    }
-    return beanPropertyMap;
-  }
-
-  static String getPropertyName(Field field) {
-    return field.getName();
+    return properties;
   }
 
   @Override
@@ -278,6 +271,7 @@ public class BeanMetadata implements Iterable<BeanProperty> {
 
   static final class BeanPropertiesHolder {
     public final HashMap<String, BeanProperty> mapping;
+
     public final ArrayList<BeanProperty> beanProperties;
 
     BeanPropertiesHolder(HashMap<String, BeanProperty> mapping) {
@@ -302,7 +296,12 @@ public class BeanMetadata implements Iterable<BeanProperty> {
 
     @Override
     protected BeanPropertiesHolder createValue(BeanMetadata key, BeanMetadata param) {
-      HashMap<String, BeanProperty> propertyMap = key.createBeanProperties();
+
+      HashMap<String, BeanProperty> propertyMap = new LinkedHashMap<>();
+      for (BeanProperty property : key.createBeanProperties()) {
+        propertyMap.put(property.getName(), property);
+      }
+
       return new BeanPropertiesHolder(propertyMap);
     }
 
