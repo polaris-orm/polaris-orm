@@ -83,11 +83,12 @@ public class BeanProperty extends Property implements Member, AnnotatedElement {
    * @param object object
    * @return property value
    */
+  @Nullable
   public Object getValue(Object object) {
     return obtainAccessor().get(object);
   }
 
-  public final void setValue(Object obj, Object value) {
+  public final void setValue(Object obj, @Nullable Object value) {
     setDirectly(obj, handleOptional(value, getType()));
   }
 

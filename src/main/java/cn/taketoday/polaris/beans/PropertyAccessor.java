@@ -31,7 +31,8 @@ public abstract class PropertyAccessor {
 
   public abstract Object get(Object obj) throws ReflectionException;
 
-  public abstract void set(Object obj, @Nullable Object value) throws ReflectionException;
+  public abstract void set(Object obj, @Nullable Object value)
+          throws ReflectionException;
 
   // static
 

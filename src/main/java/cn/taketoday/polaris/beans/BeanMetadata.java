@@ -123,6 +123,7 @@ public class BeanMetadata implements Iterable<BeanProperty> {
    * @param propertyName Property name
    * @see #obtainBeanProperty(String)
    */
+  @Nullable
   public Object getProperty(Object root, String propertyName) {
     return obtainBeanProperty(propertyName).getValue(root);
   }

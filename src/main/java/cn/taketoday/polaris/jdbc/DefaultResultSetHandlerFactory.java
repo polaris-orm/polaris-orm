@@ -148,7 +148,7 @@ public class DefaultResultSetHandlerFactory<T> implements ResultSetHandlerFactor
         return key.factory.createHandler(param);
       }
       catch (SQLException e) {
-        throw new PersistenceException(null, e);
+        throw new PersistenceException("ResultSetExtractor create failed", e);
       }
     }
   };

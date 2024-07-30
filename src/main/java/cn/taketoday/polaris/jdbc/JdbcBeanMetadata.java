@@ -48,15 +48,8 @@ public class JdbcBeanMetadata implements Iterable<BeanProperty> {
 
   public final BeanMetadata beanMetadata;
 
+  @Nullable
   private HashMap<String, BeanProperty> beanProperties;
-
-  @Deprecated
-  public JdbcBeanMetadata(Class<?> clazz) {
-    this.beanMetadata = BeanMetadata.forClass(clazz);
-    this.caseSensitive = false;
-    this.throwOnMappingFailure = false;
-    this.autoDeriveColumnNames = false;
-  }
 
   public JdbcBeanMetadata(Class<?> clazz, boolean caseSensitive, boolean autoDeriveColumnNames, boolean throwOnMappingError) {
     this.caseSensitive = caseSensitive;
@@ -94,6 +87,7 @@ public class JdbcBeanMetadata implements Iterable<BeanProperty> {
     return null;
   }
 
+  @Nullable
   private BeanProperty getProperty(String propertyName) {
     HashMap<String, BeanProperty> beanProperties = this.beanProperties;
     if (beanProperties == null) {
@@ -106,16 +100,12 @@ public class JdbcBeanMetadata implements Iterable<BeanProperty> {
 
   //
 
-  public Class<?> getObjectType() { return beanMetadata.getType(); }
-
-  public Object newInstance() { return beanMetadata.newInstance(); }
-
-  public void setProperty(Object root, String propertyName, Object value) {
-    beanMetadata.setProperty(root, propertyName, value);
+  public Class<?> getObjectType() {
+    return beanMetadata.getType();
   }
 
-  public Object getProperty(Object root, String propertyName) {
-    return beanMetadata.getProperty(root, propertyName);
+  public Object newInstance() {
+    return beanMetadata.newInstance();
   }
 
   @Override
@@ -124,10 +114,14 @@ public class JdbcBeanMetadata implements Iterable<BeanProperty> {
   }
 
   @Override
-  public void forEach(Consumer<? super BeanProperty> action) { beanMetadata.forEach(action); }
+  public void forEach(Consumer<? super BeanProperty> action) {
+    beanMetadata.forEach(action);
+  }
 
   @Override
-  public Spliterator<BeanProperty> spliterator() { return beanMetadata.spliterator(); }
+  public Spliterator<BeanProperty> spliterator() {
+    return beanMetadata.spliterator();
+  }
 
   @Override
   public boolean equals(Object o) {

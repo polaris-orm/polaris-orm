@@ -41,20 +41,12 @@ public class MapCache<Key, Value, Param> {
     this(new HashMap<>());
   }
 
-  public MapCache(int initialCapacity) {
-    this(new HashMap<>(initialCapacity));
-  }
-
   /**
    * @param mapping allows to define your own map implementation
    */
   public MapCache(Map<Key, Value> mapping) {
     this.mapping = mapping;
     this.mappingFunction = null;
-  }
-
-  public MapCache(Function<Key, Value> mappingFunction) {
-    this(new HashMap<>(), mappingFunction);
   }
 
   /**

@@ -16,10 +16,10 @@
 
 package cn.taketoday.polaris.jdbc;
 
-import cn.taketoday.polaris.util.Nullable;
 import cn.taketoday.polaris.beans.BeanMetadata;
 import cn.taketoday.polaris.beans.BeanProperty;
 import cn.taketoday.polaris.beans.BeanUtils;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
@@ -65,6 +65,7 @@ final class PropertyPath {
     }
   }
 
+  @Nullable
   public BeanProperty getNestedBeanProperty() {
     if (next != null) {
       return next.getNestedBeanProperty();
