@@ -19,11 +19,8 @@ package cn.taketoday.polaris.jdbc;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Spliterator;
-import java.util.function.Consumer;
 
 import cn.taketoday.polaris.Column;
 import cn.taketoday.polaris.beans.BeanMetadata;
@@ -37,16 +34,19 @@ import cn.taketoday.polaris.util.StringUtils;
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  */
-public class JdbcBeanMetadata implements Iterable<BeanProperty> {
+public class JdbcBeanMetadata {
 
   private static final Cache caseSensitiveFalse = new Cache();
+
   private static final Cache caseSensitiveTrue = new Cache();
 
-  public final boolean caseSensitive;
-  public final boolean throwOnMappingFailure;
-  public final boolean autoDeriveColumnNames;
+  private final boolean caseSensitive;
 
-  public final BeanMetadata beanMetadata;
+  private final boolean autoDeriveColumnNames;
+
+  final boolean throwOnMappingFailure;
+
+  private final BeanMetadata beanMetadata;
 
   @Nullable
   private HashMap<String, BeanProperty> beanProperties;
@@ -109,21 +109,6 @@ public class JdbcBeanMetadata implements Iterable<BeanProperty> {
   }
 
   @Override
-  public Iterator<BeanProperty> iterator() {
-    return beanMetadata.iterator();
-  }
-
-  @Override
-  public void forEach(Consumer<? super BeanProperty> action) {
-    beanMetadata.forEach(action);
-  }
-
-  @Override
-  public Spliterator<BeanProperty> spliterator() {
-    return beanMetadata.spliterator();
-  }
-
-  @Override
   public boolean equals(Object o) {
     if (this == o)
       return true;
@@ -169,10 +154,10 @@ public class JdbcBeanMetadata implements Iterable<BeanProperty> {
   static class Cache extends MapCache<Class<?>, HashMap<String, BeanProperty>, JdbcBeanMetadata> {
 
     @Override
-    protected HashMap<String, BeanProperty> createValue(Class<?> key, JdbcBeanMetadata beanMetadata) {
-      boolean caseSensitive = beanMetadata.caseSensitive;
+    protected HashMap<String, BeanProperty> createValue(Class<?> key, JdbcBeanMetadata params) {
+      boolean caseSensitive = params.caseSensitive;
       HashMap<String, BeanProperty> beanPropertyMap = new HashMap<>();
-      for (BeanProperty property : beanMetadata) {
+      for (BeanProperty property : params.beanMetadata) {
         String propertyName_ = getPropertyName(property);
         if (caseSensitive) {
           beanPropertyMap.put(propertyName_, property);
