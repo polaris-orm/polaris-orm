@@ -44,7 +44,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           name: github-pages
-          path: "${{ github.workspace }}/docs/build/site"
+          path: "${{ github.workspace }}/polaris-docs/build/site"
 
       - name: Deploy to GitHub Pages 🚀
         id: deployment
