@@ -1,0 +1,14 @@
+[[framework-home-page]]
+= 首页
+
+[horizontal]
+xref:overview.adoc[概述] :: 系统要求，反馈和贡献, 鸣谢，开源协议。
+
+海子 Yang（Harry Yang）
+
+Copyright 2024 the original author or authors All Rights Reserved.
+
+Copies of this document may be made for your own use and for distribution to others,
+provided that you do not charge any fee for such copies and further provided that each
+copy contains this Copyright Notice, whether distributed in print or electronically.
+
