@@ -3,6 +3,8 @@ plugins {
   id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
   id 'de.undercouch.download' version '5.4.0'
   id "io.github.gradle-nexus.publish-plugin" version "1.3.0"
+  id 'org.antora' version '1.0.0'
+  id 'cn.taketoday.generate-antora-yml'
 }
 
 description = "Polaris is Java ORM framework"
