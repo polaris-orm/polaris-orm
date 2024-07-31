@@ -3,7 +3,7 @@ name: Docs
 on:
   push:
     branches:
-      - master
+      - main
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
@@ -35,7 +35,7 @@ jobs:
         uses: gradle/gradle-build-action@v3.1.0
 
       - name: Build Docs 🔧
-        run: ./gradlew -DCI=true --no-daemon --max-workers=4 :infra-docs:antora
+        run: ./gradlew -DCI=true --no-daemon --max-workers=4 :polaris-docs:antora
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

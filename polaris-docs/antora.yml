@@ -1,0 +1,43 @@
+name: framework
+version: true
+title: Polaris ORM 文档
+nav:
+  - modules/ROOT/nav-root.adoc
+
+ext:
+  collector:
+    run:
+      command: gradlew -q -PbuildSrc.skipTests=true "-Dorg.gradle.jvmargs=-Xmx3g -XX:+HeapDumpOnOutOfMemoryError" :polaris-docs:generateAntoraResources
+      local: true
+    scan:
+      dir: ./build/generated-antora-resources
+
+asciidoc:
+  attributes:
+    attribute-missing: 'warn'
+    chomp: 'all'
+    fold: 'all'
+    table-stripes: 'odd'
+    today-org: 'polaris-tech'
+    today-github-org: "https://github.com/polaris-orm"
+    today-framework-github: "https://github.com/taketoday/today-infrastructure"
+    today-framework-code: '{today-framework-github}/tree/main'
+    today-framework-issues: '{today-framework-github}/issues'
+    today-framework-wiki: '{today-framework-github}/wiki'
+
+    # Docs
+    docs-site: 'https://docs.polaris-orm.cn'
+
+    # External projects URLs and related attributes
+    baeldung-blog: 'https://www.baeldung.com'
+    bean-validation-site: 'https://beanvalidation.org'
+    graalvm-docs: 'https://www.graalvm.org/22.3/reference-manual'
+    hibernate-validator-site: 'https://hibernate.org/validator/'
+    jackson-docs: 'https://fasterxml.github.io'
+    jackson-github-org: 'https://github.com/FasterXML'
+    java-api: 'https://docs.oracle.com/en/java/javase/17/docs/api'
+    java-tutorial: 'https://docs.oracle.com/javase/tutorial'
+    JSR: 'https://www.jcp.org/en/jsr/detail?id='
+    rfc-site: 'https://datatracker.ietf.org/doc/html'
+    stackoverflow-site: 'https://stackoverflow.com'
+    testcontainers-site: 'https://www.testcontainers.org'

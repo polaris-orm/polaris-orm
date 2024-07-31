@@ -3,8 +3,6 @@ plugins {
   id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
   id 'de.undercouch.download' version '5.4.0'
   id "io.github.gradle-nexus.publish-plugin" version "1.3.0"
-  id 'org.antora' version '1.0.0'
-  id 'cn.taketoday.generate-antora-yml'
 }
 
 description = "Polaris is Java ORM framework"
@@ -16,26 +14,38 @@ apply plugin: 'cn.taketoday.application'
 apply plugin: 'cn.taketoday.build.conventions'
 apply plugin: 'cn.taketoday.build.optional-dependencies'
 
-ext.javadocLinks = [
-        "https://docs.oracle.com/en/java/javase/17/docs/api/",
-        "https://jakarta.ee/specifications/platform/9/apidocs/",
-
-] as String[]
-
 ext {
   isSnapshot = version.endsWith('SNAPSHOT')
   isReleaseVersion = !isSnapshot
+  moduleProjects = []
 }
 
-apply from: "$rootDir/gradle/infra-module.gradle"
-
-repositories {
-  mavenLocal()
-  mavenCentral()
-
-  if (version.endsWith('-SNAPSHOT')) {
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+configure(allprojects) {
+  if (it.hasProperty("skipDocs")) {
+    it.afterEvaluate {
+      it.getTasks().matching(task -> {
+        return JavaBasePlugin.DOCUMENTATION_GROUP == task.getGroup()
+                || "distribution" == task.getGroup()
+      }).forEach(task -> task.setEnabled(false))
+    }
   }
+
+  repositories {
+    mavenLocal()
+    mavenCentral()
+
+    if (version.endsWith('-SNAPSHOT')) {
+      maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    }
+  }
+
+  ext.javadocLinks = [
+          "https://docs.oracle.com/en/java/javase/17/docs/api/",
+          "https://jakarta.ee/specifications/platform/9/apidocs/",
+
+  ] as String[]
+
+  apply from: "${rootDir}/gradle/infra-module.gradle"
 }
 
 dependencies {
