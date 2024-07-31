@@ -1,0 +1,137 @@
+plugins {
+  id 'java-library'
+  id 'org.antora' version '1.0.0'
+  id 'cn.taketoday.generate-antora-yml'
+}
+
+description = "Polaris ORM Documentation"
+
+apply from: "${rootDir}/gradle/publications.gradle"
+
+antora {
+  version = '3.2.0-alpha.4'
+//  version = '3.1.7'
+  playbook = 'antora-playbook.yml'
+  options = ['--clean', '--stacktrace']
+  dependencies = [
+      '@antora/atlas-extension'                  : '1.0.0-alpha.1',
+      '@antora/collector-extension'              : '1.0.0-alpha.3',
+      '@asciidoctor/tabs'                        : '1.0.0-beta.3',
+      '@opendevise/antora-release-line-extension': '1.0.0',
+      '@today-tech/antora-extensions'            : '1.0.0'
+  ]
+}
+
+jar {
+  enabled = false
+}
+
+javadoc {
+  enabled = false
+}
+
+generateAntoraYml {
+  asciidocAttributes = project.provider({
+    return ["polaris-version": project.version]
+  })
+}
+
+tasks.register("generateAntoraResources") {
+  dependsOn 'generateAntoraYml'
+}
+
+
+/**
+ * Produce Javadoc for all Polaris modules in "build/docs/javadoc"
+ */
+tasks.register('api', Javadoc) {
+  group = "documentation"
+  description = "Generates aggregated Javadoc API documentation."
+  title = "${rootProject.description} ${version} API"
+
+  dependsOn {
+    moduleProjects.collect {
+      it.tasks.getByName("jar")
+    }
+  }
+
+  options {
+    encoding = "UTF-8"
+    memberLevel = JavadocMemberLevel.PROTECTED
+    author = true
+    header = rootProject.description
+    use = true
+    overview = "polaris-docs/api/overview.html"
+    splitIndex = true
+    links(project.ext.javadocLinks)
+    addBooleanOption('Xdoclint:syntax,reference', true) // only check syntax and reference with doclint
+    addBooleanOption('Werror', true) // fail build on Javadoc warnings
+  }
+  source moduleProjects.collect { project ->
+    project.sourceSets.main.allJava
+  }
+  maxMemory = "1024m"
+  failOnError = false
+  destinationDir = file("$layout.buildDirectory/docs/javadoc")
+}
+
+/**
+ * Zip all Java docs (javadoc & kdoc) into a single archive
+ */
+tasks.register('docsZip', Zip) {
+  dependsOn('api')
+  group = "distribution"
+  description = "Builds -${archiveClassifier} archive containing api and reference " +
+      "for deployment at https://taketoday.cn/open-source/projects/polaris-orm/docs."
+
+  archiveBaseName = "polaris-orm"
+  archiveClassifier = "docs"
+  from("src/dist") {
+    include "changelog.txt"
+  }
+  from(api) {
+    into "javadoc-api"
+  }
+}
+
+
+/**
+ * Create a distribution zip with everything:
+ * docs, schemas, jars, source jars, javadoc jars
+ */
+tasks.register('distZip', Zip) {
+  dependsOn("docsZip")
+  group = "distribution"
+  archiveBaseName.set("polaris-orm")
+  archiveClassifier.set("dist")
+  description = "Builds -${archiveClassifier} archive, containing all jars and docs, " +
+      "suitable for community download page."
+
+  ext.baseDir = "polaris-orm-${project.version}";
+
+  from("src/docs/dist") {
+    include "readme.txt"
+    include "license.txt"
+    include "notice.txt"
+    into "${baseDir}"
+    expand(copyright: new Date().format("yyyy"), version: project.version)
+  }
+
+  from(zipTree(docsZip.archiveFile)) {
+    into "${baseDir}/docs"
+  }
+
+  moduleProjects.each { module ->
+    into("${baseDir}/libs") {
+      from module.jar
+      if (module.tasks.findByPath("sourcesJar")) {
+        from module.sourcesJar
+      }
+      if (module.tasks.findByPath("javadocJar")) {
+        from module.javadocJar
+      }
+    }
+  }
+}
+
+distZip.mustRunAfter moduleProjects.check

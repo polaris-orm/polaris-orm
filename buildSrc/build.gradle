@@ -10,6 +10,7 @@ repositories {
 
 
 dependencies {
+  implementation 'org.yaml:snakeyaml:2.0'
   implementation "org.gradle:test-retry-gradle-plugin:1.4.1"
   implementation 'cn.taketoday:today-core:4.0.0-Draft.6'
 }
@@ -27,6 +28,10 @@ gradlePlugin {
     integrationTestPlugin {
       id = "cn.taketoday.integration-test"
       implementationClass = "cn.taketoday.build.IntegrationTestPlugin"
+    }
+    generateAntoraYml {
+      id = 'cn.taketoday.generate-antora-yml'
+      implementationClass = 'cn.taketoday.build.antora.GenerateAntoraYmlPlugin'
     }
   }
 }
