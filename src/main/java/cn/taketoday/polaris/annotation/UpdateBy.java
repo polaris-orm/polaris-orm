@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris;
+package cn.taketoday.polaris.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -22,32 +22,39 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import cn.taketoday.polaris.EntityManager;
+
 /**
- * Specifies the primary table ref for the annotated entity
+ * Specifies the update by field or property
+ * <pre>{@code
+ *    // Example:
  *
- * <pre> {@code
- *    Example:
- *
- *    @Table(name="t_user")
- *    public class User {
- *      ...
+ *    @UpdateBy
+ *    @Column(name = "name")
+ *    public String getName() {
+ *      return name;
  *    }
+ * }</pre>
  *
- *    @EntityRef(User.class)
- *    public class UpdateUser {
- *      ...
+ * <pre>{@code
+ *    // Example:
+ *
+ *    @UpdateBy
+ *    private String name;
+ *
+ *    public String getName() {
+ *      return name;
  *    }
  *
  * }</pre>
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 1.0 2024/4/11 13:36
+ * @see EntityManager#update
+ * @since 1.0 2024/4/11 10:43
  */
 @Documented
-@Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE })
+@Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface EntityRef {
-
-  Class<?> value();
+public @interface UpdateBy {
 
 }

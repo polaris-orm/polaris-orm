@@ -18,9 +18,6 @@ package cn.taketoday.polaris.query;
 
 import org.junit.jupiter.api.TestInstance;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-
 import cn.taketoday.polaris.AbstractRepositoryManagerTests;
 import cn.taketoday.polaris.DefaultEntityManager;
 import cn.taketoday.polaris.jdbc.NamedQuery;

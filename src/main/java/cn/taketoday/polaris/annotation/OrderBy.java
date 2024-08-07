@@ -14,30 +14,37 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris;
+package cn.taketoday.polaris.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import cn.taketoday.polaris.Constant;
+
 /**
- * Where clause to add to the element Entity or target entity of a collection.
- * The clause is written in SQL.
+ * clause and direction cannot present same time
  *
- * @author Emmanuel Bernard
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 1.0
+ * @since 1.0 2024/3/31 17:21
  */
 @Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Where {
+public @interface OrderBy {
 
   /**
-   * The where-clause predicate.
+   * Class level
    */
   String value() default Constant.DEFAULT_NONE;
 
-  String condition() default Constant.DEFAULT_NONE;
+  /**
+   * Class level
+   */
+  String clause() default Constant.DEFAULT_NONE;
 
+  /**
+   * Property level
+   */
+  Order direction() default Order.ASC;
 }

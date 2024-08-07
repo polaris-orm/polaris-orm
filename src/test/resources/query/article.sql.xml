@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+
 <!--
   ~ Copyright 2024 the original author or authors.
   ~
@@ -15,20 +15,8 @@
   ~ limitations under the License.
   -->
 
-<mapper namespace="cn.taketoday.polaris.query.UserMapper">
+<mapper>
 
-  <select id="">
-
-  </select>
-
-  <sql id="findById">
-    select *
-    from t_user
-    where id = ?
-  </sql>
-
-
-  <!-- @formatter:off -->
   <sql id="findArticlesByTag">
     SELECT `id`, `uri`, `title`, `cover`, `summary`, `pv`, `create_at`
     FROM article LEFT JOIN article_label ON article.id = article_label.article_id
@@ -37,6 +25,5 @@
       WHERE label_id = (SELECT id FROM label WHERE name = :name)
     )
   </sql>
-
 
 </mapper>
