@@ -14,27 +14,14 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package cn.taketoday.polaris.query;
 
 /**
- * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 1.0 2024/2/24 23:53
+ * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
+ * @since 1.0 2024/8/4 21:20
  */
-@Like
-@Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface SuffixLike {
+public interface MapperProvider {
 
-  /**
-   * The where-clause predicate.
-   */
-  String value() default Constant.DEFAULT_NONE;
-
-  boolean trim() default true;
+  <T> T getMapper(Class<T> mapperClass);
 
 }

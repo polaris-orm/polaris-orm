@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris;
+package cn.taketoday.polaris.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import cn.taketoday.polaris.Constant;
+
 /**
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
  * @since 1.0 2024/2/24 23:53
  */
+@Like
 @Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Like {
+public @interface PrefixLike {
 
   /**
    * The where-clause predicate.
@@ -35,4 +38,5 @@ public @interface Like {
   String value() default Constant.DEFAULT_NONE;
 
   boolean trim() default true;
+
 }

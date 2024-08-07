@@ -14,35 +14,29 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris;
+package cn.taketoday.polaris.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import cn.taketoday.polaris.Constant;
+
 /**
- * clause and direction cannot present same time
- *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 1.0 2024/3/31 17:21
+ * @since 1.0 2024/2/24 23:53
  */
+@Like
 @Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface OrderBy {
+public @interface SuffixLike {
 
   /**
-   * Class level
+   * The where-clause predicate.
    */
   String value() default Constant.DEFAULT_NONE;
 
-  /**
-   * Class level
-   */
-  String clause() default Constant.DEFAULT_NONE;
+  boolean trim() default true;
 
-  /**
-   * Property level
-   */
-  Order direction() default Order.ASC;
 }

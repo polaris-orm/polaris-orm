@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris;
+/**
+ * Polaris ORM Query
+ */
+@NonNullApi
+@NonNullFields
+package cn.taketoday.polaris.query;
 
-public enum Order {
-  ASC, DESC
-}
+import cn.taketoday.polaris.util.NonNullApi;
+import cn.taketoday.polaris.util.NonNullFields;

@@ -14,21 +14,41 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris;
+package cn.taketoday.polaris.annotation;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Trim
+ * Specifies the primary table for the annotated entity
  *
- * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
- * @since 1.0 2024/7/27 23:25
+ * <p> If no <code>Table</code> annotation is specified for an entity
+ * class, the default values apply.
+ *
+ * <pre> {@code
+ *    Example:
+ *
+ *    @Table(t_user")
+ *    public class User {
+ *      ...
+ *    }
+ * }</pre>
+ *
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2022/8/16 21:05
  */
-@Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
+@Documented
+@Target({ ElementType.ANNOTATION_TYPE, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Trim {
+public @interface Table {
+
+  /**
+   * (Optional) The name of the table.
+   * <p> Defaults to the entity name.
+   */
+  String value() default "";
 
 }

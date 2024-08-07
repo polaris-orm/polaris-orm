@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris;
+package cn.taketoday.polaris.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -23,34 +23,30 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Specifies the primary key of an entity.
- * The field or property to which the <code>GeneratedId</code> annotation
- * is applied should be one of the following types: any Java primitive type;
- * any primitive wrapper type;
- * <code>java.math.BigDecimal</code>;
- * <code>java.math.BigInteger</code>.
+ * Specifies the mapped column for a persistent property or field.
+ * If no <code>Column</code> annotation is specified, the default values apply.
+ * <pre> {@code
+ *    // Example
  *
- * <p>The mapped column for the primary key of the entity is assumed
- * to be the primary key of the primary table. If no <code>Column</code> annotation
- * is specified, the primary key column name is assumed to be the name
- * of the primary key property or field.
+ *    @Column("DESC")
+ *    public String getDescription() {
+ *      return description;
+ *    }
  *
- * <pre>{@code
- *   // Example:
- *
- *   @GeneratedId
- *   public Long getId() {
- *     return id;
- *   }
  * }</pre>
  *
  * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 1.0 2024/2/14 21:11
+ * @since 2021/1/27 22:32
  */
-@Id
 @Documented
-@Target({ ElementType.ANNOTATION_TYPE, ElementType.FIELD, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface GeneratedId {
+@Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD, ElementType.FIELD })
+public @interface Column {
+
+  /**
+   * (Optional) The name of the column. Defaults to
+   * the property or field name.
+   */
+  String value() default "";
 
 }
