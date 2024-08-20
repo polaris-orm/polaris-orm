@@ -14,12 +14,21 @@
  * limitations under the License.
  */
 
-/**
- * XML Parsing.
- */
-@NonNullApi
-@NonNullFields
-package cn.taketoday.polaris.query.parsing;
+package cn.taketoday.polaris.query.parsing.xml;
 
-import cn.taketoday.polaris.util.NonNullApi;
-import cn.taketoday.polaris.util.NonNullFields;
+import cn.taketoday.polaris.util.Nullable;
+
+/**
+ * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
+ * @since 1.0 2024/7/11 11:30
+ */
+public class XMLParsingException extends RuntimeException {
+
+  public XMLParsingException(@Nullable String msg) {
+    super(msg);
+  }
+
+  public XMLParsingException(@Nullable String msg, @Nullable Throwable cause) {
+    super(msg, cause);
+  }
+}

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris.query.parsing;
+package cn.taketoday.polaris.query.parsing.xml;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
