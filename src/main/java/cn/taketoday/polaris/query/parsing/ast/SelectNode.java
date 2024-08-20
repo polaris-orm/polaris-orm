@@ -14,21 +14,32 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris.query.parsing;
+package cn.taketoday.polaris.query.parsing.ast;
 
 import cn.taketoday.polaris.util.Nullable;
 
 /**
- * @author <a href="https://github.com/TAKETODAY">Harry Yang</a>
- * @since 1.0 2024/7/11 11:30
+ * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
+ * @since 1.0 2024/8/20 22:54
  */
-public class XMLParsingException extends RuntimeException {
+public class SelectNode extends SqlNode {
 
-  public XMLParsingException(@Nullable String msg) {
-    super(msg);
+  private final String select;
+
+  @Nullable
+  private final WhereNode whereNode;
+
+  public SelectNode(String select, @Nullable WhereNode whereNode) {
+    this.select = select;
+    this.whereNode = whereNode;
   }
 
-  public XMLParsingException(@Nullable String msg, @Nullable Throwable cause) {
-    super(msg, cause);
+  @Override
+  public void render(StringBuilder selectSQL) {
+    selectSQL.append(select);
+    if (whereNode != null) {
+      whereNode.render(selectSQL);
+    }
   }
+
 }

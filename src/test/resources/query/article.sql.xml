@@ -1,4 +1,3 @@
-
 <!--
   ~ Copyright 2024 the original author or authors.
   ~
@@ -17,13 +16,21 @@
 
 <mapper>
 
+  <!-- @formatter:off -->
   <sql id="findArticlesByTag">
     SELECT `id`, `uri`, `title`, `cover`, `summary`, `pv`, `create_at`
     FROM article LEFT JOIN article_label ON article.id = article_label.article_id
     WHERE article.status = :status AND article_label.label_id IN (
       SELECT label_id FROM article_label
-      WHERE label_id = (SELECT id FROM label WHERE name = :name)
+      WHERE label_id = (SELECT id FROM label WHERE name = #name)
     )
+  </sql>
+
+  <sql id="search">
+    SELECT `category`, `content`, `copyright`, `cover`, `create_at`, `id`, `markdown`, `password`, `pv`, `status`, `summary`, `title`, `update_at`, `uri`
+    FROM article WHERE `category` = #category and  (`title` like @q OR `content` like '%#q%' ) and status = :status
+                 and create_at between :create_at[0] and :create_at[1]
+    order by update_at DESC, create_at DESC LIMIT 20
   </sql>
 
 </mapper>

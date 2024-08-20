@@ -16,6 +16,11 @@
 
 package cn.taketoday.polaris.query;
 
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.statement.Statement;
+
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import cn.taketoday.polaris.AbstractRepositoryManagerTests;
@@ -63,6 +68,20 @@ class MapperFactoryTests extends AbstractRepositoryManagerTests {
 
     UserModel byId = userMapper.findById(1);
     System.out.println(byId);
+  }
+
+  @Test
+  void test() throws JSQLParserException {
+    String sql = """
+            SELECT `category`, `content`, `copyright`, `cover`, `create_at`, `id`, `markdown`, `password`, `pv`, `status`, `summary`, `title`, `update_at`, `uri`
+            FROM article WHERE `category` = :#category and  (`title` like @q OR `content` like '%#q%' ) and status = :status
+                         and create_at between :create_at[0] and :create_at[1]
+            order by update_at DESC, create_at DESC LIMIT 20""";
+//    SqlParser sqlParser = SqlParser.create(sql, config);
+//    SqlNode sqlNode = sqlParser.parseQuery();
+
+    Statement parse = CCJSqlParserUtil.parse(sql);
+    System.out.println(parse);
   }
 
 }
