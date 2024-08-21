@@ -16,22 +16,29 @@
 
 package cn.taketoday.polaris.query.parsing.ast;
 
+import cn.taketoday.polaris.util.Nullable;
+
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
- * @since 1.0 2024/8/20 22:55
+ * @since 1.0 2024/8/21 21:51
  */
-public class WhereNode extends SqlNode {
+public class VariableRef implements Expression {
 
-  private final Expression expression;
+  private final String name;
 
-  public WhereNode(Expression expression) {
-    this.expression = expression;
+  @Nullable
+  private final Integer arrayIndex;
+
+  public VariableRef(String name, @Nullable Integer arrayIndex) {
+    this.name = name;
+    this.arrayIndex = arrayIndex;
   }
 
   @Override
-  public void render(StringBuilder selectSQL) {
-    selectSQL.append(" WHERE ")
-            .append(expression);
+  public String toString() {
+    if (arrayIndex != null) {
+      return "@%s[%d]".formatted(name, arrayIndex);
+    }
+    return "@" + name;
   }
-
 }

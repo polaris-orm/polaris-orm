@@ -18,20 +18,22 @@ package cn.taketoday.polaris.query.parsing.ast;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
- * @since 1.0 2024/8/20 22:55
+ * @since 1.0 2024/8/21 15:54
  */
-public class WhereNode extends SqlNode {
+public class IsNullExpression implements Expression {
 
-  private final Expression expression;
+  private final Expression leftExpression;
 
-  public WhereNode(Expression expression) {
-    this.expression = expression;
+  private final boolean not;
+
+  public IsNullExpression(Expression leftExpression, boolean not) {
+    this.leftExpression = leftExpression;
+    this.not = not;
   }
 
   @Override
-  public void render(StringBuilder selectSQL) {
-    selectSQL.append(" WHERE ")
-            .append(expression);
+  public String toString() {
+    return leftExpression + " IS " + (not ? "NOT " : "") + "NULL";
   }
 
 }

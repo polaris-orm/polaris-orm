@@ -18,20 +18,24 @@ package cn.taketoday.polaris.query.parsing.ast;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
- * @since 1.0 2024/8/20 22:55
+ * @since 1.0 2024/8/21 16:02
  */
-public class WhereNode extends SqlNode {
+public class ComparisonOperator extends BinaryExpression {
 
-  private final Expression expression;
+  private final String operator;
 
-  public WhereNode(Expression expression) {
-    this.expression = expression;
+  public ComparisonOperator(String operator) {
+    this.operator = operator;
+  }
+
+  public ComparisonOperator(String operator, Expression left, Expression right) {
+    super(left, right);
+    this.operator = operator;
   }
 
   @Override
-  public void render(StringBuilder selectSQL) {
-    selectSQL.append(" WHERE ")
-            .append(expression);
+  public String getStringExpression() {
+    return operator;
   }
 
 }

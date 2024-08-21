@@ -18,20 +18,32 @@ package cn.taketoday.polaris.query.parsing.ast;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
- * @since 1.0 2024/8/20 22:55
+ * @since 1.0 2024/8/21 17:33
  */
-public class WhereNode extends SqlNode {
+public class LikeExpression extends BinaryExpression implements Expression {
 
-  private final Expression expression;
+  private final boolean not;
 
-  public WhereNode(Expression expression) {
-    this.expression = expression;
+  private boolean useBinary = false;
+
+  public LikeExpression(Expression leftExpression, boolean not, Expression rightExpression) {
+    super(leftExpression, rightExpression);
+    this.not = not;
   }
 
   @Override
-  public void render(StringBuilder selectSQL) {
-    selectSQL.append(" WHERE ")
-            .append(expression);
+  public String getStringExpression() {
+    return "LIKE";
+  }
+
+  public void setUseBinary(boolean useBinary) {
+    this.useBinary = useBinary;
+  }
+
+  @Override
+  public String toString() {
+    return leftExpression + " " + (not ? "NOT " : "")
+            + (useBinary ? "BINARY " : "") + rightExpression;
   }
 
 }

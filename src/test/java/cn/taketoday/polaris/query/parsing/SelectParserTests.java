@@ -28,8 +28,8 @@ class SelectParserTests {
   void test() {
     String sql = """
             SELECT `category`, `content`, `copyright`, `cover`, `create_at`, `id`, `markdown`, `password`, `pv`, `status`, `summary`, `title`, `update_at`, `uri`
-            FROM article WHERE `category` = #category and  (`title` like @q OR `content` like '%#q%' ) and status = :status
-               and create_at between :create_at[0] and :create_at[1]
+            FROM article WHERE article.`category` = #category and  (`title` like @q OR `content` like '%#q%' ) and status = :status
+            and create_at between :create_at[0] and :create_at[1] or status is not null and status not like 's'
             order by update_at DESC, create_at DESC LIMIT 20""";
 
     SelectExpression expression = SelectParser.parse(sql);

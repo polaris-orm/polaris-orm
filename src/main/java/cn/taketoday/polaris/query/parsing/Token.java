@@ -62,10 +62,6 @@ class Token {
     return data != null ? data : "";
   }
 
-  public Token asBetweenToken() {
-    return new Token(TokenKind.BETWEEN, this.startPos, this.endPos);
-  }
-
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();

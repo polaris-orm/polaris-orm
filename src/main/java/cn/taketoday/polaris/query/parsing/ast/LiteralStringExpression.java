@@ -18,20 +18,19 @@ package cn.taketoday.polaris.query.parsing.ast;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
- * @since 1.0 2024/8/20 22:55
+ * @since 1.0 2024/8/21 21:29
  */
-public class WhereNode extends SqlNode {
+public class LiteralStringExpression implements Expression {
 
-  private final Expression expression;
+  private final String value;
 
-  public WhereNode(Expression expression) {
-    this.expression = expression;
+  public LiteralStringExpression(String value) {
+    this.value = value;
   }
 
   @Override
-  public void render(StringBuilder selectSQL) {
-    selectSQL.append(" WHERE ")
-            .append(expression);
+  public String toString() {
+    return value;
   }
 
 }

@@ -29,16 +29,6 @@ import java.util.List;
  */
 class Tokenizer {
 
-  /**
-   * Alternative textual operator names which must match enum constant names
-   * in {@link TokenKind}.
-   * <p>If this list gets changed, it must remain sorted since we use it with
-   * {@link Arrays#binarySearch(Object[], Object)}.
-   */
-  private static final String[] ALTERNATIVE_OPERATOR_NAMES = {
-          "DIV", "EQ", "GE", "GT", "LE", "LT", "MOD", "NE", "NOT"
-  };
-
   private static final byte[] FLAGS = new byte[256];
 
   private static final byte IS_DIGIT = 0x01;
@@ -97,22 +87,7 @@ class Tokenizer {
           case '#' -> pushCharToken(TokenKind.HASH);
           case ']' -> pushCharToken(TokenKind.RSQUARE);
           case '@' -> pushCharToken(TokenKind.VARIABLE_REF);
-          case '!' -> {
-            if (isTwoCharToken(TokenKind.NE)) {
-              pushPairToken(TokenKind.NE);
-            }
-            else {
-              pushCharToken(TokenKind.NOT);
-            }
-          }
-          case '=' -> {
-            if (isTwoCharToken(TokenKind.EQ)) {
-              pushPairToken(TokenKind.EQ);
-            }
-            else {
-              pushCharToken(TokenKind.ASSIGN);
-            }
-          }
+          case '=' -> pushCharToken(TokenKind.EQ);
           case '?' -> pushCharToken(TokenKind.QMARK);
           case '>' -> {
             if (isTwoCharToken(TokenKind.GE)) {
@@ -126,11 +101,15 @@ class Tokenizer {
             if (isTwoCharToken(TokenKind.LE)) {
               pushPairToken(TokenKind.LE);
             }
+            else if (isTwoCharToken(TokenKind.NE)) {
+              pushPairToken(TokenKind.NE);
+            }
             else {
               pushCharToken(TokenKind.LT);
             }
           }
-          case '`', '\'' -> lexQuotedStringLiteral();
+          case '`' -> lexIdentifier();
+          case '\'' -> lexQuotedStringLiteral();
           case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> lexNumericLiteral(ch == '0');
           case ' ', '\t', '\r', '\n' -> this.pos++; // drift over white space
           case '"' -> lexDoubleQuotedStringLiteral();
@@ -156,10 +135,9 @@ class Tokenizer {
       this.pos++;
 
       char ch = charsToProcess[this.pos];
-      if (ch == '\'' || ch == '`') {
+      if (ch == '\'') {
         // may not be the end if the char after is also a '
-        char c = charsToProcess[this.pos + 1];
-        if (c == '\'' || c == '`') {
+        if (charsToProcess[this.pos + 1] == '\'') {
           this.pos++;  // skip over that too, and continue
         }
         else {
@@ -335,16 +313,6 @@ class Tokenizer {
     while (isIdentifier(charsToProcess[this.pos]));
     char[] subarray = subarray(start, this.pos);
 
-    // Check if this is the alternative (textual) representation of an operator (see
-    // alternativeOperatorNames)
-    if (subarray.length == 2 || subarray.length == 3) {
-      String asString = new String(subarray).toUpperCase();
-      int idx = Arrays.binarySearch(ALTERNATIVE_OPERATOR_NAMES, asString);
-      if (idx >= 0) {
-        pushOneCharOrTwoCharToken(TokenKind.valueOf(asString), start, subarray);
-        return;
-      }
-    }
     this.tokens.add(new Token(TokenKind.IDENTIFIER, subarray, start, this.pos));
   }
 
@@ -418,7 +386,7 @@ class Tokenizer {
 
   // ID: ('a'..'z'|'A'..'Z'|'_'|'$') ('a'..'z'|'A'..'Z'|'_'|'$'|'0'..'9'|DOT_ESCAPED)*;
   private boolean isIdentifier(char ch) {
-    return isAlphabetic(ch) || isDigit(ch) || ch == '_' || ch == '$';
+    return isAlphabetic(ch) || isDigit(ch) || ch == '_' || ch == '$' || ch == '`';
   }
 
   private boolean isChar(char a, char b) {
@@ -466,7 +434,15 @@ class Tokenizer {
 
   private void raiseParseException(int start, String message, Object... inserts) {
     String formatted = MessageFormat.format(message, inserts);
-    throw new ParsingException(formatted);
+    throw parsingException(start, formatted);
+  }
+
+  private ParsingException parsingException(int startPos, String message) {
+    String happenPos = expressionString.substring(startPos);
+    if (happenPos.length() > 32) {
+      happenPos = happenPos.substring(0, 32);
+    }
+    return new ParsingException(message + ", near : '" + happenPos + "'");
   }
 
 }

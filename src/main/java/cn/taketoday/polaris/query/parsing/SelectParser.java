@@ -18,8 +18,23 @@ package cn.taketoday.polaris.query.parsing;
 
 import java.util.List;
 
+import cn.taketoday.polaris.query.parsing.ast.AndExpression;
+import cn.taketoday.polaris.query.parsing.ast.Between;
+import cn.taketoday.polaris.query.parsing.ast.ColumnNameExpression;
+import cn.taketoday.polaris.query.parsing.ast.ComparisonOperator;
+import cn.taketoday.polaris.query.parsing.ast.Expression;
+import cn.taketoday.polaris.query.parsing.ast.HashParameter;
+import cn.taketoday.polaris.query.parsing.ast.InExpression;
+import cn.taketoday.polaris.query.parsing.ast.IndexParameter;
+import cn.taketoday.polaris.query.parsing.ast.IsNullExpression;
+import cn.taketoday.polaris.query.parsing.ast.LikeExpression;
+import cn.taketoday.polaris.query.parsing.ast.LiteralStringExpression;
+import cn.taketoday.polaris.query.parsing.ast.NamedParameter;
+import cn.taketoday.polaris.query.parsing.ast.OrExpression;
+import cn.taketoday.polaris.query.parsing.ast.ParenExpression;
 import cn.taketoday.polaris.query.parsing.ast.SelectNode;
 import cn.taketoday.polaris.query.parsing.ast.SqlNode;
+import cn.taketoday.polaris.query.parsing.ast.VariableRef;
 import cn.taketoday.polaris.query.parsing.ast.WhereNode;
 import cn.taketoday.polaris.util.Nullable;
 
@@ -66,7 +81,7 @@ public class SelectParser {
         next = nextToken();
       }
       if (whereToken != null) {
-        WhereNode whereNode = eatWhereExpression();
+        WhereNode whereNode = eatWhereExpression(whereToken);
         return new SelectNode(selectSQL.substring(0, whereToken.startPos), whereNode);
       }
       else {
@@ -76,14 +91,208 @@ public class SelectParser {
     throw new ParsingException("Not a select SQL");
   }
 
-  private WhereNode eatWhereExpression() {
+  private WhereNode eatWhereExpression(Token whereToken) {
+    Expression expression = eatLogicalOrExpression();
 
     Token next = nextToken();
     while (next != null) {
       next = nextToken();
     }
 
+    return new WhereNode(expression);
+  }
+
+  // logicalOrExpression : logicalAndExpression (OR^ logicalAndExpression)*;
+
+  @Nullable
+  private Expression eatLogicalOrExpression() {
+    Expression expr = eatLogicalAndExpression();
+    while (peekIdentifierToken("or")) {
+      Token t = takeToken();  //consume OR
+      Expression rhExpr = eatLogicalAndExpression();
+      checkOperands(t, expr, rhExpr);
+      expr = new OrExpression(expr, rhExpr, t.startPos, t.endPos);
+    }
+    return expr;
+  }
+
+  // logicalAndExpression : relationalExpression (AND^ relationalExpression)*;
+  private Expression eatLogicalAndExpression() {
+    Expression expr = eatRelationalExpression();
+    while (peekIdentifierToken("and")) {
+      Token t = takeToken();  // consume 'AND'
+      Expression rhExpr = eatRelationalExpression();
+      checkOperands(t, expr, rhExpr);
+      expr = new AndExpression(expr, rhExpr, t.startPos, t.endPos);
+    }
+    return expr;
+  }
+
+  // ALL	      TRUE if all of the subquery values meet the condition
+  // AND	      TRUE if all the conditions separated by AND is TRUE
+  // ANY	      TRUE if any of the subquery values meet the condition
+  // BETWEEN	  TRUE if the operand is within the range of comparisons
+  // EXISTS	    TRUE if the subquery returns one or more records
+  // IN	        TRUE if the operand is equal to one of a list of expressions
+  // LIKE	      TRUE if the operand matches a pattern
+  // NOT	      Displays a record if the condition(s) is NOT TRUE
+  // OR	        TRUE if any of the conditions separated by OR is TRUE
+  // SOME	      TRUE if any of the subquery values meet the condition
+
+  private Expression eatRelationalExpression() {
+    Expression parenExpr = maybeEatParenExpression();
+    if (parenExpr != null) {
+      return parenExpr;
+    }
+
+    // column
+    Token columnToken = eatToken(TokenKind.IDENTIFIER);
+    String columnName = columnToken.stringValue();
+    if (peekToken(TokenKind.DOT)) {
+      nextToken();
+      Token token = takeToken();
+      columnName = columnName + "." + token.stringValue();
+    }
+
+    ColumnNameExpression left = new ColumnNameExpression(columnName);
+
+    // operator
+    Token operator = takeToken();
+    return switch (operator.kind) {
+      case LE, LT, GE, GT, EQ, NE -> {
+        Expression right = eatValueExpression();
+        yield new ComparisonOperator(new String(operator.kind.tokenChars), left, right);
+      }
+      case IDENTIFIER -> {
+        boolean not = false;
+        Expression expr;
+        String stringValue = operator.stringValue();
+        if (stringValue.equalsIgnoreCase("not")) {
+          not = true;
+          operator = takeToken();
+          stringValue = operator.stringValue();
+        }
+
+        if (stringValue.equalsIgnoreCase("between")) {
+          // between value1 and value2
+          Expression start = eatValueExpression();
+          eatToken(TokenKind.IDENTIFIER);
+          Expression end = eatValueExpression();
+          expr = new Between(left, not, start, end);
+        }
+        else if (stringValue.equalsIgnoreCase("in")) {
+          // maybe a subquery
+          // todo
+          expr = new InExpression(left, not);
+        }
+        else if (stringValue.equalsIgnoreCase("like")) {
+          // like '' | not like ''
+          Expression right = eatValueExpression();
+          expr = new LikeExpression(left, not, right);
+        }
+        else if (stringValue.equalsIgnoreCase("is")) {
+          expr = eatNullExpression(left);
+        }
+        else {
+          throw parsingException(operator.startPos, "Not a valid operator token: '%s'".formatted(toString(operator)));
+        }
+        yield expr;
+      }
+      default -> throw new ParsingException("Unsupported operator '%s'".formatted(toString(operator)));
+    };
+  }
+
+  private Expression eatValueExpression() {
+    Token value = takeToken();
+    return switch (value.kind) {
+      case LITERAL_STRING, LITERAL_REAL, LITERAL_HEXINT, LITERAL_HEXLONG,
+           LITERAL_LONG, LITERAL_INT, LITERAL_REAL_FLOAT -> new LiteralStringExpression(value.stringValue());
+      case COLON -> {
+        Token nameT = eatToken(TokenKind.IDENTIFIER);
+        Integer arrayIndex = maybeEatArrayExpression();
+        yield new NamedParameter(nameT.stringValue(), arrayIndex);
+      }
+      case QMARK -> new IndexParameter();
+      case HASH -> {
+        Token nameT = eatToken(TokenKind.IDENTIFIER);
+        Integer arrayIndex = maybeEatArrayExpression();
+        yield new HashParameter(nameT.stringValue(), arrayIndex);
+      }
+      case VARIABLE_REF -> {
+        Token nameT = eatToken(TokenKind.IDENTIFIER);
+        Integer arrayIndex = maybeEatArrayExpression();
+        yield new VariableRef(nameT.stringValue(), arrayIndex);
+      }
+      default -> throw new ParsingException("Unsupported operator '%s'".formatted(toString(value)));
+    };
+  }
+
+  private Integer maybeEatArrayExpression() {
+    if (peekToken(TokenKind.LSQUARE)) {
+      takeToken();
+      Token intT = eatToken(TokenKind.LITERAL_INT);
+      eatToken(TokenKind.RSQUARE);
+      return Integer.parseInt(intT.stringValue());
+    }
     return null;
+  }
+
+  private Expression eatNullExpression(Expression left) {
+    Expression expr;
+    // is null | is not null
+    boolean notNull = false;
+    Token t = takeToken();
+    if (t.isIdentifier("not")) {
+      t = takeToken();
+      notNull = true;
+    }
+    if (t.isIdentifier("null")) {
+      expr = new IsNullExpression(left, notNull);
+    }
+    else {
+      throw new ParsingException("Not a valid operator token: ''%s''".formatted(toString(t)));
+    }
+    return expr;
+  }
+
+  //parenExpr : LPAREN! expression RPAREN!;
+
+  @Nullable
+  private Expression maybeEatParenExpression() {
+    if (peekToken(TokenKind.LPAREN)) {
+      Token t = nextToken();
+      if (t == null) {
+        return null;
+      }
+      Expression expr = eatLogicalOrExpression();
+      if (expr == null) {
+        throw parsingException(t.startPos, "Unexpectedly ran out of input");
+      }
+      eatToken(TokenKind.RPAREN);
+      return new ParenExpression(expr);
+    }
+    return null;
+  }
+
+  private Token eatToken(TokenKind expectedKind) {
+    Token t = nextToken();
+    if (t == null) {
+      int pos = this.selectSQL.length();
+      throw parsingException(pos, "Unexpectedly ran out of input");
+    }
+    if (t.kind != expectedKind) {
+      throw parsingException(t.startPos, "Unexpected token. Expected '%s' but was '%s'".formatted(
+              expectedKind.toString().toLowerCase(), t.kind.toString().toLowerCase()));
+    }
+    return t;
+  }
+
+  private boolean peekToken(TokenKind possible1) {
+    Token t = peekToken();
+    if (t == null) {
+      return false;
+    }
+    return t.kind == possible1;
   }
 
   private boolean peekToken(TokenKind possible1, TokenKind possible2) {
@@ -141,6 +350,31 @@ public class SelectParser {
       return t.stringValue();
     }
     return t.kind.toString().toLowerCase();
+  }
+
+  private void checkOperands(Token token, @Nullable Expression left, @Nullable Expression right) {
+    checkLeftOperand(token, left);
+    checkRightOperand(token, right);
+  }
+
+  private void checkLeftOperand(Token token, @Nullable Expression operandExpression) {
+    if (operandExpression == null) {
+      throw parsingException(token.startPos, "Problem parsing left operand");
+    }
+  }
+
+  private void checkRightOperand(Token token, @Nullable Expression operandExpression) {
+    if (operandExpression == null) {
+      throw parsingException(token.startPos, "Problem parsing right operand");
+    }
+  }
+
+  private ParsingException parsingException(int startPos, String message) {
+    String happenPos = selectSQL.substring(startPos);
+    if (happenPos.length() > 32) {
+      happenPos = happenPos.substring(0, 32);
+    }
+    return new ParsingException(message + ", near : '" + happenPos + "'");
   }
 
   // Static factory methods

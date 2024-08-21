@@ -18,20 +18,30 @@ package cn.taketoday.polaris.query.parsing.ast;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
- * @since 1.0 2024/8/20 22:55
+ * @since 1.0 2024/8/21 16:01
  */
-public class WhereNode extends SqlNode {
+public class Between implements Expression {
 
-  private final Expression expression;
+  private final Expression leftExpression;
 
-  public WhereNode(Expression expression) {
-    this.expression = expression;
+  private final boolean not;
+
+  private final Expression betweenExpressionStart;
+
+  private final Expression betweenExpressionEnd;
+
+  public Between(Expression leftExpression, boolean not, Expression betweenExpressionStart, Expression betweenExpressionEnd) {
+    this.leftExpression = leftExpression;
+    this.not = not;
+    this.betweenExpressionStart = betweenExpressionStart;
+    this.betweenExpressionEnd = betweenExpressionEnd;
   }
 
   @Override
-  public void render(StringBuilder selectSQL) {
-    selectSQL.append(" WHERE ")
-            .append(expression);
+  public String toString() {
+    return leftExpression + " " + (not ? "NOT " : "") + "BETWEEN " + betweenExpressionStart
+            + " AND "
+            + betweenExpressionEnd;
   }
 
 }

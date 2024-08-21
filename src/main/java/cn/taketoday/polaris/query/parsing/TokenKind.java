@@ -70,25 +70,11 @@ enum TokenKind {
 
   LT("<"),
 
-  EQ("=="),
+  EQ("="),
 
-  NE("!="),
-
-  ASSIGN("="),
+  NE("<>"),
 
   LIKE_PREFIX("%"),
-
-  NOT("not"),
-
-  BETWEEN("between"),
-
-  WHERE("WHERE"),
-
-  AND("and"),
-
-  OR("or"),
-
-  LIKE("like"),
 
   VARIABLE_REF("@");
 

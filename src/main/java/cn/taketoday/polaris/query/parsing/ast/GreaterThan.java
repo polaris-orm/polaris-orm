@@ -18,20 +18,22 @@ package cn.taketoday.polaris.query.parsing.ast;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
- * @since 1.0 2024/8/20 22:55
+ * @since 1.0 2024/8/21 16:22
  */
-public class WhereNode extends SqlNode {
+public class GreaterThan extends ComparisonOperator {
 
-  private final Expression expression;
+  private boolean equals;
 
-  public WhereNode(Expression expression) {
-    this.expression = expression;
+  public GreaterThan() {
+    super(">");
   }
 
-  @Override
-  public void render(StringBuilder selectSQL) {
-    selectSQL.append(" WHERE ")
-            .append(expression);
+  public GreaterThan(boolean equals) {
+    super(equals ? ">=" : ">");
+  }
+
+  public GreaterThan(Expression leftExpression, Expression rightExpression) {
+    super(">", leftExpression, rightExpression);
   }
 
 }
