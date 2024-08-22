@@ -43,7 +43,7 @@ public class LikeExpression extends BinaryExpression implements Expression {
   @Override
   public String toString() {
     return leftExpression + " " + (not ? "NOT " : "")
-            + (useBinary ? "BINARY " : "") + rightExpression;
+            + (useBinary ? "BINARY " : "") + "LIKE " + rightExpression;
   }
 
 }

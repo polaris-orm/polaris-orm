@@ -147,11 +147,24 @@ public class SelectParser {
 
     // column
     Token columnToken = eatToken(TokenKind.IDENTIFIER);
-    String columnName = columnToken.stringValue();
+    String columnName;
     if (peekToken(TokenKind.DOT)) {
       nextToken();
       Token token = takeToken();
-      columnName = columnName + "." + token.stringValue();
+      columnName = selectSQL.substring(columnToken.startPos, token.endPos);
+    }
+    else if (peekToken(TokenKind.LPAREN)) {
+      Token ft = takeToken();
+      while (ft.kind != TokenKind.RPAREN) {
+        ft = takeToken();
+      }
+
+      int endPos = ft.endPos;
+      int startPos = columnToken.startPos;
+      columnName = selectSQL.substring(startPos, endPos);
+    }
+    else {
+      columnName = columnToken.stringValue();
     }
 
     ColumnNameExpression left = new ColumnNameExpression(columnName);
@@ -165,7 +178,6 @@ public class SelectParser {
       }
       case IDENTIFIER -> {
         boolean not = false;
-        Expression expr;
         String stringValue = operator.stringValue();
         if (stringValue.equalsIgnoreCase("not")) {
           not = true;
@@ -178,25 +190,24 @@ public class SelectParser {
           Expression start = eatValueExpression();
           eatToken(TokenKind.IDENTIFIER);
           Expression end = eatValueExpression();
-          expr = new Between(left, not, start, end);
+          yield new Between(left, not, start, end);
         }
         else if (stringValue.equalsIgnoreCase("in")) {
           // maybe a subquery
           // todo
-          expr = new InExpression(left, not);
+          yield new InExpression(left, not);
         }
         else if (stringValue.equalsIgnoreCase("like")) {
           // like '' | not like ''
           Expression right = eatValueExpression();
-          expr = new LikeExpression(left, not, right);
+          yield new LikeExpression(left, not, right);
         }
         else if (stringValue.equalsIgnoreCase("is")) {
-          expr = eatNullExpression(left);
+          yield eatNullExpression(left);
         }
         else {
           throw parsingException(operator.startPos, "Not a valid operator token: '%s'".formatted(toString(operator)));
         }
-        yield expr;
       }
       default -> throw new ParsingException("Unsupported operator '%s'".formatted(toString(operator)));
     };
@@ -223,7 +234,7 @@ public class SelectParser {
         Integer arrayIndex = maybeEatArrayExpression();
         yield new VariableRef(nameT.stringValue(), arrayIndex);
       }
-      default -> throw new ParsingException("Unsupported operator '%s'".formatted(toString(value)));
+      default -> throw new ParsingException("Unsupported value expression '%s'".formatted(toString(value)));
     };
   }
 

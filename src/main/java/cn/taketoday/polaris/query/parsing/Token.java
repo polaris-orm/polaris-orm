@@ -54,6 +54,16 @@ class Token {
     return kind == TokenKind.IDENTIFIER;
   }
 
+  public boolean isLiteral() {
+    return kind == TokenKind.LITERAL_INT
+            || kind == TokenKind.LITERAL_HEXINT
+            || kind == TokenKind.LITERAL_LONG
+            || kind == TokenKind.LITERAL_HEXLONG
+            || kind == TokenKind.LITERAL_REAL
+            || kind == TokenKind.LITERAL_REAL_FLOAT
+            || kind == TokenKind.LITERAL_STRING;
+  }
+
   public boolean isIdentifier(String identifier) {
     return kind == TokenKind.IDENTIFIER && identifier.equalsIgnoreCase(stringValue());
   }
