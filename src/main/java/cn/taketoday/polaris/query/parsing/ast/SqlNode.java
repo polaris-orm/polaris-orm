@@ -22,6 +22,15 @@ package cn.taketoday.polaris.query.parsing.ast;
  */
 public abstract class SqlNode {
 
+  protected final int startPos;  // index of first character
+
+  protected final int endPos;  // index of char after the last character
+
+  protected SqlNode(int startPos, int endPos) {
+    this.startPos = startPos;
+    this.endPos = endPos;
+  }
+
   public abstract void render(StringBuilder selectSQL);
 
 }

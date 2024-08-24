@@ -20,17 +20,18 @@ package cn.taketoday.polaris.query.parsing.ast;
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0 2024/8/21 11:47
  */
-public class ColumnNameExpression extends SqlNode implements Expression {
+public class ColumnNameExpression implements Expression {
 
   private final String name;
 
-  public ColumnNameExpression(String name) {
-    this.name = name;
-  }
+  private final boolean maybeFunction;
 
-  @Override
-  public void render(StringBuilder selectSQL) {
-    selectSQL.append(name);
+  private final boolean dotName;
+
+  public ColumnNameExpression(String name, boolean maybeFunction, boolean dotName) {
+    this.name = name;
+    this.maybeFunction = maybeFunction;
+    this.dotName = dotName;
   }
 
   @Override

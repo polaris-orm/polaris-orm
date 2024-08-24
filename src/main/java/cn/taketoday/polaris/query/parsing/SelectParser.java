@@ -16,6 +16,7 @@
 
 package cn.taketoday.polaris.query.parsing;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.taketoday.polaris.query.parsing.ast.AndExpression;
@@ -33,7 +34,6 @@ import cn.taketoday.polaris.query.parsing.ast.NamedParameter;
 import cn.taketoday.polaris.query.parsing.ast.OrExpression;
 import cn.taketoday.polaris.query.parsing.ast.ParenExpression;
 import cn.taketoday.polaris.query.parsing.ast.SelectNode;
-import cn.taketoday.polaris.query.parsing.ast.SqlNode;
 import cn.taketoday.polaris.query.parsing.ast.VariableRef;
 import cn.taketoday.polaris.query.parsing.ast.WhereNode;
 import cn.taketoday.polaris.util.Nullable;
@@ -59,16 +59,11 @@ public class SelectParser {
   }
 
   public SelectExpression parse() {
-    SqlNode ast = eatExpression();
-    Token t = peekToken();
-    if (t != null) {
-      throw new ParsingException("After parsing a valid expression, there is still more data in the expression: ''%s''"
-              .formatted(toString(t)));
-    }
+    SelectNode ast = eatExpression();
     return new SelectExpression(ast);
   }
 
-  private SqlNode eatExpression() {
+  private SelectNode eatExpression() {
     if (peekIdentifierToken("SELECT")) {
       Token whereToken = null;
       Token next = nextToken();
@@ -81,25 +76,28 @@ public class SelectParser {
         next = nextToken();
       }
       if (whereToken != null) {
-        WhereNode whereNode = eatWhereExpression(whereToken);
-        return new SelectNode(selectSQL.substring(0, whereToken.startPos), whereNode);
+        WhereNode whereNode = eatWhereExpression();
+        Token token = peekToken();
+        if (token != null) {
+          return new SelectNode(selectSQL.substring(0, whereToken.startPos), whereNode,
+                  selectSQL.substring(token.startPos));
+        }
+        return new SelectNode(selectSQL.substring(0, whereToken.startPos), whereNode, null);
       }
       else {
-        return new SelectNode(selectSQL, null);
+        return new SelectNode(selectSQL, null, null);
       }
     }
-    throw new ParsingException("Not a select SQL");
+    throw parsingException(0, "Not a select statement");
   }
 
-  private WhereNode eatWhereExpression(Token whereToken) {
+  private WhereNode eatWhereExpression() {
     Expression expression = eatLogicalOrExpression();
-
-    Token next = nextToken();
-    while (next != null) {
-      next = nextToken();
+    Token token = peekToken();
+    if (token == null || token.isIdentifier()) {
+      return new WhereNode(expression);
     }
-
-    return new WhereNode(expression);
+    throw parsingException(token.startPos, "Syntax error");
   }
 
   // logicalOrExpression : logicalAndExpression (OR^ logicalAndExpression)*;
@@ -146,12 +144,15 @@ public class SelectParser {
     }
 
     // column
-    Token columnToken = eatToken(TokenKind.IDENTIFIER);
+    boolean dotName = false;
+    boolean maybeFunction = false;
     String columnName;
+    Token columnToken = eatToken(TokenKind.IDENTIFIER);
     if (peekToken(TokenKind.DOT)) {
       nextToken();
       Token token = takeToken();
       columnName = selectSQL.substring(columnToken.startPos, token.endPos);
+      dotName = true;
     }
     else if (peekToken(TokenKind.LPAREN)) {
       Token ft = takeToken();
@@ -162,15 +163,16 @@ public class SelectParser {
       int endPos = ft.endPos;
       int startPos = columnToken.startPos;
       columnName = selectSQL.substring(startPos, endPos);
+      maybeFunction = true;
     }
     else {
       columnName = columnToken.stringValue();
     }
 
-    ColumnNameExpression left = new ColumnNameExpression(columnName);
+    ColumnNameExpression left = new ColumnNameExpression(columnName, maybeFunction, dotName);
 
     // operator
-    Token operator = takeToken();
+    Token operator = takeToken("Syntax error, operator token expected");
     return switch (operator.kind) {
       case LE, LT, GE, GT, EQ, NE -> {
         Expression right = eatValueExpression();
@@ -193,9 +195,23 @@ public class SelectParser {
           yield new Between(left, not, start, end);
         }
         else if (stringValue.equalsIgnoreCase("in")) {
-          // maybe a subquery
-          // todo
-          yield new InExpression(left, not);
+          // IN (1, 2, ?, :age, 5)
+          eatToken(TokenKind.LPAREN);
+          List<Expression> expressionList = new ArrayList<>();
+          do {
+            Expression expression = eatValueExpression();
+            expressionList.add(expression);
+            if (!peekToken(TokenKind.COMMA)) {
+              // maybe a subquery IN(select a from b)
+
+              break;
+            }
+            eatToken(TokenKind.COMMA);
+          }
+          while (!peekToken(TokenKind.RPAREN));
+          eatToken(TokenKind.RPAREN);
+
+          yield new InExpression(left, not, expressionList);
         }
         else if (stringValue.equalsIgnoreCase("like")) {
           // like '' | not like ''
@@ -203,6 +219,7 @@ public class SelectParser {
           yield new LikeExpression(left, not, right);
         }
         else if (stringValue.equalsIgnoreCase("is")) {
+          // is null | is not null
           yield eatNullExpression(left);
         }
         else {
@@ -266,7 +283,7 @@ public class SelectParser {
     return expr;
   }
 
-  //parenExpr : LPAREN! expression RPAREN!;
+  // parenExpr : LPAREN! expression RPAREN!;
 
   @Nullable
   private Expression maybeEatParenExpression() {
@@ -331,8 +348,12 @@ public class SelectParser {
   }
 
   private Token takeToken() {
+    return takeToken("Unexpectedly ran out of input");
+  }
+
+  private Token takeToken(String errorMessage) {
     if (this.tokenStreamPointer >= this.tokenStreamLength) {
-      throw new IllegalStateException("No token");
+      throw parsingException(selectSQL.length(), errorMessage);
     }
     return this.tokenStream.get(this.tokenStreamPointer++);
   }
@@ -381,11 +402,10 @@ public class SelectParser {
   }
 
   private ParsingException parsingException(int startPos, String message) {
-    String happenPos = selectSQL.substring(startPos);
-    if (happenPos.length() > 32) {
-      happenPos = happenPos.substring(0, 32);
+    if (startPos > 0) {
+      return new ParsingException("Statement [%s] @%s: %s".formatted(selectSQL, startPos, message));
     }
-    return new ParsingException(message + ", near : '" + happenPos + "'");
+    return new ParsingException("Statement [%s]: %s".formatted(selectSQL, message));
   }
 
   // Static factory methods

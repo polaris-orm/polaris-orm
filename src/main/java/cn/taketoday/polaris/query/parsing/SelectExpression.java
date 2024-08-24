@@ -16,7 +16,7 @@
 
 package cn.taketoday.polaris.query.parsing;
 
-import cn.taketoday.polaris.query.parsing.ast.SqlNode;
+import cn.taketoday.polaris.query.parsing.ast.SelectNode;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
@@ -24,9 +24,9 @@ import cn.taketoday.polaris.query.parsing.ast.SqlNode;
  */
 public class SelectExpression {
 
-  private final SqlNode astNode;
+  private final SelectNode astNode;
 
-  public SelectExpression(SqlNode astNode) {
+  public SelectExpression(SelectNode astNode) {
     this.astNode = astNode;
   }
 

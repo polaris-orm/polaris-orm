@@ -18,6 +18,8 @@ package cn.taketoday.polaris.query.parsing;
 
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0 2024/8/20 23:06
@@ -28,8 +30,9 @@ class SelectParserTests {
   void test() {
     String sql = """
             SELECT `category`, `content`, `copyright`, `cover`, `create_at`, `id`, `markdown`, `password`, `pv`, `status`, `summary`, `title`, `update_at`, `uri`
-            FROM article WHERE article.`category` = #category and  (`title` like @q OR `content` like '%#q%' ) and status = :status
+            FROM article WHERE article.`category` = #category and  (`title` like @q OR `content` like '%#q%' ) and (status = :status)
             and create_at between :create_at[0] and :create_at[1] or status is not null and status not like 's' and TRIM(status) = 'YHJ'
+            or status not in (?, :status, 3, 4, '5', :`d`)
             order by update_at DESC, create_at DESC LIMIT 20""";
 
     SelectExpression expression = SelectParser.parse(sql);
@@ -37,6 +40,22 @@ class SelectParserTests {
     String render = expression.render();
 
     System.out.println(render);
+  }
+
+  @Test
+  void syntaxError() {
+    assertThatThrownBy(() -> SelectParser.parse("Update article set status = 1 where status = 2"))
+            .isInstanceOf(ParsingException.class)
+            .hasMessage("Statement [Update article set status = 1 where status = 2]: Not a select statement");
+
+    assertThatThrownBy(() -> SelectParser.parse("SELECT * FROM article WHERE"))
+            .isInstanceOf(ParsingException.class)
+            .hasMessage("Statement [SELECT * FROM article WHERE] @27: Unexpectedly ran out of input");
+
+    assertThatThrownBy(() -> SelectParser.parse("SELECT * FROM article WHERE a"))
+            .isInstanceOf(ParsingException.class)
+            .hasMessage("Statement [SELECT * FROM article WHERE a] @29: Syntax error, operator token expected");
+
   }
 
 }

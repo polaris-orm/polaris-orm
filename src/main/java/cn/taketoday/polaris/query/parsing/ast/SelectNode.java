@@ -22,23 +22,29 @@ import cn.taketoday.polaris.util.Nullable;
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0 2024/8/20 22:54
  */
-public class SelectNode extends SqlNode {
+public class SelectNode implements Expression {
 
   private final String select;
 
   @Nullable
   private final WhereNode whereNode;
 
-  public SelectNode(String select, @Nullable WhereNode whereNode) {
+  @Nullable
+  private final String other;
+
+  public SelectNode(String select, @Nullable WhereNode whereNode, @Nullable String other) {
     this.select = select;
     this.whereNode = whereNode;
+    this.other = other;
   }
 
-  @Override
   public void render(StringBuilder selectSQL) {
     selectSQL.append(select);
     if (whereNode != null) {
       whereNode.render(selectSQL);
+    }
+    if (other != null) {
+      selectSQL.append(" ").append(other);
     }
   }
 
