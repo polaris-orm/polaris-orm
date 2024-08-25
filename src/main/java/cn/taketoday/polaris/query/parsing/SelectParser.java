@@ -24,6 +24,7 @@ import cn.taketoday.polaris.query.parsing.ast.Between;
 import cn.taketoday.polaris.query.parsing.ast.ColumnNameExpression;
 import cn.taketoday.polaris.query.parsing.ast.ComparisonOperator;
 import cn.taketoday.polaris.query.parsing.ast.Expression;
+import cn.taketoday.polaris.query.parsing.ast.FunctionExpression;
 import cn.taketoday.polaris.query.parsing.ast.HashParameter;
 import cn.taketoday.polaris.query.parsing.ast.InExpression;
 import cn.taketoday.polaris.query.parsing.ast.IndexParameter;
@@ -65,39 +66,51 @@ public class SelectParser {
 
   private SelectNode eatExpression() {
     if (peekIdentifierToken("SELECT")) {
-      Token whereToken = null;
-      Token next = nextToken();
-      while (next != null) {
-        if (next.isIdentifier("WHERE")) {
-          // where token
-          whereToken = next;
-          break;
-        }
-        next = nextToken();
-      }
-      if (whereToken != null) {
-        WhereNode whereNode = eatWhereExpression();
-        Token token = peekToken();
-        if (token != null) {
-          return new SelectNode(selectSQL.substring(0, whereToken.startPos), whereNode,
-                  selectSQL.substring(token.startPos));
-        }
-        return new SelectNode(selectSQL.substring(0, whereToken.startPos), whereNode, null);
-      }
-      else {
-        return new SelectNode(selectSQL, null, null);
-      }
+      return eatSelectExpression();
     }
     throw parsingException(0, "Not a select statement");
   }
 
+  private SelectNode eatSelectExpression() {
+    Token whereToken = null;
+    Token next = nextToken();
+    while (next != null) {
+      if (next.isIdentifier("WHERE")) {
+        // where token
+        whereToken = next;
+        break;
+      }
+      next = nextToken();
+    }
+    if (whereToken != null) {
+      WhereNode whereNode = eatWhereExpression();
+      if (whereNode == null) {
+        throw parsingException(whereToken.endPos, "Where clause not found");
+      }
+      Token token = peekToken();
+      if (token != null && token.kind != TokenKind.RPAREN && token.kind != TokenKind.COMMA) {
+        return new SelectNode(selectSQL.substring(0, whereToken.startPos), whereNode,
+                selectSQL.substring(token.startPos));
+      }
+      // todo group by
+      return new SelectNode(selectSQL.substring(0, whereToken.startPos), whereNode, null);
+    }
+    else {
+      return new SelectNode(selectSQL, null, null);
+    }
+  }
+
+  @Nullable
   private WhereNode eatWhereExpression() {
     Expression expression = eatLogicalOrExpression();
-    Token token = peekToken();
-    if (token == null || token.isIdentifier()) {
-      return new WhereNode(expression);
+    if (expression != null) {
+      Token token = peekToken();
+      if (token == null || token.isIdentifier()) {
+        return new WhereNode(expression);
+      }
+      throw parsingException(token.startPos, "Syntax error");
     }
-    throw parsingException(token.startPos, "Syntax error");
+    return null;
   }
 
   // logicalOrExpression : logicalAndExpression (OR^ logicalAndExpression)*;
@@ -115,6 +128,7 @@ public class SelectParser {
   }
 
   // logicalAndExpression : relationalExpression (AND^ relationalExpression)*;
+  @Nullable
   private Expression eatLogicalAndExpression() {
     Expression expr = eatRelationalExpression();
     while (peekIdentifierToken("and")) {
@@ -126,113 +140,164 @@ public class SelectParser {
     return expr;
   }
 
-  // ALL	      TRUE if all of the subquery values meet the condition
-  // AND	      TRUE if all the conditions separated by AND is TRUE
-  // ANY	      TRUE if any of the subquery values meet the condition
-  // BETWEEN	  TRUE if the operand is within the range of comparisons
-  // EXISTS	    TRUE if the subquery returns one or more records
-  // IN	        TRUE if the operand is equal to one of a list of expressions
-  // LIKE	      TRUE if the operand matches a pattern
-  // NOT	      Displays a record if the condition(s) is NOT TRUE
-  // OR	        TRUE if any of the conditions separated by OR is TRUE
-  // SOME	      TRUE if any of the subquery values meet the condition
-
+  @Nullable
   private Expression eatRelationalExpression() {
     Expression parenExpr = maybeEatParenExpression();
     if (parenExpr != null) {
       return parenExpr;
     }
 
+    Expression funcExpr = maybeEatFunctionExpression();
+    if (funcExpr != null) {
+      Expression expression = maybeEatOperatorExpression(funcExpr);
+      if (expression != null) {
+        return expression;
+      }
+      return funcExpr;
+    }
+
     // column
+    Token columnT = nextToken();
+    if (columnT != null && columnT.isIdentifier()) {
+      Expression left = eatColumnNameExpression(columnT);
+      Token operator = peekToken();
+      if (operator == null) {
+        throw parsingException(selectSQL.length(), "Syntax error, operator token expected");
+      }
+
+      // operator
+      Expression expression = maybeEatOperatorExpression(left);
+      if (expression == null) {
+        throw parsingException(operator.startPos, "Unsupported operator '%s'".formatted(toString(operator)));
+      }
+      return expression;
+    }
+    return null;
+  }
+
+  @Nullable
+  private Expression maybeEatOperatorExpression(Expression left) {
+    Token operator = peekToken();
+    if (operator == null) {
+      return null;
+    }
+    return switch (operator.kind) {
+      case LE, LT, GE, GT, EQ, NE -> {
+        takeToken();
+        Expression right = eatValueExpression();
+        yield new ComparisonOperator(new String(operator.kind.tokenChars), left, right);
+      }
+      case IDENTIFIER -> eatIdentifierOperatorExpression(operator, left);
+      default -> null;
+    };
+  }
+
+  private Expression eatColumnNameExpression(Token columnToken) {
     boolean dotName = false;
-    boolean maybeFunction = false;
     String columnName;
-    Token columnToken = eatToken(TokenKind.IDENTIFIER);
     if (peekToken(TokenKind.DOT)) {
       nextToken();
       Token token = takeToken();
       columnName = selectSQL.substring(columnToken.startPos, token.endPos);
       dotName = true;
     }
-    else if (peekToken(TokenKind.LPAREN)) {
-      Token ft = takeToken();
-      while (ft.kind != TokenKind.RPAREN) {
-        ft = takeToken();
-      }
-
-      int endPos = ft.endPos;
-      int startPos = columnToken.startPos;
-      columnName = selectSQL.substring(startPos, endPos);
-      maybeFunction = true;
-    }
     else {
       columnName = columnToken.stringValue();
     }
 
-    ColumnNameExpression left = new ColumnNameExpression(columnName, maybeFunction, dotName);
+    return new ColumnNameExpression(columnName, dotName);
+  }
 
-    // operator
-    Token operator = takeToken("Syntax error, operator token expected");
-    return switch (operator.kind) {
-      case LE, LT, GE, GT, EQ, NE -> {
-        Expression right = eatValueExpression();
-        yield new ComparisonOperator(new String(operator.kind.tokenChars), left, right);
+  // funcExpr
+
+  private Expression maybeEatFunctionExpression() {
+    if (peekTokens(TokenKind.IDENTIFIER, TokenKind.LPAREN)) {
+      // function func(c)
+      Token nameToken = eatToken(TokenKind.IDENTIFIER);
+
+      // func(1, 2, ?, :age, 5)
+      eatToken(TokenKind.LPAREN);
+
+      List<Expression> args = new ArrayList<>();
+      Expression expression = eatValueExpression();
+      args.add(expression);
+      Token ft = takeToken();
+      while (ft.kind != TokenKind.RPAREN) {
+        expression = eatValueExpression();
+        args.add(expression);
+        if (peekToken(TokenKind.COMMA)) {
+          eatToken(TokenKind.COMMA);
+        }
+        ft = takeToken();
       }
-      case IDENTIFIER -> {
-        boolean not = false;
-        String stringValue = operator.stringValue();
-        if (stringValue.equalsIgnoreCase("not")) {
-          not = true;
-          operator = takeToken();
-          stringValue = operator.stringValue();
-        }
 
-        if (stringValue.equalsIgnoreCase("between")) {
-          // between value1 and value2
-          Expression start = eatValueExpression();
-          eatToken(TokenKind.IDENTIFIER);
-          Expression end = eatValueExpression();
-          yield new Between(left, not, start, end);
-        }
-        else if (stringValue.equalsIgnoreCase("in")) {
-          // IN (1, 2, ?, :age, 5)
-          eatToken(TokenKind.LPAREN);
-          List<Expression> expressionList = new ArrayList<>();
-          do {
-            Expression expression = eatValueExpression();
-            expressionList.add(expression);
-            if (!peekToken(TokenKind.COMMA)) {
-              // maybe a subquery IN(select a from b)
+      return new FunctionExpression(nameToken.stringValue(), args);
+    }
+    return null;
+  }
 
-              break;
-            }
-            eatToken(TokenKind.COMMA);
-          }
-          while (!peekToken(TokenKind.RPAREN));
-          eatToken(TokenKind.RPAREN);
-
-          yield new InExpression(left, not, expressionList);
-        }
-        else if (stringValue.equalsIgnoreCase("like")) {
-          // like '' | not like ''
-          Expression right = eatValueExpression();
-          yield new LikeExpression(left, not, right);
-        }
-        else if (stringValue.equalsIgnoreCase("is")) {
-          // is null | is not null
-          yield eatNullExpression(left);
-        }
-        else {
-          throw parsingException(operator.startPos, "Not a valid operator token: '%s'".formatted(toString(operator)));
-        }
+  private Expression eatIdentifierOperatorExpression(Token operator, Expression left) {
+    boolean not = false;
+    String stringValue = operator.stringValue();
+    if (stringValue.equalsIgnoreCase("not")) {
+      takeToken();
+      not = true;
+      operator = peekToken();
+      if (operator == null) {
+        throw parsingException(selectSQL.length(), "Syntax error, operator token expected");
       }
-      default -> throw new ParsingException("Unsupported operator '%s'".formatted(toString(operator)));
-    };
+      stringValue = operator.stringValue();
+    }
+
+    if (stringValue.equalsIgnoreCase("between")) {
+      takeToken();
+      // between value1 and value2
+      Expression start = eatValueExpression();
+      eatToken(TokenKind.IDENTIFIER);
+      Expression end = eatValueExpression();
+      return new Between(left, not, start, end);
+    }
+    else if (stringValue.equalsIgnoreCase("in")) {
+      takeToken();
+      // IN (1, 2, ?, :age, 5)
+      eatToken(TokenKind.LPAREN);
+      List<Expression> expressionList = new ArrayList<>();
+      do {
+        Expression expression = eatValueExpression();
+        expressionList.add(expression);
+        if (!peekToken(TokenKind.COMMA)) {
+          break;
+        }
+        eatToken(TokenKind.COMMA);
+      }
+      while (!peekToken(TokenKind.RPAREN));
+      eatToken(TokenKind.RPAREN);
+
+      return new InExpression(left, not, expressionList);
+    }
+    else if (stringValue.equalsIgnoreCase("like")) {
+      takeToken();
+      // like '' | not like ''
+      Expression right = eatValueExpression();
+      return new LikeExpression(left, not, right);
+    }
+    else if (stringValue.equalsIgnoreCase("is")) {
+      takeToken();
+      // is null | is not null
+      return eatNullExpression(left);
+    }
+    else {
+      return null;
+    }
   }
 
   private Expression eatValueExpression() {
     Token value = takeToken();
-    return switch (value.kind) {
+    boolean inParen = value.kind == TokenKind.LPAREN;
+    if (inParen) {
+      value = takeToken();
+    }
+    Expression expression = switch (value.kind) {
       case LITERAL_STRING, LITERAL_REAL, LITERAL_HEXINT, LITERAL_HEXLONG,
            LITERAL_LONG, LITERAL_INT, LITERAL_REAL_FLOAT -> new LiteralStringExpression(value.stringValue());
       case COLON -> {
@@ -251,8 +316,54 @@ public class SelectParser {
         Integer arrayIndex = maybeEatArrayExpression();
         yield new VariableRef(nameT.stringValue(), arrayIndex);
       }
-      default -> throw new ParsingException("Unsupported value expression '%s'".formatted(toString(value)));
+      default -> {
+        // maybe a subquery IN(select a from b)
+        if (value.isIdentifier("select")) {
+          yield eatSubqueryExpression(value.startPos, inParen);
+        }
+
+        if (value.isIdentifier()) {
+          yield eatColumnNameExpression(value);
+        }
+        throw parsingException(value.startPos, "Unsupported value expression '%s'".formatted(toString(value)));
+      }
     };
+
+    if (inParen) {
+      eatToken(TokenKind.RPAREN);
+      return new ParenExpression(expression);
+    }
+    return expression;
+  }
+
+  private Expression eatSubqueryExpression(int startPos, boolean inParen) {
+    Token whereToken = null;
+    Token next = nextToken();
+    while (next != null) {
+      if (next.isIdentifier("WHERE")) {
+        // where token
+        whereToken = next;
+        break;
+      }
+      next = nextToken();
+    }
+    if (whereToken != null) {
+      WhereNode whereNode = eatWhereExpression();
+      if (whereNode == null) {
+        throw parsingException(whereToken.startPos, "Where clause not found");
+      }
+      Token token = peekToken();
+      if (token != null && token.kind != TokenKind.RPAREN && token.kind != TokenKind.COMMA) {
+        return new SelectNode(selectSQL.substring(startPos, whereToken.startPos), whereNode,
+                selectSQL.substring(token.startPos));
+      }
+      // todo group by
+      return new SelectNode(selectSQL.substring(startPos, whereToken.startPos), whereNode, null);
+    }
+    else {
+      //
+      return new SelectNode(selectSQL.substring(startPos), null, null);
+    }
   }
 
   private Integer maybeEatArrayExpression() {
@@ -328,7 +439,22 @@ public class SelectParser {
     if (t == null) {
       return false;
     }
-    return (t.kind == possible1 || t.kind == possible2);
+    return (t.kind == possible1 && t.kind == possible2);
+  }
+
+  private boolean peekTokens(TokenKind possible1, TokenKind possible2) {
+    if (tokenStreamPointer + 1 >= tokenStreamLength) {
+      return false;
+    }
+    Token t = this.tokenStream.get(tokenStreamPointer);
+    if (t == null || t.kind != possible1) {
+      return false;
+    }
+    t = this.tokenStream.get(tokenStreamPointer + 1);
+    if (t == null) {
+      return false;
+    }
+    return t.kind == possible2;
   }
 
   private boolean peekToken(TokenKind possible1, TokenKind possible2, TokenKind possible3) {
