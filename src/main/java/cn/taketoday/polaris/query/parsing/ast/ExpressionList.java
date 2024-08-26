@@ -16,24 +16,28 @@
 
 package cn.taketoday.polaris.query.parsing.ast;
 
+import java.util.List;
+import java.util.StringJoiner;
+
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
- * @since 1.0 2024/8/21 16:22
+ * @since 1.0 2024/8/26 23:29
  */
-public class GreaterThan extends ComparisonOperator {
+public class ExpressionList implements Expression {
 
-  private boolean equals;
+  private final List<Expression> expressions;
 
-  public GreaterThan() {
-    super(">");
+  public ExpressionList(List<Expression> expressions) {
+    this.expressions = expressions;
   }
 
-  public GreaterThan(boolean equals) {
-    super(equals ? ">=" : ">");
-  }
-
-  public GreaterThan(Expression leftExpression, Expression rightExpression) {
-    super(">", leftExpression, rightExpression);
+  @Override
+  public String toString() {
+    StringJoiner joiner = new StringJoiner(", ");
+    for (Expression expression : expressions) {
+      joiner.add(expression.toString());
+    }
+    return joiner.toString();
   }
 
 }

@@ -32,7 +32,7 @@ class SelectParserTests {
             SELECT `category`, `content`, `copyright`, `cover`, `create_at`, `id`, `markdown`, `password`, `pv`, `status`, `summary`, `title`, `update_at`, `uri`
             FROM article WHERE article.`category` = #category and  (`title` like @q OR `content` like '%#q%' ) and (status = :status)
             and create_at between :create_at[0] and :create_at[1] or status is not null and status not like 's' and TRIM(status) = 'YHJ'
-            or status not in (?, :status, 3, 4, '5', :`d`)  or find_in_set(status, 'd')
+            or status not in (?, :status, 3, 4, '5', :`d`)  or find_in_set(status, 'd') and status in(1, true, false) and status in(func(status, 'd'))
             order by update_at DESC, create_at DESC LIMIT 20""";
 
     //  and status in ((select 1), 2)

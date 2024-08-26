@@ -20,11 +20,11 @@ package cn.taketoday.polaris.query.parsing.ast;
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0 2024/8/21 21:29
  */
-public class LiteralStringExpression implements Expression {
+public class LiteralExpression implements Expression {
 
   private final String value;
 
-  public LiteralStringExpression(String value) {
+  public LiteralExpression(String value) {
     this.value = value;
   }
 

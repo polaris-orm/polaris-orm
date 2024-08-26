@@ -380,10 +380,6 @@ class Tokenizer {
     this.pos += 2;
   }
 
-  private void pushOneCharOrTwoCharToken(TokenKind kind, int pos, char[] data) {
-    this.tokens.add(new Token(kind, data, pos, pos + kind.getLength()));
-  }
-
   // ID: ('a'..'z'|'A'..'Z'|'_'|'$') ('a'..'z'|'A'..'Z'|'_'|'$'|'0'..'9'|DOT_ESCAPED)*;
   private boolean isIdentifier(char ch) {
     return isAlphabetic(ch) || isDigit(ch) || ch == '_' || ch == '$' || ch == '`';

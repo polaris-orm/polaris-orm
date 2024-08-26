@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.taketoday.polaris.query.parsing.ast.AndExpression;
+import cn.taketoday.polaris.query.parsing.ast.ExpressionList;
 import cn.taketoday.polaris.query.parsing.ast.Between;
 import cn.taketoday.polaris.query.parsing.ast.ColumnNameExpression;
 import cn.taketoday.polaris.query.parsing.ast.ComparisonOperator;
@@ -30,7 +31,7 @@ import cn.taketoday.polaris.query.parsing.ast.InExpression;
 import cn.taketoday.polaris.query.parsing.ast.IndexParameter;
 import cn.taketoday.polaris.query.parsing.ast.IsNullExpression;
 import cn.taketoday.polaris.query.parsing.ast.LikeExpression;
-import cn.taketoday.polaris.query.parsing.ast.LiteralStringExpression;
+import cn.taketoday.polaris.query.parsing.ast.LiteralExpression;
 import cn.taketoday.polaris.query.parsing.ast.NamedParameter;
 import cn.taketoday.polaris.query.parsing.ast.OrExpression;
 import cn.taketoday.polaris.query.parsing.ast.ParenExpression;
@@ -130,10 +131,10 @@ public class SelectParser {
   // logicalAndExpression : relationalExpression (AND^ relationalExpression)*;
   @Nullable
   private Expression eatLogicalAndExpression() {
-    Expression expr = eatRelationalExpression();
+    Expression expr = eatConditionExpression();
     while (peekIdentifierToken("and")) {
       Token t = takeToken();  // consume 'AND'
-      Expression rhExpr = eatRelationalExpression();
+      Expression rhExpr = eatConditionExpression();
       checkOperands(t, expr, rhExpr);
       expr = new AndExpression(expr, rhExpr, t.startPos, t.endPos);
     }
@@ -141,7 +142,7 @@ public class SelectParser {
   }
 
   @Nullable
-  private Expression eatRelationalExpression() {
+  private Expression eatConditionExpression() {
     Expression parenExpr = maybeEatParenExpression();
     if (parenExpr != null) {
       return parenExpr;
@@ -187,7 +188,7 @@ public class SelectParser {
         Expression right = eatValueExpression();
         yield new ComparisonOperator(new String(operator.kind.tokenChars), left, right);
       }
-      case IDENTIFIER -> eatIdentifierOperatorExpression(operator, left);
+      case IDENTIFIER -> maybeEatIdentifierOperatorExpression(operator, left);
       default -> null;
     };
   }
@@ -216,27 +217,14 @@ public class SelectParser {
       Token nameToken = eatToken(TokenKind.IDENTIFIER);
 
       // func(1, 2, ?, :age, 5)
-      eatToken(TokenKind.LPAREN);
-
-      List<Expression> args = new ArrayList<>();
-      Expression expression = eatValueExpression();
-      args.add(expression);
-      Token ft = takeToken();
-      while (ft.kind != TokenKind.RPAREN) {
-        expression = eatValueExpression();
-        args.add(expression);
-        if (peekToken(TokenKind.COMMA)) {
-          eatToken(TokenKind.COMMA);
-        }
-        ft = takeToken();
-      }
-
+      Expression args = eatArguments();
       return new FunctionExpression(nameToken.stringValue(), args);
     }
     return null;
   }
 
-  private Expression eatIdentifierOperatorExpression(Token operator, Expression left) {
+  @Nullable
+  private Expression maybeEatIdentifierOperatorExpression(Token operator, Expression left) {
     boolean not = false;
     String stringValue = operator.stringValue();
     if (stringValue.equalsIgnoreCase("not")) {
@@ -299,7 +287,7 @@ public class SelectParser {
     }
     Expression expression = switch (value.kind) {
       case LITERAL_STRING, LITERAL_REAL, LITERAL_HEXINT, LITERAL_HEXLONG,
-           LITERAL_LONG, LITERAL_INT, LITERAL_REAL_FLOAT -> new LiteralStringExpression(value.stringValue());
+           LITERAL_LONG, LITERAL_INT, LITERAL_REAL_FLOAT -> new LiteralExpression(value.stringValue());
       case COLON -> {
         Token nameT = eatToken(TokenKind.IDENTIFIER);
         Integer arrayIndex = maybeEatArrayExpression();
@@ -317,12 +305,22 @@ public class SelectParser {
         yield new VariableRef(nameT.stringValue(), arrayIndex);
       }
       default -> {
-        // maybe a subquery IN(select a from b)
+        // maybe a subquery IN(select a from b), in((select 1), 2, 3)
         if (value.isIdentifier("select")) {
           yield eatSubqueryExpression(value.startPos, inParen);
         }
 
+        if (value.isIdentifier("true") || value.isIdentifier("false")) {
+          yield new LiteralExpression(value.stringValue());
+        }
+
         if (value.isIdentifier()) {
+          // function func(c)
+          if (peekToken(TokenKind.LPAREN)) {
+            // func(1, 2, ?, :age, 5)
+            Expression args = eatArguments();
+            yield new FunctionExpression(value.stringValue(), args);
+          }
           yield eatColumnNameExpression(value);
         }
         throw parsingException(value.startPos, "Unsupported value expression '%s'".formatted(toString(value)));
@@ -336,7 +334,25 @@ public class SelectParser {
     return expression;
   }
 
+  private Expression eatArguments() {
+    eatToken(TokenKind.LPAREN);
+    List<Expression> args = new ArrayList<>();
+    Expression expr = eatValueExpression();
+    args.add(expr);
+    Token ft = takeToken();
+    while (ft.kind != TokenKind.RPAREN) {
+      expr = eatValueExpression();
+      args.add(expr);
+      if (peekToken(TokenKind.COMMA)) {
+        eatToken(TokenKind.COMMA);
+      }
+      ft = takeToken();
+    }
+    return new ParenExpression(new ExpressionList(args));
+  }
+
   private Expression eatSubqueryExpression(int startPos, boolean inParen) {
+    int parenLayer = inParen ? 1 : 0;
     Token whereToken = null;
     Token next = nextToken();
     while (next != null) {
@@ -366,6 +382,7 @@ public class SelectParser {
     }
   }
 
+  @Nullable
   private Integer maybeEatArrayExpression() {
     if (peekToken(TokenKind.LSQUARE)) {
       takeToken();

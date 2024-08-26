@@ -65,7 +65,7 @@ class Token {
   }
 
   public boolean isIdentifier(String identifier) {
-    return kind == TokenKind.IDENTIFIER && identifier.equalsIgnoreCase(stringValue());
+    return kind == TokenKind.IDENTIFIER && identifier.equalsIgnoreCase(data);
   }
 
   public String stringValue() {

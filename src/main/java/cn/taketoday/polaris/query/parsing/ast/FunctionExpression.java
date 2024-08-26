@@ -16,9 +16,6 @@
 
 package cn.taketoday.polaris.query.parsing.ast;
 
-import java.util.List;
-import java.util.StringJoiner;
-
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0 2024/8/25 22:06
@@ -27,23 +24,16 @@ public class FunctionExpression implements Expression {
 
   private final String name;
 
-  private final List<Expression> args;
+  private final Expression args;
 
-  public FunctionExpression(String name, List<Expression> args) {
+  public FunctionExpression(String name, Expression args) {
     this.name = name;
     this.args = args;
   }
 
   @Override
   public String toString() {
-    return name + argsList();
+    return name + args;
   }
 
-  private String argsList() {
-    StringJoiner joiner = new StringJoiner(", ", "(", ")");
-    for (Expression expression : args) {
-      joiner.add(expression.toString());
-    }
-    return joiner.toString();
-  }
 }
