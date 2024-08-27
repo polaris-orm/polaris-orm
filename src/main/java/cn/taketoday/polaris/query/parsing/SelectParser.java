@@ -20,11 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.taketoday.polaris.query.parsing.ast.AndExpression;
-import cn.taketoday.polaris.query.parsing.ast.ExpressionList;
 import cn.taketoday.polaris.query.parsing.ast.Between;
 import cn.taketoday.polaris.query.parsing.ast.ColumnNameExpression;
 import cn.taketoday.polaris.query.parsing.ast.ComparisonOperator;
 import cn.taketoday.polaris.query.parsing.ast.Expression;
+import cn.taketoday.polaris.query.parsing.ast.ExpressionList;
 import cn.taketoday.polaris.query.parsing.ast.FunctionExpression;
 import cn.taketoday.polaris.query.parsing.ast.HashParameter;
 import cn.taketoday.polaris.query.parsing.ast.InExpression;
@@ -334,20 +334,16 @@ public class SelectParser {
     return expression;
   }
 
+  // (1, 2, :xxx, func(1, 2), (select 1), false, '1', @var)
   private Expression eatArgumentsExpression() {
-    eatToken(TokenKind.LPAREN);
-    List<Expression> args = new ArrayList<>();
-    Expression expr = eatValueExpression();
-    args.add(expr);
-    Token ft = takeToken();
-    while (ft.kind != TokenKind.RPAREN) {
-      expr = eatValueExpression();
+    Token t = eatToken(TokenKind.LPAREN);
+    ArrayList<Expression> args = new ArrayList<>();
+
+    for (; t.kind != TokenKind.RPAREN; t = takeToken()) {
+      Expression expr = eatValueExpression();
       args.add(expr);
-      if (peekToken(TokenKind.COMMA)) {
-        eatToken(TokenKind.COMMA);
-      }
-      ft = takeToken();
     }
+
     return new ParenExpression(new ExpressionList(args));
   }
 
