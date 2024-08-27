@@ -404,8 +404,8 @@ public class SelectParser {
       next = nextToken();
     }
 
-    WhereNode whereNode = null;
     String other = null;
+    WhereNode whereNode = null;
     if (whereToken != null) {
       whereNode = eatWhereExpression();
       if (whereNode == null) {
@@ -414,17 +414,11 @@ public class SelectParser {
 
       Token t = takeToken();
       next = t;
-      if (inParen) {
-        if (next.kind != TokenKind.RPAREN) {
-          other = other(parenLayer, next, t);
-        }
-      }
-      else {
-        if (next.kind != TokenKind.RPAREN) {
-          other = other(parenLayer, next, t);
-        }
+      if (next.kind != TokenKind.RPAREN) {
+        other = other(parenLayer, next, t);
       }
     }
+
     tokenStreamPointer -= 1;
     return new SelectNode(selectSQL.substring(startPos, selectEndPos), whereNode, other);
   }
