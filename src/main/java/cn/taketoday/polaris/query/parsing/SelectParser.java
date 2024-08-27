@@ -281,7 +281,7 @@ public class SelectParser {
       }
 
       if (peekIdentifierToken("escape")) {
-        // like '' | not like '' escape '/'
+        // like '/%/_%_' ESCAPE '/' | not like '/%/_%_' ESCAPE '/'
         takeToken();
         escape = eatValueExpression();
       }
@@ -458,21 +458,17 @@ public class SelectParser {
   }
 
   private Expression eatNullExpression(Expression left) {
-    Expression expr;
     // is null | is not null
-    boolean notNull = false;
+    boolean not = false;
     Token t = takeToken();
     if (t.isIdentifier("not")) {
       t = takeToken();
-      notNull = true;
+      not = true;
     }
     if (t.isIdentifier("null")) {
-      expr = new IsNullExpression(left, notNull);
+      return new IsNullExpression(left, not);
     }
-    else {
-      throw new ParsingException("Not a valid operator token: ''%s''".formatted(toString(t)));
-    }
-    return expr;
+    throw parsingException(t.startPos, "Not a valid operator token: ''%s''".formatted(toString(t)));
   }
 
   // parenExpr : LPAREN! expression RPAREN!;
