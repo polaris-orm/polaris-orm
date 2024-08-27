@@ -22,7 +22,7 @@ package cn.taketoday.polaris.query.parsing.ast;
  */
 public class ComparisonOperator extends BinaryExpression {
 
-  private final String operator;
+  public final String operator;
 
   public ComparisonOperator(String operator, Expression left, Expression right) {
     super(left, right);

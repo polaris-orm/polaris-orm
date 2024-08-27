@@ -20,11 +20,11 @@ package cn.taketoday.polaris.query.parsing.ast;
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0 2024/8/20 22:55
  */
-public class WhereNode implements Expression {
+public class WhereExpression implements Expression {
 
-  private final Expression expression;
+  public final Expression expression;
 
-  public WhereNode(Expression expression) {
+  public WhereExpression(Expression expression) {
     super();
     this.expression = expression;
   }

@@ -22,11 +22,11 @@ package cn.taketoday.polaris.query.parsing.ast;
  */
 public class FunctionExpression implements Expression {
 
-  private final String name;
+  public final String name;
 
-  private final Expression args;
+  public final Expression args;
 
-  private final boolean binary;
+  public final boolean binary;
 
   public FunctionExpression(String name, Expression args, boolean binary) {
     this.name = name;

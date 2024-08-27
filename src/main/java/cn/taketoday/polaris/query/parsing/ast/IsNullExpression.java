@@ -22,9 +22,9 @@ package cn.taketoday.polaris.query.parsing.ast;
  */
 public class IsNullExpression implements Expression {
 
-  private final Expression leftExpression;
+  public final Expression leftExpression;
 
-  private final boolean not;
+  public final boolean not;
 
   public IsNullExpression(Expression leftExpression, boolean not) {
     this.leftExpression = leftExpression;

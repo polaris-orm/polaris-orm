@@ -21,7 +21,8 @@ package cn.taketoday.polaris.query.parsing.ast;
  * @since 1.0 2024/8/21 22:43
  */
 public class ParenExpression implements Expression {
-  private final Expression expression;
+
+  public final Expression expression;
 
   public ParenExpression(Expression expression) {
     this.expression = expression;

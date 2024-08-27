@@ -18,6 +18,16 @@ package cn.taketoday.polaris.query.parsing;
 
 import org.junit.jupiter.api.Test;
 
+import cn.taketoday.polaris.query.parsing.ast.ColumnExpression;
+import cn.taketoday.polaris.query.parsing.ast.ComparisonOperator;
+import cn.taketoday.polaris.query.parsing.ast.Expression;
+import cn.taketoday.polaris.query.parsing.ast.ExpressionList;
+import cn.taketoday.polaris.query.parsing.ast.FunctionExpression;
+import cn.taketoday.polaris.query.parsing.ast.LiteralExpression;
+import cn.taketoday.polaris.query.parsing.ast.ParenExpression;
+import cn.taketoday.polaris.query.parsing.ast.WhereExpression;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -30,26 +40,103 @@ class SelectParserTests {
   void test() {
     String sql = """
             SELECT `category`, `content`, `copyright`, `cover`, `create_at`, `id`, `markdown`, `password`, `pv`, `status`, `summary`, `title`, `update_at`, `uri`
-            FROM article WHERE article.`category` = #category and  (`title` like @q OR `content` like '%#q%' ) and (status = :status) and 1=1
-            and create_at between :create_at[0] and :create_at[1] or status is not null and status not like 's' and TRIM(status) = 'YHJ'
-            or status not in (?, :status, 3, 4, '5', :`d`)  or find_in_set(status, 'd') and status in(1, true, false) and status in(func(status, 'd'))
+            FROM article WHERE article.`category` = #category
+            and (`title` like @q OR `content` like '%#q%' )
+            and (status = :status) and 1=1
+            and create_at between :create_at[0] and :create_at[1]
+            or status is not null
+            and status not like 's'
+            and TRIM(status) = 'YHJ'
+            or status not in (?, :status, 3, 4, '5', :`d`)
+            or find_in_set(status, 'd')
+            and status in(1, true, false)
+            and status in(func(status, 'd'))
             and binary status = 1
             and status in ((select 1 where 1 = 1 order by col desc), 2)
             and status in (select 1, 2)
+            and status in ((select 1), 2)
+            and status in (1, (select col where (1 = 1) and (2 = 1 or 1 = 2) order by col desc), 2)
+            and status in (binary find_in_set(status, 'd'), 2)
+            and status in (binary status, 2)
             and status in (select 1 where col = 1 and 1 = 1)
             and status like binary '/%/_%_' ESCAPE '/'
             and status rlike binary '/%/_%_' ESCAPE '/'
             and status REGEXP binary '/%/_%_' ESCAPE '/'
-            
+            or article.status = :status AND article_label.label_id IN (
+                  SELECT label_id FROM article_label
+                  WHERE label_id = (SELECT id FROM label WHERE name = #name)
+            )
             order by update_at DESC, create_at DESC LIMIT 20""";
-
-    //  and status in ((select 1), 2)
 
     SelectExpression expression = SelectParser.parse(sql);
 
     String render = expression.render();
 
     System.out.println(render);
+  }
+
+  @Test
+  void noWhere() {
+    SelectExpression expression = SelectParser.parse("select * from article");
+    assertThat(expression.getSelect()).isEqualTo("select * from article");
+    assertThat(expression.getOther()).isNull();
+    assertThat(expression.getWhere()).isNull();
+  }
+
+  @Test
+  void noOther() {
+    SelectExpression selectExpr = SelectParser.parse("select * from article where id = 1");
+    assertThat(selectExpr.getSelect()).isEqualTo("select * from article ");
+    assertThat(selectExpr.getOther()).isNull();
+    WhereExpression where = selectExpr.getWhere();
+    assertThat(where).isNotNull();
+    assertThat(where.expression).isNotNull();
+
+    assertThat(where.expression).isInstanceOf(ComparisonOperator.class);
+
+    ComparisonOperator expression = (ComparisonOperator) where.expression;
+    assertThat(expression.operator).isEqualTo("=");
+    assertThat(expression.rightExpression).isInstanceOf(LiteralExpression.class);
+    assertThat(expression.leftExpression).isInstanceOf(ColumnExpression.class);
+
+    LiteralExpression leftExpression = (LiteralExpression) expression.rightExpression;
+    assertThat(leftExpression.value).isEqualTo("1");
+
+    ColumnExpression columnName = (ColumnExpression) expression.leftExpression;
+
+    assertThat(columnName.name).isEqualTo("id");
+    assertThat(columnName.dotName).isFalse();
+    assertThat(columnName.binary).isFalse();
+  }
+
+  @Test
+  void func() {
+    SelectExpression selectExpr = SelectParser.parse("SELECT * FROM article WHERE trim(binary a.b)");
+    assertThat(selectExpr.getSelect()).isEqualTo("SELECT * FROM article ");
+    assertThat(selectExpr.getOther()).isNull();
+    WhereExpression where = selectExpr.getWhere();
+
+    assertThat(where).isNotNull();
+    assertThat(where.expression).isNotNull();
+    assertThat(where.expression).isInstanceOf(FunctionExpression.class);
+
+    FunctionExpression functionExpr = (FunctionExpression) where.expression;
+    assertThat(functionExpr.toString()).isEqualTo("trim(BINARY a.b)");
+
+    assertThat(functionExpr.name).isEqualTo("trim");
+    assertThat(functionExpr.args).isInstanceOf(ParenExpression.class);
+    ParenExpression parenExpr = (ParenExpression) functionExpr.args;
+    assertThat(parenExpr.expression).isInstanceOf(ExpressionList.class);
+    ExpressionList expressionList = (ExpressionList) parenExpr.expression;
+    assertThat(expressionList.expressions).hasSize(1);
+
+    Expression arg = expressionList.expressions.get(0);
+    assertThat(arg).isInstanceOf(ColumnExpression.class);
+
+    ColumnExpression columnNameArg = (ColumnExpression) arg;
+    assertThat(columnNameArg.name).isEqualTo("a.b");
+    assertThat(columnNameArg.dotName).isTrue();
+    assertThat(columnNameArg.binary).isTrue();
   }
 
   @Test
@@ -66,8 +153,17 @@ class SelectParserTests {
             .isInstanceOf(ParsingException.class)
             .hasMessage("Statement [SELECT * FROM article WHERE a] @29: Syntax error, operator token expected");
 
+    assertThatThrownBy(() -> SelectParser.parse("SELECT * FROM article WHERE 1 = 1 >"))
+            .isInstanceOf(ParsingException.class)
+            .hasMessage("Statement [SELECT * FROM article WHERE 1 = 1 >] @34: Syntax error");
 
+    assertThatThrownBy(() -> SelectParser.parse("SELECT * FROM article WHERE 1 not_found"))
+            .isInstanceOf(ParsingException.class)
+            .hasMessage("Statement [SELECT * FROM article WHERE 1 not_found] @30: Unsupported operator 'not_found', near : 'not_found'");
 
+    assertThatThrownBy(() -> SelectParser.parse("SELECT * FROM article WHERE 1 is c"))
+            .isInstanceOf(ParsingException.class)
+            .hasMessage("Statement [SELECT * FROM article WHERE 1 is c] @33: Not a valid operator token: ''c''");
 
   }
 

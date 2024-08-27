@@ -24,10 +24,10 @@ import cn.taketoday.polaris.util.Nullable;
  */
 public class NamedParameter implements Expression {
 
-  private final String name;
+  public final String name;
 
   @Nullable
-  private final Integer arrayIndex;
+  public final Integer arrayIndex;
 
   public NamedParameter(String name, @Nullable Integer arrayIndex) {
     this.name = name;

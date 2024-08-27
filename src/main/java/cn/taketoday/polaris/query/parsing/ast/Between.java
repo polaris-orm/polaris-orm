@@ -22,26 +22,25 @@ package cn.taketoday.polaris.query.parsing.ast;
  */
 public class Between implements Expression {
 
-  private final Expression leftExpression;
+  public final Expression leftExpression;
 
-  private final boolean not;
+  public final boolean not;
 
-  private final Expression betweenExpressionStart;
+  public final Expression start;
 
-  private final Expression betweenExpressionEnd;
+  public final Expression end;
 
-  public Between(Expression leftExpression, boolean not, Expression betweenExpressionStart, Expression betweenExpressionEnd) {
+  public Between(Expression leftExpression, boolean not, Expression start, Expression end) {
     this.leftExpression = leftExpression;
     this.not = not;
-    this.betweenExpressionStart = betweenExpressionStart;
-    this.betweenExpressionEnd = betweenExpressionEnd;
+    this.start = start;
+    this.end = end;
   }
 
   @Override
   public String toString() {
-    return leftExpression + " " + (not ? "NOT " : "") + "BETWEEN " + betweenExpressionStart
-            + " AND "
-            + betweenExpressionEnd;
+    return leftExpression + " " + (not ? "NOT " : "") + "BETWEEN " + start
+            + " AND " + end;
   }
 
 }

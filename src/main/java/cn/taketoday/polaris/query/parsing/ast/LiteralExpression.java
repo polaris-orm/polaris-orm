@@ -22,7 +22,7 @@ package cn.taketoday.polaris.query.parsing.ast;
  */
 public class LiteralExpression implements Expression {
 
-  private final String value;
+  public final String value;
 
   public LiteralExpression(String value) {
     this.value = value;
@@ -30,6 +30,10 @@ public class LiteralExpression implements Expression {
 
   @Override
   public String toString() {
+    return value;
+  }
+
+  public String getValue() {
     return value;
   }
 

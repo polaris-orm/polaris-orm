@@ -22,12 +22,12 @@ package cn.taketoday.polaris.query.parsing.ast;
  */
 public class InExpression implements Expression {
 
-  private final Expression leftExpression;
+  public final Expression leftExpression;
 
-  private final boolean not;
+  public final boolean not;
 
   // ParenExpression
-  private final Expression parenExpression;
+  public final Expression parenExpression;
 
   public InExpression(Expression leftExpression, boolean not, Expression expressionList) {
     this.leftExpression = leftExpression;

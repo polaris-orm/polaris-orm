@@ -22,22 +22,8 @@ package cn.taketoday.polaris.query.parsing.ast;
  */
 public class OrExpression extends BinaryExpression {
 
-  private final int startPos;
-
-  private final int endPos;
-
-  public OrExpression(Expression leftExpression, Expression rightExpression, int startPos, int endPos) {
+  public OrExpression(Expression leftExpression, Expression rightExpression) {
     super(leftExpression, rightExpression);
-    this.startPos = startPos;
-    this.endPos = endPos;
-  }
-
-  public int getStartPos() {
-    return startPos;
-  }
-
-  public int getEndPos() {
-    return endPos;
   }
 
   @Override

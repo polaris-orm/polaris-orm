@@ -24,14 +24,14 @@ import cn.taketoday.polaris.util.Nullable;
  */
 public class LikeExpression extends BinaryExpression implements Expression {
 
-  private final boolean not;
+  public final boolean not;
 
-  private final boolean binary;
+  public final boolean binary;
 
-  private final String type;
+  public final String type;
 
   @Nullable
-  private final Expression escape;
+  public final Expression escape;
 
   public LikeExpression(Expression leftExpression, boolean not,
           Expression rightExpression, boolean binary, String type, @Nullable Expression escape) {

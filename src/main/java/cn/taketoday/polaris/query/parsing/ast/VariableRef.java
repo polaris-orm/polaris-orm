@@ -24,10 +24,10 @@ import cn.taketoday.polaris.util.Nullable;
  */
 public class VariableRef implements Expression {
 
-  private final String name;
+  public final String name;
 
   @Nullable
-  private final Integer arrayIndex;
+  public final Integer arrayIndex;
 
   public VariableRef(String name, @Nullable Integer arrayIndex) {
     this.name = name;
@@ -41,4 +41,5 @@ public class VariableRef implements Expression {
     }
     return "@" + name;
   }
+
 }

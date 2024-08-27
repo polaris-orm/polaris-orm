@@ -18,19 +18,28 @@ package cn.taketoday.polaris.query.parsing.ast;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
- * @since 1.0 2024/8/20 22:37
+ * @since 1.0 2024/8/21 11:47
  */
-public abstract class SqlNode {
+public class ColumnExpression implements Expression {
 
-  protected final int startPos;  // index of first character
+  public final String name;
 
-  protected final int endPos;  // index of char after the last character
+  public final boolean dotName;
 
-  protected SqlNode(int startPos, int endPos) {
-    this.startPos = startPos;
-    this.endPos = endPos;
+  public final boolean binary;
+
+  public ColumnExpression(String name, boolean dotName, boolean binary) {
+    this.name = name;
+    this.dotName = dotName;
+    this.binary = binary;
   }
 
-  public abstract void render(StringBuilder selectSQL);
+  @Override
+  public String toString() {
+    if (binary) {
+      return "BINARY " + name;
+    }
+    return name;
+  }
 
 }

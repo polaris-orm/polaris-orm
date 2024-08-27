@@ -16,24 +16,69 @@
 
 package cn.taketoday.polaris.query.parsing;
 
-import cn.taketoday.polaris.query.parsing.ast.SelectNode;
+import cn.taketoday.polaris.query.parsing.ast.Expression;
+import cn.taketoday.polaris.query.parsing.ast.WhereExpression;
+import cn.taketoday.polaris.util.Nullable;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0 2024/8/20 22:26
  */
-public class SelectExpression {
+public class SelectExpression implements Expression {
 
-  private final SelectNode astNode;
+  private final String select;
 
-  public SelectExpression(SelectNode astNode) {
-    this.astNode = astNode;
+  @Nullable
+  private final WhereExpression where;
+
+  @Nullable
+  private final String other;
+
+  public SelectExpression(String select, @Nullable WhereExpression where, @Nullable String other) {
+    this.select = select;
+    this.where = where;
+    this.other = other;
+  }
+
+  @Override
+  public String toString() {
+    if (where != null) {
+      if (other != null) {
+        return select + " " + where + " " + other;
+      }
+      return select + " " + where;
+    }
+    return select;
+  }
+
+  public String getSelect() {
+    return select;
+  }
+
+  @Nullable
+  public WhereExpression getWhere() {
+    return where;
+  }
+
+  @Nullable
+  public String getOther() {
+    return other;
   }
 
   public String render() {
     StringBuilder builder = new StringBuilder();
-    astNode.render(builder);
+    render(builder);
     return builder.toString();
+  }
+
+  public void render(StringBuilder selectSQL) {
+    selectSQL.append(select);
+    if (where != null) {
+      where.render(selectSQL);
+    }
+    if (other != null) {
+      selectSQL.append(" ").append(other);
+    }
   }
 
 }

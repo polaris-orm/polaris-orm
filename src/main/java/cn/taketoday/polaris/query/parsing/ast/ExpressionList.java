@@ -25,7 +25,7 @@ import java.util.StringJoiner;
  */
 public class ExpressionList implements Expression {
 
-  private final List<Expression> expressions;
+  public final List<Expression> expressions;
 
   public ExpressionList(List<Expression> expressions) {
     this.expressions = expressions;

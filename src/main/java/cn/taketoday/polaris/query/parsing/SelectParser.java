@@ -21,7 +21,7 @@ import java.util.List;
 
 import cn.taketoday.polaris.query.parsing.ast.AndExpression;
 import cn.taketoday.polaris.query.parsing.ast.Between;
-import cn.taketoday.polaris.query.parsing.ast.ColumnNameExpression;
+import cn.taketoday.polaris.query.parsing.ast.ColumnExpression;
 import cn.taketoday.polaris.query.parsing.ast.ComparisonOperator;
 import cn.taketoday.polaris.query.parsing.ast.Expression;
 import cn.taketoday.polaris.query.parsing.ast.ExpressionList;
@@ -35,9 +35,8 @@ import cn.taketoday.polaris.query.parsing.ast.LiteralExpression;
 import cn.taketoday.polaris.query.parsing.ast.NamedParameter;
 import cn.taketoday.polaris.query.parsing.ast.OrExpression;
 import cn.taketoday.polaris.query.parsing.ast.ParenExpression;
-import cn.taketoday.polaris.query.parsing.ast.SelectNode;
 import cn.taketoday.polaris.query.parsing.ast.VariableRef;
-import cn.taketoday.polaris.query.parsing.ast.WhereNode;
+import cn.taketoday.polaris.query.parsing.ast.WhereExpression;
 import cn.taketoday.polaris.util.Nullable;
 
 /**
@@ -63,18 +62,13 @@ public class SelectParser {
   }
 
   public SelectExpression parse() {
-    SelectNode ast = eatExpression();
-    return new SelectExpression(ast);
-  }
-
-  private SelectNode eatExpression() {
     if (peekIdentifierToken("SELECT")) {
       return eatSelectExpression();
     }
     throw parsingException(0, "Not a select statement");
   }
 
-  private SelectNode eatSelectExpression() {
+  private SelectExpression eatSelectExpression() {
     Token whereToken = null;
     Token next = nextToken();
     while (next != null) {
@@ -86,30 +80,30 @@ public class SelectParser {
       next = nextToken();
     }
     if (whereToken != null) {
-      WhereNode whereNode = eatWhereExpression();
-      if (whereNode == null) {
+      WhereExpression whereExpression = eatWhereExpression();
+      if (whereExpression == null) {
         throw parsingException(whereToken.endPos, "Where clause not found");
       }
       Token token = peekToken();
       if (token != null && token.kind != TokenKind.RPAREN && token.kind != TokenKind.COMMA) {
-        return new SelectNode(selectSQL.substring(0, whereToken.startPos), whereNode,
+        return new SelectExpression(selectSQL.substring(0, whereToken.startPos), whereExpression,
                 selectSQL.substring(token.startPos));
       }
       // todo group by
-      return new SelectNode(selectSQL.substring(0, whereToken.startPos), whereNode, null);
+      return new SelectExpression(selectSQL.substring(0, whereToken.startPos), whereExpression, null);
     }
     else {
-      return new SelectNode(selectSQL, null, null);
+      return new SelectExpression(selectSQL, null, null);
     }
   }
 
   @Nullable
-  private WhereNode eatWhereExpression() {
+  private WhereExpression eatWhereExpression() {
     Expression expression = eatLogicalOrExpression();
     if (expression != null) {
       Token token = peekToken();
       if (token == null || token.isIdentifier() || token.kind == TokenKind.RPAREN) {
-        return new WhereNode(expression);
+        return new WhereExpression(expression);
       }
       throw parsingException(token.startPos, "Syntax error");
     }
@@ -125,7 +119,7 @@ public class SelectParser {
       Token t = takeToken();  //consume OR
       Expression rhExpr = eatLogicalAndExpression();
       checkOperands(t, expr, rhExpr);
-      expr = new OrExpression(expr, rhExpr, t.startPos, t.endPos);
+      expr = new OrExpression(expr, rhExpr);
     }
     return expr;
   }
@@ -138,7 +132,7 @@ public class SelectParser {
       Token t = takeToken();  // consume 'AND'
       Expression rhExpr = eatConditionExpression();
       checkOperands(t, expr, rhExpr);
-      expr = new AndExpression(expr, rhExpr, t.startPos, t.endPos);
+      expr = new AndExpression(expr, rhExpr);
     }
     return expr;
   }
@@ -225,7 +219,7 @@ public class SelectParser {
       columnName = columnToken.stringValue();
     }
 
-    return new ColumnNameExpression(columnName, dotName, binary);
+    return new ColumnExpression(columnName, dotName, binary);
   }
 
   // funcExpr
@@ -412,26 +406,26 @@ public class SelectParser {
     }
 
     String other = null;
-    WhereNode whereNode = null;
+    WhereExpression whereExpression = null;
     if (whereToken != null) {
-      whereNode = eatWhereExpression();
-      if (whereNode == null) {
+      whereExpression = eatWhereExpression();
+      if (whereExpression == null) {
         throw parsingException(whereToken.startPos, "Where clause not found");
       }
 
       Token t = takeToken();
       next = t;
       if (next.kind != TokenKind.RPAREN) {
-        other = other(parenLayer, next, t);
+        other = eatOtherExpression(parenLayer, next, t);
       }
     }
 
     tokenStreamPointer -= 1;
-    return new SelectNode(selectSQL.substring(startPos, selectEndPos), whereNode, other);
+    return new SelectExpression(selectSQL.substring(startPos, selectEndPos), whereExpression, other);
   }
 
   @Nullable
-  private String other(int parenLayer, Token next, Token t) {
+  private String eatOtherExpression(int parenLayer, Token next, Token t) {
     while (next != null) {
       if (next.kind == TokenKind.LPAREN) {
         parenLayer++;

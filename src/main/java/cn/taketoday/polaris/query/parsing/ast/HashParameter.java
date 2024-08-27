@@ -23,10 +23,11 @@ import cn.taketoday.polaris.util.Nullable;
  * @since 1.0 2024/8/21 21:50
  */
 public class HashParameter implements Expression {
-  private final String name;
+
+  public final String name;
 
   @Nullable
-  private final Integer arrayIndex;
+  public final Integer arrayIndex;
 
   public HashParameter(String name, @Nullable Integer arrayIndex) {
     this.name = name;
