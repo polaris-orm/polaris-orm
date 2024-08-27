@@ -30,9 +30,17 @@ class SelectParserTests {
   void test() {
     String sql = """
             SELECT `category`, `content`, `copyright`, `cover`, `create_at`, `id`, `markdown`, `password`, `pv`, `status`, `summary`, `title`, `update_at`, `uri`
-            FROM article WHERE article.`category` = #category and  (`title` like @q OR `content` like '%#q%' ) and (status = :status)
+            FROM article WHERE article.`category` = #category and  (`title` like @q OR `content` like '%#q%' ) and (status = :status) and 1=1
             and create_at between :create_at[0] and :create_at[1] or status is not null and status not like 's' and TRIM(status) = 'YHJ'
             or status not in (?, :status, 3, 4, '5', :`d`)  or find_in_set(status, 'd') and status in(1, true, false) and status in(func(status, 'd'))
+            and binary status = 1
+            and status in ((select 1 where 1 = 1 order by col desc), 2)
+            and status in (select 1, 2)
+            and status in (select 1 where col = 1 and 1 = 1)
+            and status like binary '/%/_%_' ESCAPE '/'
+            and status rlike binary '/%/_%_' ESCAPE '/'
+            and status REGEXP binary '/%/_%_' ESCAPE '/'
+            
             order by update_at DESC, create_at DESC LIMIT 20""";
 
     //  and status in ((select 1), 2)

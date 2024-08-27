@@ -26,13 +26,19 @@ public class ColumnNameExpression implements Expression {
 
   private final boolean dotName;
 
-  public ColumnNameExpression(String name, boolean dotName) {
+  private final boolean binary;
+
+  public ColumnNameExpression(String name, boolean dotName, boolean binary) {
     this.name = name;
     this.dotName = dotName;
+    this.binary = binary;
   }
 
   @Override
   public String toString() {
+    if (binary) {
+      return "BINARY " + name;
+    }
     return name;
   }
 

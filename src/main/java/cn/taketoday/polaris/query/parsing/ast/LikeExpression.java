@@ -16,6 +16,8 @@
 
 package cn.taketoday.polaris.query.parsing.ast;
 
+import cn.taketoday.polaris.util.Nullable;
+
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0 2024/8/21 17:33
@@ -24,26 +26,32 @@ public class LikeExpression extends BinaryExpression implements Expression {
 
   private final boolean not;
 
-  private boolean useBinary = false;
+  private final boolean binary;
 
-  public LikeExpression(Expression leftExpression, boolean not, Expression rightExpression) {
+  private final String type;
+
+  @Nullable
+  private final Expression escape;
+
+  public LikeExpression(Expression leftExpression, boolean not,
+          Expression rightExpression, boolean binary, String type, @Nullable Expression escape) {
     super(leftExpression, rightExpression);
     this.not = not;
+    this.binary = binary;
+    this.type = type;
+    this.escape = escape;
   }
 
   @Override
   public String getStringExpression() {
-    return "LIKE";
-  }
-
-  public void setUseBinary(boolean useBinary) {
-    this.useBinary = useBinary;
+    return type;
   }
 
   @Override
   public String toString() {
     return leftExpression + " " + (not ? "NOT " : "")
-            + (useBinary ? "BINARY " : "") + "LIKE " + rightExpression;
+            + (binary ? "BINARY " : "") + type + " " + rightExpression
+            + (escape != null ? " ESCAPE " + escape : "");
   }
 
 }

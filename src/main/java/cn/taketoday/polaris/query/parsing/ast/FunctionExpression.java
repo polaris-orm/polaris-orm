@@ -26,13 +26,19 @@ public class FunctionExpression implements Expression {
 
   private final Expression args;
 
-  public FunctionExpression(String name, Expression args) {
+  private final boolean binary;
+
+  public FunctionExpression(String name, Expression args, boolean binary) {
     this.name = name;
     this.args = args;
+    this.binary = binary;
   }
 
   @Override
   public String toString() {
+    if (binary) {
+      return "BINARY " + name + args;
+    }
     return name + args;
   }
 

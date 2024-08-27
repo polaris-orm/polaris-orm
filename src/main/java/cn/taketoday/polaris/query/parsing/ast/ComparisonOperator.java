@@ -24,10 +24,6 @@ public class ComparisonOperator extends BinaryExpression {
 
   private final String operator;
 
-  public ComparisonOperator(String operator) {
-    this.operator = operator;
-  }
-
   public ComparisonOperator(String operator, Expression left, Expression right) {
     super(left, right);
     this.operator = operator;

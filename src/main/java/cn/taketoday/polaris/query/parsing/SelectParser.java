@@ -106,7 +106,7 @@ public class SelectParser {
     Expression expression = eatLogicalOrExpression();
     if (expression != null) {
       Token token = peekToken();
-      if (token == null || token.isIdentifier()) {
+      if (token == null || token.isIdentifier() || token.kind == TokenKind.RPAREN) {
         return new WhereNode(expression);
       }
       throw parsingException(token.startPos, "Syntax error");
@@ -148,7 +148,14 @@ public class SelectParser {
       return parenExpr;
     }
 
-    Expression funcExpr = maybeEatFunctionExpression();
+    // binary col = val
+    boolean binary = false;
+    if (peekIdentifierToken("binary")) {
+      takeToken();
+      binary = true;
+    }
+
+    Expression funcExpr = maybeEatFunctionExpression(binary);
     if (funcExpr != null) {
       Expression expression = maybeEatOperatorExpression(funcExpr);
       if (expression != null) {
@@ -159,8 +166,18 @@ public class SelectParser {
 
     // column
     Token columnT = nextToken();
-    if (columnT != null && columnT.isIdentifier()) {
-      Expression left = eatColumnNameExpression(columnT);
+    if (columnT != null) {
+      // col | literal
+      Expression left;
+      if (columnT.isLiteral()) {
+        left = new LiteralExpression(columnT.stringValue());
+      }
+      else if (columnT.isIdentifier()) {
+        left = eatColumnNameExpression(columnT, binary);
+      }
+      else {
+        return null;
+      }
       Token operator = peekToken();
       if (operator == null) {
         throw parsingException(selectSQL.length(), "Syntax error, operator token expected");
@@ -193,7 +210,7 @@ public class SelectParser {
     };
   }
 
-  private Expression eatColumnNameExpression(Token columnToken) {
+  private Expression eatColumnNameExpression(Token columnToken, boolean binary) {
     boolean dotName = false;
     String columnName;
     if (peekToken(TokenKind.DOT)) {
@@ -206,38 +223,38 @@ public class SelectParser {
       columnName = columnToken.stringValue();
     }
 
-    return new ColumnNameExpression(columnName, dotName);
+    return new ColumnNameExpression(columnName, dotName, binary);
   }
 
   // funcExpr
 
-  private Expression maybeEatFunctionExpression() {
+  private Expression maybeEatFunctionExpression(boolean binary) {
     if (peekTokens(TokenKind.IDENTIFIER, TokenKind.LPAREN)) {
       // function func(c)
       Token nameToken = eatToken(TokenKind.IDENTIFIER);
 
       // func(1, 2, ?, :age, 5)
       Expression args = eatArgumentsExpression();
-      return new FunctionExpression(nameToken.stringValue(), args);
+      return new FunctionExpression(nameToken.stringValue(), args, binary);
     }
     return null;
   }
 
   @Nullable
-  private Expression maybeEatIdentifierOperatorExpression(Token operator, Expression left) {
+  private Expression maybeEatIdentifierOperatorExpression(Token operatorT, Expression left) {
     boolean not = false;
-    String stringValue = operator.stringValue();
-    if (stringValue.equalsIgnoreCase("not")) {
+    String operator = operatorT.stringValue();
+    if (operator.equalsIgnoreCase("not")) {
       takeToken();
       not = true;
-      operator = peekToken();
-      if (operator == null) {
+      operatorT = peekToken();
+      if (operatorT == null) {
         throw parsingException(selectSQL.length(), "Syntax error, operator token expected");
       }
-      stringValue = operator.stringValue();
+      operator = operatorT.stringValue();
     }
 
-    if (stringValue.equalsIgnoreCase("between")) {
+    if (operator.equalsIgnoreCase("between")) {
       takeToken();
       // between value1 and value2
       Expression start = eatValueExpression();
@@ -245,19 +262,34 @@ public class SelectParser {
       Expression end = eatValueExpression();
       return new Between(left, not, start, end);
     }
-    else if (stringValue.equalsIgnoreCase("in")) {
+    else if (operator.equalsIgnoreCase("in")) {
       takeToken();
       // IN (1, 2, ?, :age, 5)
       Expression expression = eatArgumentsExpression();
       return new InExpression(left, not, expression);
     }
-    else if (stringValue.equalsIgnoreCase("like")) {
+    else if (operator.equalsIgnoreCase("like")
+            || operator.equalsIgnoreCase("regexp")
+            || operator.equalsIgnoreCase("rlike")) {
       takeToken();
+      Expression escape = null;
+      boolean binary = false;
+      if (peekIdentifierToken("binary")) {
+        takeToken();
+        // like binary '' | not like binary ''
+        binary = true;
+      }
+
+      if (peekIdentifierToken("escape")) {
+        // like '' | not like '' escape '/'
+        takeToken();
+        escape = eatValueExpression();
+      }
       // like '' | not like ''
       Expression right = eatValueExpression();
-      return new LikeExpression(left, not, right);
+      return new LikeExpression(left, not, right, binary, operator, escape);
     }
-    else if (stringValue.equalsIgnoreCase("is")) {
+    else if (operator.equalsIgnoreCase("is")) {
       takeToken();
       // is null | is not null
       return eatNullExpression(left);
@@ -302,14 +334,21 @@ public class SelectParser {
           yield new LiteralExpression(value.stringValue());
         }
 
+        boolean binary = false;
+        if (value.isIdentifier("binary")) {
+          value = takeToken();
+          binary = true;
+        }
+
         if (value.isIdentifier()) {
           // function func(c)
           if (peekToken(TokenKind.LPAREN)) {
             // func(1, 2, ?, :age, 5)
             Expression args = eatArgumentsExpression();
-            yield new FunctionExpression(value.stringValue(), args);
+            yield new FunctionExpression(value.stringValue(), args, binary);
           }
-          yield eatColumnNameExpression(value);
+
+          yield eatColumnNameExpression(value, binary);
         }
         throw parsingException(value.startPos, "Unsupported value expression '%s'".formatted(toString(value)));
       }
@@ -357,7 +396,7 @@ public class SelectParser {
       else if (next.kind == TokenKind.RPAREN) {
         parenLayer--;
         if (parenLayer == 0) {
-          selectEndPos = next.endPos;
+          selectEndPos = next.startPos;
           break;
         }
       }
@@ -376,23 +415,22 @@ public class SelectParser {
       Token t = takeToken();
       next = t;
       if (inParen) {
-        if (next.kind == TokenKind.RPAREN) {
-          // end
-
-        }
-        else {
-          other = getString(parenLayer, next, other, t);
+        if (next.kind != TokenKind.RPAREN) {
+          other = other(parenLayer, next, t);
         }
       }
       else {
-        other = getString(parenLayer, next, other, t);
+        if (next.kind != TokenKind.RPAREN) {
+          other = other(parenLayer, next, t);
+        }
       }
     }
-
+    tokenStreamPointer -= 1;
     return new SelectNode(selectSQL.substring(startPos, selectEndPos), whereNode, other);
   }
 
-  private String getString(int parenLayer, Token next, String other, Token t) {
+  @Nullable
+  private String other(int parenLayer, Token next, Token t) {
     while (next != null) {
       if (next.kind == TokenKind.LPAREN) {
         parenLayer++;
@@ -400,13 +438,12 @@ public class SelectParser {
       else if (next.kind == TokenKind.RPAREN) {
         parenLayer--;
         if (parenLayer == 0) {
-          other = selectSQL.substring(t.startPos, next.startPos);
-          break;
+          return selectSQL.substring(t.startPos, next.startPos);
         }
       }
       next = nextToken();
     }
-    return other;
+    return null;
   }
 
   @Nullable
@@ -573,6 +610,13 @@ public class SelectParser {
 
   private ParsingException parsingException(int startPos, String message) {
     if (startPos > 0) {
+      String happenPos = selectSQL.substring(startPos);
+      if (happenPos.length() > 32) {
+        happenPos = happenPos.substring(0, 32);
+      }
+      if (happenPos.length() >= 4) {
+        return new ParsingException("Statement [%s] @%s: %s, near : '%s'".formatted(selectSQL, startPos, message, happenPos));
+      }
       return new ParsingException("Statement [%s] @%s: %s".formatted(selectSQL, startPos, message));
     }
     return new ParsingException("Statement [%s]: %s".formatted(selectSQL, message));

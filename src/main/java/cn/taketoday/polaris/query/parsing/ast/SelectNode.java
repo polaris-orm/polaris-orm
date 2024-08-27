@@ -48,4 +48,15 @@ public class SelectNode implements Expression {
     }
   }
 
+  @Override
+  public String toString() {
+    if (whereNode != null) {
+      if (other != null) {
+        return select + " " + whereNode + " " + other;
+      }
+      return select + " " + whereNode;
+    }
+    return select;
+  }
+
 }
