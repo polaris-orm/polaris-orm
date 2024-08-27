@@ -66,6 +66,9 @@ class SelectParserTests {
             .isInstanceOf(ParsingException.class)
             .hasMessage("Statement [SELECT * FROM article WHERE a] @29: Syntax error, operator token expected");
 
+
+
+
   }
 
 }

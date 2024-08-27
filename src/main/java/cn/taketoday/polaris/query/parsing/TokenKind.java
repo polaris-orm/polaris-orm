@@ -74,8 +74,6 @@ enum TokenKind {
 
   NE("<>"),
 
-  LIKE_PREFIX("%"),
-
   VARIABLE_REF("@");
 
   final char[] tokenChars;

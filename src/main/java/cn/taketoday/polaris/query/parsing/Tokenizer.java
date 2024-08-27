@@ -80,7 +80,6 @@ class Tokenizer {
           case '.' -> pushCharToken(TokenKind.DOT);
           case ',' -> pushCharToken(TokenKind.COMMA);
           case '*' -> pushCharToken(TokenKind.STAR);
-          case '%' -> pushCharToken(TokenKind.LIKE_PREFIX);
           case '(' -> pushCharToken(TokenKind.LPAREN);
           case ')' -> pushCharToken(TokenKind.RPAREN);
           case '[' -> pushCharToken(TokenKind.LSQUARE);

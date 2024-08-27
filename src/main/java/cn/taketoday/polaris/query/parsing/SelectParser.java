@@ -41,6 +41,8 @@ import cn.taketoday.polaris.query.parsing.ast.WhereNode;
 import cn.taketoday.polaris.util.Nullable;
 
 /**
+ * Select statement parser
+ *
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0 2024/8/20 22:25
  */
@@ -510,14 +512,6 @@ public class SelectParser {
     return t.kind == possible1;
   }
 
-  private boolean peekToken(TokenKind possible1, TokenKind possible2) {
-    Token t = peekToken();
-    if (t == null) {
-      return false;
-    }
-    return (t.kind == possible1 && t.kind == possible2);
-  }
-
   private boolean peekTokens(TokenKind possible1, TokenKind possible2) {
     if (tokenStreamPointer + 1 >= tokenStreamLength) {
       return false;
@@ -533,14 +527,6 @@ public class SelectParser {
     return t.kind == possible2;
   }
 
-  private boolean peekToken(TokenKind possible1, TokenKind possible2, TokenKind possible3) {
-    Token t = peekToken();
-    if (t == null) {
-      return false;
-    }
-    return (t.kind == possible1 || t.kind == possible2 || t.kind == possible3);
-  }
-
   private boolean peekIdentifierToken(String identifierString) {
     Token t = peekToken();
     if (t == null) {
@@ -550,12 +536,8 @@ public class SelectParser {
   }
 
   private Token takeToken() {
-    return takeToken("Unexpectedly ran out of input");
-  }
-
-  private Token takeToken(String errorMessage) {
     if (this.tokenStreamPointer >= this.tokenStreamLength) {
-      throw parsingException(selectSQL.length(), errorMessage);
+      throw parsingException(selectSQL.length(), "Unexpectedly ran out of input");
     }
     return this.tokenStream.get(this.tokenStreamPointer++);
   }
