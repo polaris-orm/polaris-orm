@@ -217,7 +217,7 @@ public class SelectParser {
       Token nameToken = eatToken(TokenKind.IDENTIFIER);
 
       // func(1, 2, ?, :age, 5)
-      Expression args = eatArguments();
+      Expression args = eatArgumentsExpression();
       return new FunctionExpression(nameToken.stringValue(), args);
     }
     return null;
@@ -318,7 +318,7 @@ public class SelectParser {
           // function func(c)
           if (peekToken(TokenKind.LPAREN)) {
             // func(1, 2, ?, :age, 5)
-            Expression args = eatArguments();
+            Expression args = eatArgumentsExpression();
             yield new FunctionExpression(value.stringValue(), args);
           }
           yield eatColumnNameExpression(value);
@@ -334,7 +334,7 @@ public class SelectParser {
     return expression;
   }
 
-  private Expression eatArguments() {
+  private Expression eatArgumentsExpression() {
     eatToken(TokenKind.LPAREN);
     List<Expression> args = new ArrayList<>();
     Expression expr = eatValueExpression();
