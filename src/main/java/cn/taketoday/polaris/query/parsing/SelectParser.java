@@ -248,20 +248,8 @@ public class SelectParser {
     else if (stringValue.equalsIgnoreCase("in")) {
       takeToken();
       // IN (1, 2, ?, :age, 5)
-      eatToken(TokenKind.LPAREN);
-      List<Expression> expressionList = new ArrayList<>();
-      do {
-        Expression expression = eatValueExpression();
-        expressionList.add(expression);
-        if (!peekToken(TokenKind.COMMA)) {
-          break;
-        }
-        eatToken(TokenKind.COMMA);
-      }
-      while (!peekToken(TokenKind.RPAREN));
-      eatToken(TokenKind.RPAREN);
-
-      return new InExpression(left, not, expressionList);
+      Expression expression = eatArgumentsExpression();
+      return new InExpression(left, not, expression);
     }
     else if (stringValue.equalsIgnoreCase("like")) {
       takeToken();
@@ -347,35 +335,78 @@ public class SelectParser {
     return new ParenExpression(new ExpressionList(args));
   }
 
+  // (select * from a)
   private Expression eatSubqueryExpression(int startPos, boolean inParen) {
     int parenLayer = inParen ? 1 : 0;
+
+    int selectEndPos = 0;
+
     Token whereToken = null;
     Token next = nextToken();
     while (next != null) {
       if (next.isIdentifier("WHERE")) {
         // where token
         whereToken = next;
+        selectEndPos = whereToken.startPos;
         break;
       }
+
+      if (next.kind == TokenKind.LPAREN) {
+        parenLayer++;
+      }
+      else if (next.kind == TokenKind.RPAREN) {
+        parenLayer--;
+        if (parenLayer == 0) {
+          selectEndPos = next.endPos;
+          break;
+        }
+      }
+
       next = nextToken();
     }
+
+    WhereNode whereNode = null;
+    String other = null;
     if (whereToken != null) {
-      WhereNode whereNode = eatWhereExpression();
+      whereNode = eatWhereExpression();
       if (whereNode == null) {
         throw parsingException(whereToken.startPos, "Where clause not found");
       }
-      Token token = peekToken();
-      if (token != null && token.kind != TokenKind.RPAREN && token.kind != TokenKind.COMMA) {
-        return new SelectNode(selectSQL.substring(startPos, whereToken.startPos), whereNode,
-                selectSQL.substring(token.startPos));
+
+      Token t = takeToken();
+      next = t;
+      if (inParen) {
+        if (next.kind == TokenKind.RPAREN) {
+          // end
+
+        }
+        else {
+          other = getString(parenLayer, next, other, t);
+        }
       }
-      // todo group by
-      return new SelectNode(selectSQL.substring(startPos, whereToken.startPos), whereNode, null);
+      else {
+        other = getString(parenLayer, next, other, t);
+      }
     }
-    else {
-      //
-      return new SelectNode(selectSQL.substring(startPos), null, null);
+
+    return new SelectNode(selectSQL.substring(startPos, selectEndPos), whereNode, other);
+  }
+
+  private String getString(int parenLayer, Token next, String other, Token t) {
+    while (next != null) {
+      if (next.kind == TokenKind.LPAREN) {
+        parenLayer++;
+      }
+      else if (next.kind == TokenKind.RPAREN) {
+        parenLayer--;
+        if (parenLayer == 0) {
+          other = selectSQL.substring(t.startPos, next.startPos);
+          break;
+        }
+      }
+      next = nextToken();
     }
+    return other;
   }
 
   @Nullable

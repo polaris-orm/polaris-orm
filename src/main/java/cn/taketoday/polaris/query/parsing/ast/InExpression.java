@@ -16,9 +16,6 @@
 
 package cn.taketoday.polaris.query.parsing.ast;
 
-import java.util.List;
-import java.util.StringJoiner;
-
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0 2024/8/21 17:32
@@ -29,28 +26,21 @@ public class InExpression implements Expression {
 
   private final boolean not;
 
-  private final List<Expression> expressionList;
+  // ParenExpression
+  private final Expression parenExpression;
 
-  public InExpression(Expression leftExpression, boolean not, List<Expression> expressionList) {
+  public InExpression(Expression leftExpression, boolean not, Expression expressionList) {
     this.leftExpression = leftExpression;
     this.not = not;
-    this.expressionList = expressionList;
+    this.parenExpression = expressionList;
   }
 
   @Override
   public String toString() {
     if (not) {
-      return leftExpression + " NOT IN " + expressionList();
+      return leftExpression + " NOT IN " + parenExpression;
     }
-    return leftExpression + " IN " + expressionList();
-  }
-
-  private String expressionList() {
-    StringJoiner joiner = new StringJoiner(", ", "(", ")");
-    for (Expression expression : expressionList) {
-      joiner.add(expression.toString());
-    }
-    return joiner.toString();
+    return leftExpression + " IN " + parenExpression;
   }
 
 }
