@@ -279,14 +279,15 @@ public class SelectParser {
         // like binary '' | not like binary ''
         binary = true;
       }
+      // like '' | not like ''
+      Expression right = eatValueExpression();
 
       if (peekIdentifierToken("escape")) {
         // like '/%/_%_' ESCAPE '/' | not like '/%/_%_' ESCAPE '/'
         takeToken();
         escape = eatValueExpression();
       }
-      // like '' | not like ''
-      Expression right = eatValueExpression();
+
       return new LikeExpression(left, not, right, binary, operator, escape);
     }
     else if (operator.equalsIgnoreCase("is")) {
@@ -399,6 +400,10 @@ public class SelectParser {
           selectEndPos = next.startPos;
           break;
         }
+      }
+      else if (next.kind == TokenKind.COMMA && !inParen) {
+        selectEndPos = next.startPos;
+        break;
       }
 
       next = nextToken();

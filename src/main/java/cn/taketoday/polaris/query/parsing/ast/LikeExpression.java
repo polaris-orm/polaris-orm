@@ -50,7 +50,7 @@ public class LikeExpression extends BinaryExpression implements Expression {
   @Override
   public String toString() {
     return leftExpression + " " + (not ? "NOT " : "")
-            + (binary ? "BINARY " : "") + type + " " + rightExpression
+            + type + " " + (binary ? "BINARY " : "") + rightExpression
             + (escape != null ? " ESCAPE " + escape : "");
   }
 
