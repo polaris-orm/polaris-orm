@@ -20,11 +20,11 @@ package cn.taketoday.polaris.query.parsing.ast;
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0 2024/8/21 16:02
  */
-public class ComparisonOperator extends BinaryExpression {
+public class ComparisonExpression extends BinaryExpression {
 
   public final String operator;
 
-  public ComparisonOperator(String operator, Expression left, Expression right) {
+  public ComparisonExpression(String operator, Expression left, Expression right) {
     super(left, right);
     this.operator = operator;
   }

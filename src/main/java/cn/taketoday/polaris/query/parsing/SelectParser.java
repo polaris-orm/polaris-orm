@@ -22,7 +22,7 @@ import java.util.List;
 import cn.taketoday.polaris.query.parsing.ast.AndExpression;
 import cn.taketoday.polaris.query.parsing.ast.Between;
 import cn.taketoday.polaris.query.parsing.ast.ColumnExpression;
-import cn.taketoday.polaris.query.parsing.ast.ComparisonOperator;
+import cn.taketoday.polaris.query.parsing.ast.ComparisonExpression;
 import cn.taketoday.polaris.query.parsing.ast.Expression;
 import cn.taketoday.polaris.query.parsing.ast.ExpressionList;
 import cn.taketoday.polaris.query.parsing.ast.FunctionExpression;
@@ -144,15 +144,15 @@ public class SelectParser {
   }
 
   private ExpressionList eatExpressionList() {
-    Token t = takeToken();
-    ArrayList<Expression> args = new ArrayList<>();
-
-    for (; t.kind == TokenKind.COMMA; t = takeToken()) {
+    ArrayList<Expression> expressions = new ArrayList<>();
+    Token t;
+    do {
       Expression expr = eatValueExpression();
-      args.add(expr);
+      expressions.add(expr);
+      t = peekToken();
     }
-
-    return new ExpressionList(args);
+    while (t != null && t.kind == TokenKind.COMMA);
+    return new ExpressionList(expressions);
   }
 
   @Nullable
@@ -271,7 +271,7 @@ public class SelectParser {
       case LE, LT, GE, GT, EQ, NE -> {
         takeToken();
         Expression right = eatValueExpression();
-        yield new ComparisonOperator(new String(operator.kind.tokenChars), left, right);
+        yield new ComparisonExpression(new String(operator.kind.tokenChars), left, right);
       }
       case IDENTIFIER -> maybeEatIdentifierOperatorExpression(operator, left);
       default -> null;

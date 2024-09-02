@@ -36,10 +36,10 @@ public class SelectExpression implements Expression, StatementSequence {
   private final WhereExpression where;
 
   @Nullable
-  private final GroupByExpression groupBy;
+  public final GroupByExpression groupBy;
 
   @Nullable
-  private final HavingExpression having;
+  public final HavingExpression having;
 
   @Nullable
   private final String other;

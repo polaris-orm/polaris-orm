@@ -19,10 +19,12 @@ package cn.taketoday.polaris.query.parsing;
 import org.junit.jupiter.api.Test;
 
 import cn.taketoday.polaris.query.parsing.ast.ColumnExpression;
-import cn.taketoday.polaris.query.parsing.ast.ComparisonOperator;
+import cn.taketoday.polaris.query.parsing.ast.ComparisonExpression;
 import cn.taketoday.polaris.query.parsing.ast.Expression;
 import cn.taketoday.polaris.query.parsing.ast.ExpressionList;
 import cn.taketoday.polaris.query.parsing.ast.FunctionExpression;
+import cn.taketoday.polaris.query.parsing.ast.GroupByExpression;
+import cn.taketoday.polaris.query.parsing.ast.HavingExpression;
 import cn.taketoday.polaris.query.parsing.ast.LiteralExpression;
 import cn.taketoday.polaris.query.parsing.ast.ParenExpression;
 import cn.taketoday.polaris.query.parsing.ast.WhereExpression;
@@ -92,9 +94,9 @@ class SelectParserTests {
     assertThat(where).isNotNull();
     assertThat(where.expression).isNotNull();
 
-    assertThat(where.expression).isInstanceOf(ComparisonOperator.class);
+    assertThat(where.expression).isInstanceOf(ComparisonExpression.class);
 
-    ComparisonOperator expression = (ComparisonOperator) where.expression;
+    ComparisonExpression expression = (ComparisonExpression) where.expression;
     assertThat(expression.operator).isEqualTo("=");
     assertThat(expression.rightExpression).isInstanceOf(LiteralExpression.class);
     assertThat(expression.leftExpression).isInstanceOf(ColumnExpression.class);
@@ -143,11 +145,47 @@ class SelectParserTests {
   void groupBy() {
     String query = "SELECT coalesce(name, '总数'), SUM(signin) as signin_count FROM employee group by name WITH ROLLUP";
     var expression = SelectParser.parse(query);
-    System.out.println(expression);
+
+    assertThat(expression.groupBy).isNotNull();
+
+    assertThat(expression.groupBy.withRollup).isTrue();
+    assertThat(expression.groupBy.groupByExpressions.expressions).hasSize(1);
+    assertThat(expression.groupBy.groupByExpressions.expressions.get(0)).isInstanceOf(ColumnExpression.class);
+    ColumnExpression columnExpression = (ColumnExpression) expression.groupBy.groupByExpressions.expressions.get(0);
+
+    assertThat(columnExpression.name).isEqualTo("name");
+    assertThat(columnExpression.dotName).isFalse();
+    assertThat(columnExpression.binary).isFalse();
+
+    assertThat(expression.having).isNull();
 
     query = "SELECT coalesce(name, '总数'), SUM(signin) as signin_count FROM employee group by name WITH ROLLUP having sum(signin) = sum(signin)";
     expression = SelectParser.parse(query);
-    System.out.println(expression);
+
+    assertThat(expression.groupBy).isNotNull();
+
+    GroupByExpression groupBy = expression.groupBy;
+
+    assertThat(groupBy.withRollup).isTrue();
+    assertThat(groupBy.groupByExpressions.expressions).hasSize(1);
+    assertThat(groupBy.groupByExpressions.expressions.get(0)).isInstanceOf(ColumnExpression.class);
+
+    columnExpression = (ColumnExpression) groupBy.groupByExpressions.expressions.get(0);
+
+    assertThat(columnExpression.name).isEqualTo("name");
+    assertThat(columnExpression.dotName).isFalse();
+    assertThat(columnExpression.binary).isFalse();
+
+    HavingExpression having = expression.having;
+    assertThat(having).isNotNull();
+    assertThat(having.expression).isNotNull();
+    assertThat(having.expression).isInstanceOf(ComparisonExpression.class);
+
+    ComparisonExpression comparisonExpression = (ComparisonExpression) having.expression;
+    assertThat(comparisonExpression.leftExpression).isInstanceOf(FunctionExpression.class);
+    assertThat(comparisonExpression.operator).isEqualTo("=");
+    assertThat(comparisonExpression.rightExpression).isInstanceOf(FunctionExpression.class);
+
   }
 
   @Test
