@@ -26,7 +26,9 @@ import cn.taketoday.polaris.query.parsing.ast.ComparisonOperator;
 import cn.taketoday.polaris.query.parsing.ast.Expression;
 import cn.taketoday.polaris.query.parsing.ast.ExpressionList;
 import cn.taketoday.polaris.query.parsing.ast.FunctionExpression;
+import cn.taketoday.polaris.query.parsing.ast.GroupByExpression;
 import cn.taketoday.polaris.query.parsing.ast.HashParameter;
+import cn.taketoday.polaris.query.parsing.ast.HavingExpression;
 import cn.taketoday.polaris.query.parsing.ast.InExpression;
 import cn.taketoday.polaris.query.parsing.ast.IndexParameter;
 import cn.taketoday.polaris.query.parsing.ast.IsNullExpression;
@@ -37,6 +39,7 @@ import cn.taketoday.polaris.query.parsing.ast.OrExpression;
 import cn.taketoday.polaris.query.parsing.ast.ParenExpression;
 import cn.taketoday.polaris.query.parsing.ast.VariableRef;
 import cn.taketoday.polaris.query.parsing.ast.WhereExpression;
+import cn.taketoday.polaris.query.parsing.ast.XorExpression;
 import cn.taketoday.polaris.util.Nullable;
 
 /**
@@ -70,31 +73,86 @@ public class SelectParser {
 
   private SelectExpression eatSelectExpression() {
     Token whereToken = null;
-    Token next = nextToken();
+    Token next = peekToken();
+    int selectEndIndex = selectSQL.length();
     while (next != null) {
       if (next.isIdentifier("WHERE")) {
         // where token
         whereToken = next;
+        selectEndIndex = whereToken.startPos;
+        break;
+      }
+      else if (next.isIdentifier("group")) {
+        // group token
+        tokenStreamPointer--;
+        selectEndIndex = next.startPos;
         break;
       }
       next = nextToken();
     }
+
+    // todo 嵌套 where
+
+    WhereExpression whereExpression = null;
     if (whereToken != null) {
-      WhereExpression whereExpression = eatWhereExpression();
+      whereExpression = eatWhereExpression();
       if (whereExpression == null) {
         throw parsingException(whereToken.endPos, "Where clause not found");
       }
-      Token token = peekToken();
-      if (token != null && token.kind != TokenKind.RPAREN && token.kind != TokenKind.COMMA) {
-        return new SelectExpression(selectSQL.substring(0, whereToken.startPos), whereExpression,
-                selectSQL.substring(token.startPos));
+    }
+
+    GroupByExpression groupBy = maybeEatGroupByExpression();
+    HavingExpression having = maybeEatHavingExpression();
+
+    return new SelectExpression(selectSQL.substring(0, selectEndIndex),
+            whereExpression, groupBy, having, null);
+  }
+
+  @Nullable
+  private GroupByExpression maybeEatGroupByExpression() {
+    if (peekIdentifierToken("group")) {
+      takeToken();
+      eatIdentifier("by");
+
+      ExpressionList expression = eatExpressionList();
+
+      boolean withRollup = false;
+      if (peekIdentifierToken("with")) {
+        takeToken();
+        eatIdentifier("rollup");
+        withRollup = true;
       }
-      // todo group by
-      return new SelectExpression(selectSQL.substring(0, whereToken.startPos), whereExpression, null);
+      return new GroupByExpression(expression, withRollup);
     }
-    else {
-      return new SelectExpression(selectSQL, null, null);
+    return null;
+  }
+
+  @Nullable
+  private HavingExpression maybeEatHavingExpression() {
+    if (peekIdentifierToken("having")) {
+      takeToken();
+      Expression expression = eatLogicalOrExpression();
+      if (expression != null) {
+        Token token = peekToken();
+        if (token == null || token.isIdentifier() || token.kind == TokenKind.RPAREN) {
+          return new HavingExpression(expression);
+        }
+        throw parsingException(token.startPos, "Syntax error");
+      }
     }
+    return null;
+  }
+
+  private ExpressionList eatExpressionList() {
+    Token t = takeToken();
+    ArrayList<Expression> args = new ArrayList<>();
+
+    for (; t.kind == TokenKind.COMMA; t = takeToken()) {
+      Expression expr = eatValueExpression();
+      args.add(expr);
+    }
+
+    return new ExpressionList(args);
   }
 
   @Nullable
@@ -127,12 +185,26 @@ public class SelectParser {
   // logicalAndExpression : relationalExpression (AND^ relationalExpression)*;
   @Nullable
   private Expression eatLogicalAndExpression() {
-    Expression expr = eatConditionExpression();
+    Expression expr = eatLogicalXorExpression();
     while (peekIdentifierToken("and")) {
       Token t = takeToken();  // consume 'AND'
-      Expression rhExpr = eatConditionExpression();
+      Expression rhExpr = eatLogicalXorExpression();
       checkOperands(t, expr, rhExpr);
       expr = new AndExpression(expr, rhExpr);
+    }
+    return expr;
+  }
+
+  // logicalXorExpression : relationalExpression (XOR^ relationalExpression)*;
+
+  @Nullable
+  private Expression eatLogicalXorExpression() {
+    Expression expr = eatConditionExpression();
+    while (peekIdentifierToken("xor")) {
+      Token t = takeToken();  // consume 'XOR'
+      Expression rhExpr = eatConditionExpression();
+      checkOperands(t, expr, rhExpr);
+      expr = new XorExpression(expr, rhExpr);
     }
     return expr;
   }
@@ -169,7 +241,7 @@ public class SelectParser {
         left = new LiteralExpression(columnT.stringValue());
       }
       else if (columnT.isIdentifier()) {
-        left = eatColumnNameExpression(columnT, binary);
+        left = eatColumnExpression(columnT, binary);
       }
       else {
         return null;
@@ -206,7 +278,7 @@ public class SelectParser {
     };
   }
 
-  private Expression eatColumnNameExpression(Token columnToken, boolean binary) {
+  private Expression eatColumnExpression(Token columnToken, boolean binary) {
     boolean dotName = false;
     String columnName;
     if (peekToken(TokenKind.DOT)) {
@@ -224,6 +296,7 @@ public class SelectParser {
 
   // funcExpr
 
+  @Nullable
   private Expression maybeEatFunctionExpression(boolean binary) {
     if (peekTokens(TokenKind.IDENTIFIER, TokenKind.LPAREN)) {
       // function func(c)
@@ -277,13 +350,11 @@ public class SelectParser {
       }
       // like '' | not like ''
       Expression right = eatValueExpression();
-
       if (peekIdentifierToken("escape")) {
         // like '/%/_%_' ESCAPE '/' | not like '/%/_%_' ESCAPE '/'
         takeToken();
         escape = eatValueExpression();
       }
-
       return new LikeExpression(left, not, right, binary, operator, escape);
     }
     else if (operator.equalsIgnoreCase("is")) {
@@ -304,7 +375,7 @@ public class SelectParser {
     }
     Expression expression = switch (value.kind) {
       case LITERAL_STRING, LITERAL_REAL, LITERAL_HEXINT, LITERAL_HEXLONG,
-           LITERAL_LONG, LITERAL_INT, LITERAL_REAL_FLOAT -> new LiteralExpression(value.stringValue());
+           LITERAL_LONG, LITERAL_INT, LITERAL_REAL_FLOAT, STAR -> new LiteralExpression(value.stringValue());
       case COLON -> {
         Token nameT = eatToken(TokenKind.IDENTIFIER);
         Integer arrayIndex = maybeEatArrayExpression();
@@ -345,7 +416,7 @@ public class SelectParser {
             yield new FunctionExpression(value.stringValue(), args, binary);
           }
 
-          yield eatColumnNameExpression(value, binary);
+          yield eatColumnExpression(value, binary);
         }
         throw parsingException(value.startPos, "Unsupported value expression '%s'".formatted(toString(value)));
       }
@@ -421,7 +492,7 @@ public class SelectParser {
     }
 
     tokenStreamPointer -= 1;
-    return new SelectExpression(selectSQL.substring(startPos, selectEndPos), whereExpression, other);
+    return new SelectExpression(selectSQL.substring(startPos, selectEndPos), whereExpression, null, null, other);
   }
 
   @Nullable
@@ -483,6 +554,15 @@ public class SelectParser {
       return new ParenExpression(expr);
     }
     return null;
+  }
+
+  private Token eatIdentifier(String identifier) {
+    Token t = eatToken(TokenKind.IDENTIFIER);
+    if (t.isIdentifier(identifier)) {
+      return t;
+    }
+    throw parsingException(t.startPos,
+            "Unexpected token. Expected '%s' but was '%s'".formatted(identifier, t.stringValue()));
   }
 
   private Token eatToken(TokenKind expectedKind) {

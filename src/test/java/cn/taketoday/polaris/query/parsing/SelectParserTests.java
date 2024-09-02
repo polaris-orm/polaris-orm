@@ -62,7 +62,7 @@ class SelectParserTests {
             and status like binary '/%/_%_' ESCAPE '/'
             and status rlike binary '/%/_%_' ESCAPE '/'
             and status REGEXP binary '/%/_%_' ESCAPE '/'
-            or article.status = :status AND article_label.label_id IN (
+            xor article.status = :status AND article_label.label_id IN (
                   SELECT label_id FROM article_label
                   WHERE label_id = (SELECT id FROM label WHERE name = #name)
             )
@@ -137,6 +137,17 @@ class SelectParserTests {
     assertThat(columnNameArg.name).isEqualTo("a.b");
     assertThat(columnNameArg.dotName).isTrue();
     assertThat(columnNameArg.binary).isTrue();
+  }
+
+  @Test
+  void groupBy() {
+    String query = "SELECT coalesce(name, '总数'), SUM(signin) as signin_count FROM employee group by name WITH ROLLUP";
+    var expression = SelectParser.parse(query);
+    System.out.println(expression);
+
+    query = "SELECT coalesce(name, '总数'), SUM(signin) as signin_count FROM employee group by name WITH ROLLUP having sum(signin) = sum(signin)";
+    expression = SelectParser.parse(query);
+    System.out.println(expression);
   }
 
   @Test

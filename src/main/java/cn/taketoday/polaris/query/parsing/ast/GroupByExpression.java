@@ -14,18 +14,29 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris.query.parsing;
-
-import cn.taketoday.polaris.DataAccessException;
+package cn.taketoday.polaris.query.parsing.ast;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
- * @since 1.0
+ * @since 1.0 2024/8/28 15:44
  */
-public class ParsingException extends DataAccessException {
+public class GroupByExpression implements Expression {
 
-  public ParsingException(String message) {
-    super(message);
+  public final ExpressionList groupByExpressions;
+
+  public final boolean withRollup;
+
+  public GroupByExpression(ExpressionList groupByExpressions, boolean withRollup) {
+    this.groupByExpressions = groupByExpressions;
+    this.withRollup = withRollup;
+  }
+
+  @Override
+  public String toString() {
+    if (withRollup) {
+      return "GROUP BY " + groupByExpressions + " WITH ROLLUP";
+    }
+    return "GROUP BY " + groupByExpressions;
   }
 
 }

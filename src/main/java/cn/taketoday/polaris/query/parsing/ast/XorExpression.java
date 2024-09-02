@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package cn.taketoday.polaris.query.parsing;
-
-import cn.taketoday.polaris.DataAccessException;
+package cn.taketoday.polaris.query.parsing.ast;
 
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0
  */
-public class ParsingException extends DataAccessException {
+public class XorExpression extends BinaryExpression {
 
-  public ParsingException(String message) {
-    super(message);
+  public XorExpression(Expression leftExpression, Expression rightExpression) {
+    super(leftExpression, rightExpression);
+  }
+
+  @Override
+  public String getStringExpression() {
+    return "XOR";
   }
 
 }

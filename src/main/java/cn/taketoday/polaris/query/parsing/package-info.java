@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
+/**
+ * Query statement parsing
+ *
+ * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
+ * @since 1.0 2024/8/28 14:18
+ */
+@NonNullApi
+@NonNullFields
 package cn.taketoday.polaris.query.parsing;
 
-import cn.taketoday.polaris.DataAccessException;
-
-/**
- * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
- * @since 1.0
- */
-public class ParsingException extends DataAccessException {
-
-  public ParsingException(String message) {
-    super(message);
-  }
-
-}
+import cn.taketoday.polaris.util.NonNullApi;
+import cn.taketoday.polaris.util.NonNullFields;
