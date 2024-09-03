@@ -68,6 +68,7 @@ class SelectParserTests {
                   SELECT label_id FROM article_label
                   WHERE label_id = (SELECT id FROM label WHERE name = #name)
             )
+            xor status and status
             order by update_at DESC, create_at DESC LIMIT 20""";
 
     SelectExpression expression = SelectParser.parse(sql);
@@ -189,6 +190,25 @@ class SelectParserTests {
   }
 
   @Test
+  void whereNoOperator() {
+    SelectExpression expression = SelectParser.parse("select * from article where 1");
+    assertThat(expression.select).startsWith("select * from article");
+    assertThat(expression.other).isNull();
+    assertThat(expression.where).isNotNull();
+    assertThat(expression.where.expression).isInstanceOf(LiteralExpression.class);
+    LiteralExpression literalExpression = (LiteralExpression) expression.where.expression;
+    assertThat(literalExpression.value).isEqualTo("1");
+
+    expression = SelectParser.parse("select * from article where col");
+    assertThat(expression.select).startsWith("select * from article");
+    assertThat(expression.other).isNull();
+    assertThat(expression.where).isNotNull();
+    assertThat(expression.where.expression).isInstanceOf(ColumnExpression.class);
+    ColumnExpression columnExpression = (ColumnExpression) expression.where.expression;
+    assertThat(columnExpression.name).isEqualTo("col");
+  }
+
+  @Test
   void syntaxError() {
     assertThatThrownBy(() -> SelectParser.parse("Update article set status = 1 where status = 2"))
             .isInstanceOf(ParsingException.class)
@@ -198,17 +218,9 @@ class SelectParserTests {
             .isInstanceOf(ParsingException.class)
             .hasMessage("Statement [SELECT * FROM article WHERE] @27: Where clause not found");
 
-    assertThatThrownBy(() -> SelectParser.parse("SELECT * FROM article WHERE a"))
-            .isInstanceOf(ParsingException.class)
-            .hasMessage("Statement [SELECT * FROM article WHERE a] @29: Syntax error, operator token expected");
-
     assertThatThrownBy(() -> SelectParser.parse("SELECT * FROM article WHERE 1 = 1 >"))
             .isInstanceOf(ParsingException.class)
             .hasMessage("Statement [SELECT * FROM article WHERE 1 = 1 >] @34: Syntax error");
-
-    assertThatThrownBy(() -> SelectParser.parse("SELECT * FROM article WHERE 1 not_found"))
-            .isInstanceOf(ParsingException.class)
-            .hasMessage("Statement [SELECT * FROM article WHERE 1 not_found] @30: Unsupported operator 'not_found', near : 'not_found'");
 
     assertThatThrownBy(() -> SelectParser.parse("SELECT * FROM article WHERE 1 is c"))
             .isInstanceOf(ParsingException.class)

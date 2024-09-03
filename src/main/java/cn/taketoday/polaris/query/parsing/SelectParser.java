@@ -238,23 +238,22 @@ public class SelectParser {
       // col | literal
       Expression left;
       if (columnT.isLiteral()) {
+        // where 1 = 1
         left = new LiteralExpression(columnT.stringValue());
       }
       else if (columnT.isIdentifier()) {
+        // where col = val
         left = eatColumnExpression(columnT, binary);
       }
       else {
         return null;
       }
-      Token operator = peekToken();
-      if (operator == null) {
-        throw parsingException(selectSQL.length(), "Syntax error, operator token expected");
-      }
 
       // operator
       Expression expression = maybeEatOperatorExpression(left);
       if (expression == null) {
-        throw parsingException(operator.startPos, "Unsupported operator '%s'".formatted(toString(operator)));
+        // where 1, where col
+        return left;
       }
       return expression;
     }

@@ -30,10 +30,10 @@ import cn.taketoday.polaris.util.Nullable;
  */
 public class SelectExpression implements Expression, StatementSequence {
 
-  private final String select;
+  public final String select;
 
   @Nullable
-  private final WhereExpression where;
+  public final WhereExpression where;
 
   @Nullable
   public final GroupByExpression groupBy;
@@ -42,7 +42,7 @@ public class SelectExpression implements Expression, StatementSequence {
   public final HavingExpression having;
 
   @Nullable
-  private final String other;
+  public final String other;
 
   public SelectExpression(String select, @Nullable WhereExpression where,
           @Nullable GroupByExpression groupBy, @Nullable HavingExpression having, @Nullable String other) {

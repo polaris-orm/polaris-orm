@@ -16,11 +16,16 @@
 
 package cn.taketoday.polaris.query.parsing.ast;
 
+import cn.taketoday.polaris.query.parsing.ExpressionVisitor;
+
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0 2024/8/21 15:55
  */
 public interface Expression {
 
+  default void accept(ExpressionVisitor visitor) {
+
+  }
 
 }
