@@ -25,9 +25,9 @@ import cn.taketoday.polaris.util.Nullable;
 public interface QueryHandlerFactory {
 
   @Nullable
-  QueryStatement createQuery(Object example);
+  QueryStatement createQuery(Object param);
 
   @Nullable
-  ConditionStatement createCondition(Object example);
+  ConditionStatement createCondition(Object param);
 
 }
