@@ -16,6 +16,7 @@
 
 package cn.taketoday.polaris.query.parsing.ast;
 
+import cn.taketoday.polaris.query.parsing.ExpressionVisitor;
 import cn.taketoday.polaris.util.Nullable;
 
 /**
@@ -52,6 +53,11 @@ public class LikeExpression extends BinaryExpression implements Expression {
     return leftExpression + " " + (not ? "NOT " : "")
             + type + " " + (binary ? "BINARY " : "") + rightExpression
             + (escape != null ? " ESCAPE " + escape : "");
+  }
+
+  @Override
+  public void accept(ExpressionVisitor visitor) {
+    visitor.visit(this);
   }
 
 }

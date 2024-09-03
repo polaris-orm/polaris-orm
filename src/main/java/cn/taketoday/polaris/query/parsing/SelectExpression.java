@@ -120,6 +120,11 @@ public class SelectExpression implements Expression, StatementSequence {
   }
 
   @Override
+  public void accept(ExpressionVisitor visitor) {
+    visitor.visit(this);
+  }
+
+  @Override
   public String toStatementString(Platform platform) {
     return toString();
   }

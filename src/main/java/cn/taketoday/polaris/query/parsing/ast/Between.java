@@ -16,6 +16,8 @@
 
 package cn.taketoday.polaris.query.parsing.ast;
 
+import cn.taketoday.polaris.query.parsing.ExpressionVisitor;
+
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0 2024/8/21 16:01
@@ -41,6 +43,11 @@ public class Between implements Expression {
   public String toString() {
     return leftExpression + " " + (not ? "NOT " : "") + "BETWEEN " + start
             + " AND " + end;
+  }
+
+  @Override
+  public void accept(ExpressionVisitor visitor) {
+    visitor.visit(this);
   }
 
 }

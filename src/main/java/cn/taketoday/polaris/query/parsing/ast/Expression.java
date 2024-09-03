@@ -25,7 +25,7 @@ import cn.taketoday.polaris.query.parsing.ExpressionVisitor;
 public interface Expression {
 
   default void accept(ExpressionVisitor visitor) {
-
+    visitor.visit(this);
   }
 
 }

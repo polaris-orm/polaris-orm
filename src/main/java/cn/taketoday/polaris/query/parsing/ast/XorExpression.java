@@ -16,6 +16,8 @@
 
 package cn.taketoday.polaris.query.parsing.ast;
 
+import cn.taketoday.polaris.query.parsing.ExpressionVisitor;
+
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0
@@ -31,4 +33,9 @@ public class XorExpression extends BinaryExpression {
     return "XOR";
   }
 
+  @Override
+  public void accept(ExpressionVisitor visitor) {
+    visitor.visit(this);
+  }
+  
 }

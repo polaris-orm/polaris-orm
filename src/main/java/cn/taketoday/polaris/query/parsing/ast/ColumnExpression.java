@@ -16,6 +16,8 @@
 
 package cn.taketoday.polaris.query.parsing.ast;
 
+import cn.taketoday.polaris.query.parsing.ExpressionVisitor;
+
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0 2024/8/21 11:47
@@ -40,6 +42,11 @@ public class ColumnExpression implements Expression {
       return "BINARY " + name;
     }
     return name;
+  }
+
+  @Override
+  public void accept(ExpressionVisitor visitor) {
+    visitor.visit(this);
   }
 
 }

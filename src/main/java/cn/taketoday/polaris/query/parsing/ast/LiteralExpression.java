@@ -16,6 +16,8 @@
 
 package cn.taketoday.polaris.query.parsing.ast;
 
+import cn.taketoday.polaris.query.parsing.ExpressionVisitor;
+
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0 2024/8/21 21:29
@@ -35,6 +37,11 @@ public class LiteralExpression implements Expression {
 
   public String getValue() {
     return value;
+  }
+
+  @Override
+  public void accept(ExpressionVisitor visitor) {
+    visitor.visit(this);
   }
 
 }

@@ -18,16 +18,28 @@ package cn.taketoday.polaris.query.parsing;
 
 import org.junit.jupiter.api.Test;
 
+import cn.taketoday.polaris.query.parsing.ast.AndExpression;
+import cn.taketoday.polaris.query.parsing.ast.Between;
 import cn.taketoday.polaris.query.parsing.ast.ColumnExpression;
 import cn.taketoday.polaris.query.parsing.ast.ComparisonExpression;
 import cn.taketoday.polaris.query.parsing.ast.Expression;
 import cn.taketoday.polaris.query.parsing.ast.ExpressionList;
 import cn.taketoday.polaris.query.parsing.ast.FunctionExpression;
 import cn.taketoday.polaris.query.parsing.ast.GroupByExpression;
+import cn.taketoday.polaris.query.parsing.ast.HashParameter;
 import cn.taketoday.polaris.query.parsing.ast.HavingExpression;
+import cn.taketoday.polaris.query.parsing.ast.InExpression;
+import cn.taketoday.polaris.query.parsing.ast.IndexParameter;
+import cn.taketoday.polaris.query.parsing.ast.IsNullExpression;
+import cn.taketoday.polaris.query.parsing.ast.LikeExpression;
 import cn.taketoday.polaris.query.parsing.ast.LiteralExpression;
+import cn.taketoday.polaris.query.parsing.ast.NamedParameter;
+import cn.taketoday.polaris.query.parsing.ast.OrExpression;
 import cn.taketoday.polaris.query.parsing.ast.ParenExpression;
+import cn.taketoday.polaris.query.parsing.ast.VariableRef;
 import cn.taketoday.polaris.query.parsing.ast.WhereExpression;
+import cn.taketoday.polaris.query.parsing.ast.XorExpression;
+import cn.taketoday.polaris.util.Nullable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -74,8 +86,12 @@ class SelectParserTests {
     SelectExpression expression = SelectParser.parse(sql);
 
     String render = expression.render();
-
     System.out.println(render);
+
+    ToStringVisitor visitor = new ToStringVisitor();
+    expression.accept(visitor);
+
+    System.out.println(visitor);
   }
 
   @Test
@@ -228,4 +244,238 @@ class SelectParserTests {
 
   }
 
+  @Test
+  void visitor() {
+    ToStringVisitor visitor = new ToStringVisitor();
+    var selectExpr = SelectParser.parse("select * from article where id = 1 and name = 'n' ");
+
+    selectExpr.accept(visitor);
+
+    System.out.println(visitor.buffer);
+  }
+
+  static class ToStringVisitor implements ExpressionVisitor {
+
+    final StringBuilder buffer = new StringBuilder();
+
+    @Override
+    public String toString() {
+      return buffer.toString();
+    }
+
+    @Override
+    public void visit(Between between) {
+      between.leftExpression.accept(this);
+      if (between.not) {
+        buffer.append(" NOT");
+      }
+      buffer.append(" BETWEEN");
+
+      between.start.accept(this);
+      buffer.append(" AND");
+      between.end.accept(this);
+    }
+
+    @Override
+    public void visit(ColumnExpression column) {
+      if (column.binary) {
+        buffer.append(" BINARY");
+      }
+      buffer.append(' ');
+      buffer.append(column.name);
+    }
+
+    @Override
+    public void visit(ComparisonExpression comparison) {
+      comparison.leftExpression.accept(this);
+      buffer.append(' ');
+      buffer.append(comparison.operator);
+      buffer.append(' ');
+      comparison.rightExpression.accept(this);
+    }
+
+    @Override
+    public void visit(String expression) {
+      buffer.append(expression);
+    }
+
+    @Override
+    public void visit(ExpressionList expressionList) {
+      boolean comma = false;
+      for (Expression expression : expressionList.expressions) {
+        if (comma) {
+          buffer.append(",");
+        }
+        else {
+          comma = true;
+        }
+        expression.accept(this);
+      }
+    }
+
+    @Override
+    public void visit(FunctionExpression function) {
+      if (function.binary) {
+        buffer.append(" BINARY");
+      }
+      buffer.append(' ');
+      buffer.append(function.name);
+      function.args.accept(this);
+    }
+
+    @Override
+    public void visit(GroupByExpression groupBy) {
+      buffer.append(" GROUP BY");
+      visit(groupBy.groupByExpressions);
+      if (groupBy.withRollup) {
+        buffer.append(" WITH ROLLUP");
+      }
+    }
+
+    @Override
+    public void visit(HavingExpression having) {
+      buffer.append(" HAVING");
+      having.expression.accept(this);
+    }
+
+    @Override
+    public void visit(IndexParameter indexParameter) {
+      buffer.append(" ?");
+    }
+
+    @Override
+    public void visit(InExpression inExpression) {
+      inExpression.leftExpression.accept(this);
+
+      if (inExpression.not) {
+        buffer.append(" NOT");
+      }
+      buffer.append(" IN");
+
+      inExpression.parenExpression.accept(this);
+    }
+
+    @Override
+    public void visit(IsNullExpression isNullExpression) {
+      isNullExpression.leftExpression.accept(this);
+
+      buffer.append(" IS");
+
+      if (isNullExpression.not) {
+        buffer.append(" NOT");
+      }
+
+      buffer.append(" NULL");
+    }
+
+    @Override
+    public void visit(LikeExpression likeExpression) {
+      likeExpression.leftExpression.accept(this);
+
+      if (likeExpression.not) {
+        buffer.append(" NOT");
+      }
+      buffer.append(likeExpression.type);
+
+      if (likeExpression.binary) {
+        buffer.append(" BINARY");
+      }
+
+      likeExpression.rightExpression.accept(this);
+
+      if (likeExpression.escape != null) {
+        buffer.append(" ESCAPE ");
+        buffer.append(likeExpression.escape);
+      }
+    }
+
+    @Override
+    public void visit(LiteralExpression literal) {
+      buffer.append(literal.value);
+    }
+
+    @Override
+    public void visit(ParenExpression paren) {
+      buffer.append(" (");
+      paren.expression.accept(this);
+      buffer.append(')');
+    }
+
+    @Override
+    public void visit(HashParameter hash) {
+      buffer.append(" #");
+      buffer.append(hash.name);
+
+      appendArrayIndex(hash.arrayIndex);
+    }
+
+    @Override
+    public void visit(NamedParameter named) {
+      buffer.append(" :");
+      buffer.append(named.name);
+
+      appendArrayIndex(named.arrayIndex);
+    }
+
+    private void appendArrayIndex(@Nullable Integer arrayIndex) {
+      if (arrayIndex != null) {
+        buffer.append('[')
+                .append(arrayIndex)
+                .append(']');
+      }
+    }
+
+    @Override
+    public void visit(VariableRef variableRef) {
+      buffer.append(" @");
+      buffer.append(variableRef.name);
+
+      appendArrayIndex(variableRef.arrayIndex);
+    }
+
+    @Override
+    public void visit(WhereExpression whereExpression) {
+      buffer.append(" WHERE");
+      whereExpression.expression.accept(this);
+    }
+
+    @Override
+    public void visit(AndExpression andExpression) {
+      andExpression.leftExpression.accept(this);
+      buffer.append(" AND");
+      andExpression.rightExpression.accept(this);
+    }
+
+    @Override
+    public void visit(OrExpression orExpression) {
+      orExpression.leftExpression.accept(this);
+      buffer.append(" OR");
+      orExpression.rightExpression.accept(this);
+    }
+
+    @Override
+    public void visit(XorExpression xorExpression) {
+      xorExpression.leftExpression.accept(this);
+      buffer.append(" XOR");
+      xorExpression.rightExpression.accept(this);
+    }
+
+    @Override
+    public void visit(SelectExpression select) {
+      visit(select.select);
+
+      if (select.where != null) {
+        visit(select.where);
+      }
+      if (select.groupBy != null) {
+        select.groupBy.accept(this);
+      }
+      if (select.having != null) {
+        select.having.accept(this);
+      }
+      if (select.other != null) {
+        visit(select.other);
+      }
+    }
+  }
 }

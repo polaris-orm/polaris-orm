@@ -16,6 +16,7 @@
 
 package cn.taketoday.polaris.query.parsing.ast;
 
+import cn.taketoday.polaris.query.parsing.ExpressionVisitor;
 import cn.taketoday.polaris.util.Nullable;
 
 /**
@@ -40,6 +41,11 @@ public class NamedParameter implements Expression {
       return ":%s[%d]".formatted(name, arrayIndex);
     }
     return ":" + name;
+  }
+
+  @Override
+  public void accept(ExpressionVisitor visitor) {
+    visitor.visit(this);
   }
 
 }

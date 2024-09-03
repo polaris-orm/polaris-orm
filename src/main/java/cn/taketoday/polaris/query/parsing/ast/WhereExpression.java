@@ -16,6 +16,8 @@
 
 package cn.taketoday.polaris.query.parsing.ast;
 
+import cn.taketoday.polaris.query.parsing.ExpressionVisitor;
+
 /**
  * @author <a href="https://github.com/TAKETODAY">海子 Yang</a>
  * @since 1.0 2024/8/20 22:55
@@ -38,4 +40,10 @@ public class WhereExpression implements Expression {
     selectSQL.append("WHERE ")
             .append(expression);
   }
+
+  @Override
+  public void accept(ExpressionVisitor visitor) {
+    visitor.visit(this);
+  }
+
 }
