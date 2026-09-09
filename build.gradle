@@ -9,7 +9,7 @@ description = "Polaris is Java ORM framework"
 
 apply plugin: 'jacoco'
 apply plugin: "java-test-fixtures"
-apply plugin: 'cn.taketoday.application'
+apply plugin: 'infra.application'
 apply plugin: 'cn.taketoday.build.conventions'
 apply plugin: 'cn.taketoday.build.optional-dependencies'
 
