@@ -10,7 +10,7 @@ Polaris 是一个 Java ORM 框架
 [![Coverage Status](https://coveralls.io/repos/github/polaris-orm/polaris-orm/badge.svg?branch=main)](https://coveralls.io/github/polaris-orm/polaris-orm?branch=main)
 
 
-本项目是 [TAKETODAY/today-infrastructure/today-jdbc](https://github.com/TAKETODAY/today-infrastructure/tree/master/today-jdbc) 的一个分支。**欢迎大家贡献代码**
+本项目是 [TAKETODAY/today-infrastructure/infra-jdbc](https://github.com/TAKETODAY/today-infrastructure/tree/master/infra-jdbc) 的一个分支。**欢迎大家贡献代码**
 
 ## 特点
 
