@@ -18,6 +18,7 @@ package cn.taketoday.polaris;
 
 import org.junit.jupiter.api.Test;
 
+import cn.taketoday.polaris.annotation.EntityRef;
 import cn.taketoday.polaris.model.UserModel;
 
 import static org.assertj.core.api.Assertions.assertThat;
