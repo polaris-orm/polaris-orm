@@ -80,6 +80,16 @@ class Tokenizer {
           case '.' -> pushCharToken(TokenKind.DOT);
           case ',' -> pushCharToken(TokenKind.COMMA);
           case '*' -> pushCharToken(TokenKind.STAR);
+          case '/' -> pushCharToken(TokenKind.SLASH);
+          case '%' -> pushCharToken(TokenKind.PERCENT);
+          case '!' -> {
+            if (charsToProcess[this.pos + 1] == '=') {
+              pushPairToken(TokenKind.NE);
+            }
+            else {
+              pushCharToken(TokenKind.BANG);
+            }
+          }
           case '(' -> pushCharToken(TokenKind.LPAREN);
           case ')' -> pushCharToken(TokenKind.RPAREN);
           case '[' -> pushCharToken(TokenKind.LSQUARE);
@@ -97,7 +107,10 @@ class Tokenizer {
             }
           }
           case '<' -> {
-            if (isTwoCharToken(TokenKind.LE)) {
+            if (isThreeCharToken(TokenKind.NULL_SAFE_EQ)) {
+              pushTripleToken(TokenKind.NULL_SAFE_EQ);
+            }
+            else if (isTwoCharToken(TokenKind.LE)) {
               pushPairToken(TokenKind.LE);
             }
             else if (isTwoCharToken(TokenKind.NE)) {
@@ -364,6 +377,16 @@ class Tokenizer {
   }
 
   /**
+   * Check if this might be a three character token.
+   */
+  private boolean isThreeCharToken(TokenKind kind) {
+    return (kind.tokenChars.length == 3 &&
+            this.charsToProcess[this.pos] == kind.tokenChars[0] &&
+            this.charsToProcess[this.pos + 1] == kind.tokenChars[1] &&
+            this.charsToProcess[this.pos + 2] == kind.tokenChars[2]);
+  }
+
+  /**
    * Push a token of just one character in length.
    */
   private void pushCharToken(TokenKind kind) {
@@ -377,6 +400,14 @@ class Tokenizer {
   private void pushPairToken(TokenKind kind) {
     this.tokens.add(new Token(kind, this.pos, this.pos + 2));
     this.pos += 2;
+  }
+
+  /**
+   * Push a token of three characters in length.
+   */
+  private void pushTripleToken(TokenKind kind) {
+    this.tokens.add(new Token(kind, this.pos, this.pos + 3));
+    this.pos += 3;
   }
 
   // ID: ('a'..'z'|'A'..'Z'|'_'|'$') ('a'..'z'|'A'..'Z'|'_'|'$'|'0'..'9'|DOT_ESCAPED)*;

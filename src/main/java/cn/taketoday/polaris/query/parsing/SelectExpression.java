@@ -55,38 +55,7 @@ public class SelectExpression implements Expression, StatementSequence {
 
   @Override
   public String toString() {
-    if (where != null) {
-      if (groupBy != null) {
-        if (having != null) {
-          if (other != null) {
-            return select + " " + where + " " + groupBy + " " + having + " " + other;
-          }
-          return select + " " + where + " " + groupBy + " " + having;
-        }
-        if (other != null) {
-          return select + " " + where + " " + groupBy + " " + other;
-        }
-        return select + " " + where + " " + groupBy;
-      }
-
-      if (other != null) {
-        return select + " " + where + " " + other;
-      }
-      return select + " " + where;
-    }
-    else if (groupBy != null) {
-      if (having != null) {
-        if (other != null) {
-          return select + " " + groupBy + " " + having + " " + other;
-        }
-        return select + " " + groupBy + " " + having;
-      }
-      if (other != null) {
-        return select + " " + groupBy + " " + other;
-      }
-      return select + " " + groupBy;
-    }
-    return select;
+    return render();
   }
 
   public String getSelect() {
@@ -112,10 +81,26 @@ public class SelectExpression implements Expression, StatementSequence {
   public void render(StringBuilder selectSQL) {
     selectSQL.append(select);
     if (where != null) {
+      appendSeparator(selectSQL);
       where.render(selectSQL);
     }
-    if (other != null) {
-      selectSQL.append(" ").append(other);
+    if (groupBy != null) {
+      appendSeparator(selectSQL);
+      selectSQL.append(groupBy);
+    }
+    if (having != null) {
+      appendSeparator(selectSQL);
+      selectSQL.append(having);
+    }
+    if (other != null && !other.isEmpty()) {
+      appendSeparator(selectSQL);
+      selectSQL.append(other);
+    }
+  }
+
+  private static void appendSeparator(StringBuilder builder) {
+    if (!builder.isEmpty() && !Character.isWhitespace(builder.codePointBefore(builder.length()))) {
+      builder.append(' ');
     }
   }
 

@@ -74,6 +74,14 @@ enum TokenKind {
 
   NE("<>"),
 
+  NULL_SAFE_EQ("<=>"),
+
+  SLASH("/"),
+
+  PERCENT("%"),
+
+  BANG("!"),
+
   VARIABLE_REF("@");
 
   final char[] tokenChars;

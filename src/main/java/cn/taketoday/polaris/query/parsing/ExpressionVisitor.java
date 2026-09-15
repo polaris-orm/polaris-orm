@@ -17,9 +17,11 @@
 package cn.taketoday.polaris.query.parsing;
 
 import cn.taketoday.polaris.query.parsing.ast.AndExpression;
+import cn.taketoday.polaris.query.parsing.ast.ArithmeticExpression;
 import cn.taketoday.polaris.query.parsing.ast.Between;
 import cn.taketoday.polaris.query.parsing.ast.ColumnExpression;
 import cn.taketoday.polaris.query.parsing.ast.ComparisonExpression;
+import cn.taketoday.polaris.query.parsing.ast.ExistsExpression;
 import cn.taketoday.polaris.query.parsing.ast.Expression;
 import cn.taketoday.polaris.query.parsing.ast.ExpressionList;
 import cn.taketoday.polaris.query.parsing.ast.FunctionExpression;
@@ -28,12 +30,15 @@ import cn.taketoday.polaris.query.parsing.ast.HashParameter;
 import cn.taketoday.polaris.query.parsing.ast.HavingExpression;
 import cn.taketoday.polaris.query.parsing.ast.InExpression;
 import cn.taketoday.polaris.query.parsing.ast.IndexParameter;
+import cn.taketoday.polaris.query.parsing.ast.IsExpression;
 import cn.taketoday.polaris.query.parsing.ast.IsNullExpression;
 import cn.taketoday.polaris.query.parsing.ast.LikeExpression;
 import cn.taketoday.polaris.query.parsing.ast.LiteralExpression;
 import cn.taketoday.polaris.query.parsing.ast.NamedParameter;
+import cn.taketoday.polaris.query.parsing.ast.NotExpression;
 import cn.taketoday.polaris.query.parsing.ast.OrExpression;
 import cn.taketoday.polaris.query.parsing.ast.ParenExpression;
+import cn.taketoday.polaris.query.parsing.ast.UnaryExpression;
 import cn.taketoday.polaris.query.parsing.ast.VariableRef;
 import cn.taketoday.polaris.query.parsing.ast.WhereExpression;
 import cn.taketoday.polaris.query.parsing.ast.XorExpression;
@@ -52,6 +57,10 @@ public interface ExpressionVisitor {
 
   }
 
+  default void visit(ArithmeticExpression arithmeticExpression) {
+
+  }
+
   default void visit(ColumnExpression column) {
 
   }
@@ -65,6 +74,10 @@ public interface ExpressionVisitor {
   }
 
   default void visit(ExpressionList expressionList) {
+
+  }
+
+  default void visit(ExistsExpression exists) {
 
   }
 
@@ -96,6 +109,10 @@ public interface ExpressionVisitor {
 
   }
 
+  default void visit(IsExpression isExpression) {
+
+  }
+
   default void visit(LikeExpression likeExpression) {
 
   }
@@ -108,11 +125,19 @@ public interface ExpressionVisitor {
 
   }
 
+  default void visit(NotExpression notExpression) {
+
+  }
+
   default void visit(OrExpression orExpression) {
 
   }
 
   default void visit(ParenExpression paren) {
+
+  }
+
+  default void visit(UnaryExpression unaryExpression) {
 
   }
 
